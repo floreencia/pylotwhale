@@ -1,0 +1,122 @@
+#!/usr/bin/python
+
+import pylab as pl
+import numpy as np
+import os
+
+sys.path.append('/home/florencia/whales/scripts/')
+import pcaO
+
+#import scikits.audiolab as al
+
+
+def pcaCalcs(fileN, sRate=192000, plBasis = 1, plWeights = 1):
+
+    '''
+    plots the average of the variance keept by the k-th PC
+    
+    fileN = ceps file (cols)time x ceps
+    
+    '''
+    cepsM = np.loadtxt(fileN).T # time runns horizontally
+    baseN = os.path.splitext(fileN)[0]
+    print baseN
+   
+    N = len(cepsM.T) #time points
+    tf = N/(1.0*sRate)
+    
+    pca = pcaO.pca0mean(cepsM.T) # vertical time
+
+    if(plBasis):
+        Tmatrix = pca.vectors()
+        
+        fig = pl.figure(figsize=(6,5))
+        ax = fig.add_subplot(111)
+        cax = pl.imshow(Tmatrix, extent=[1,128,1,128], interpolation = 'nearest', aspect ='auto')
+        
+        ax.set_xlabel( 'PC vector', fontsize=16 )
+        ax.set_ylabel( 'cepstral coefficient ', fontsize=16 )
+        ax.tick_params(axis='both', labelsize='x-large')  #set_xticks(ticks, fontsize=24)
+    
+        outF = baseN+"PCweihgts-.png"
+        print outF
+        pl.savefig(outF)
+
+
+   if(plWeights):
+       
+       wei = pca.weights()
+       denom = weights.sum()
+
+       for i in np.arange(1,len(vec)):
+           wei[i] = wei[i] + wei[i-1]
+           #print vec[i]for i in np.arange(1,len(vec)):
+
+       wei  /= denom # normalize
+
+
+
+    #outC = baseN+"PCvecs-.png"
+
+
+
+
+ 
+        fig = pl.figure(figsize=(6,5))
+        ax = fig.add_subplot(111)
+        cax = pl.imshow(Tmatrix, extent=[0,128,0,128], interpolation = 'nearest', aspect ='auto')
+        
+        ax.set_xlabel( 'PC vector', fontsize=16 )
+        ax.set_ylabel( 'cepstral coefficient ', fontsize=16 )
+        ax.tick_params(axis='both', labelsize='x-large')  #set_xticks(ticks, fontsize=24)
+        pl.savefig(outF)
+    
+    outF = cepsF+"-PCTmatrixZoom0-10.png"
+    print outF
+
+
+
+
+
+Tmatrix = pca.vectors()
+weights = pca.weights()
+                      
+fig = pl.figure(figsize=(2,5))
+ax = fig.add_subplot(111)
+cax = pl.imshow(Tmatrix, extent=[1,128,1000*qf,0], interpolation = 'nearest', aspect ='auto')
+fig.colorbar(cax)
+#labels
+
+pl.xlim(0,10)
+pl.ylim(0.6,0)
+pl.savefig(outF)
+
+
+
+
+
+    fig = pl.figure(figsize=(6,5))
+    ax = fig.add_subplot(111)
+    cax = pl.imshow(atPCbasis, interpolation = 'nearest', extent=[0,tf,1,128], aspect = 'auto', origin='auto')
+    pl.ylim(1,yM)
+
+    # cbar
+    ax.set_xlabel( 'time [s] ', fontsize=16 )
+    ax.set_ylabel( 'principal component', fontsize=16 )
+
+    # Set x ticks
+    pl.yticks(np.linspace(1,yM,yM,endpoint=True))
+
+    #ya = ax.get_yaxis()
+    #ya.set_major_locator(MaxNLocator(integer=True))
+
+    ax.tick_params(axis='both', labelsize='x-large')  #set_xticks(ticks, fontsize=24)
+    m = atPCbasis.min()
+    M = atPCbasis.max()
+    cbar = fig.colorbar(cax, ticks=[m, M])
+    cbar.ax.set_yticklabels(['%.0f'%m, '%.0f'%M], size='x-large')# vertically oriented co 
+  
+    pl.savefig(outF) 
+
+
+

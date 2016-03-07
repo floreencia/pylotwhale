@@ -1,0 +1,16 @@
+###################################################
+#    Modify these variables as per need
+###################################################
+
+# Directory where the music dataset is located (GTZAN dataset)
+GENRE_DIR = "/home/florencia/profesjonell/ml/datasets/genres/wav"
+
+# Directory where the test music is located
+TEST_DIR = "/home/florencia/whales/data/mySamples/human/music_speech/music"
+
+# All the available genres
+GENRE_LIST = [ "blues","jazz","metal","pop","rock", "pop", "classical", "metal", "reggae", "country"]
+
+# Working with these genres
+#GENRE_LIST = [ "blues","jazz","metal","pop","rock"]
+

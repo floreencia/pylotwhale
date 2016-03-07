@@ -1,0 +1,60 @@
+0000000000000000000000000000000000000000 98990ea1a0115c90e06d216ca1bac804e8b341ee floreencia <flo@nld.ds.mpg.de> 1439062428 +0200	commit (initial): train feature extraction
+98990ea1a0115c90e06d216ca1bac804e8b341ee 0ce51049c2b139fdcb9ecb1171e7670aadec6a16 floreencia <flo@nld.ds.mpg.de> 1439135519 +0200	commit: svc classifier script
+0ce51049c2b139fdcb9ecb1171e7670aadec6a16 0573ae38bd6f8d9e0b0b52422d3acfcd762f0d38 floreencia <flo@nld.ds.mpg.de> 1439215475 +0200	commit: controlable output -o added
+0573ae38bd6f8d9e0b0b52422d3acfcd762f0d38 0573ae38bd6f8d9e0b0b52422d3acfcd762f0d38 floreencia <flo@nld.ds.mpg.de> 1439216450 +0200	checkout: moving from master to newFeature
+0573ae38bd6f8d9e0b0b52422d3acfcd762f0d38 bd9fd7f736762ae6e594ecb6293f6f66b114881e floreencia <flo@nld.ds.mpg.de> 1439245929 +0200	commit: iterkey added
+bd9fd7f736762ae6e594ecb6293f6f66b114881e ed552ce090f2a148b18c52215e4e36150e3d65fe floreencia <flo@nld.ds.mpg.de> 1439248174 +0200	commit: output realative to the wDir (working dir) varieble
+ed552ce090f2a148b18c52215e4e36150e3d65fe f2d69ab90b95187c63775f22e5b44d6a61a1cd3b floreencia <flo@nld.ds.mpg.de> 1439248202 +0200	commit (amend): output realative to the wDir (working dir) variable
+f2d69ab90b95187c63775f22e5b44d6a61a1cd3b 167a2c96ae3734ad355de3ba4c0b7d83a40508f5 floreencia <flo@nld.ds.mpg.de> 1439298561 +0200	commit: sarah's meeting
+167a2c96ae3734ad355de3ba4c0b7d83a40508f5 04edf176dbb78aefc7838040ca51a13ebcd48a18 floreencia <flo@nld.ds.mpg.de> 1439465282 +0200	commit: spectrum as default features
+04edf176dbb78aefc7838040ca51a13ebcd48a18 be3c07bdb32b07176b8d2ac6672f68f4e59d37fe floreencia <flo@nld.ds.mpg.de> 1439468036 +0200	commit: +comments
+be3c07bdb32b07176b8d2ac6672f68f4e59d37fe 362239a3f6dfe25fa3f0cf7a9bc34da66d84914f floreencia <flo@nld.ds.mpg.de> 1439823515 +0200	commit: parser help eddited
+362239a3f6dfe25fa3f0cf7a9bc34da66d84914f 5a1c9abdb4e0c64c29f2c76042fd3fd0313061cf floreencia <flo@nld.ds.mpg.de> 1439829781 +0200	commit: bugfix testWs parameter added to test and prediction sets
+5a1c9abdb4e0c64c29f2c76042fd3fd0313061cf 540332317bbb5334e278d677537dad8c6fb96d0b floreencia <flo@nld.ds.mpg.de> 1439911005 +0200	commit: predicted anotations and plots for train and test sets added
+540332317bbb5334e278d677537dad8c6fb96d0b 83083c46c6fc4153934a0b33b73b4af9089f2079 floreencia <flo@nld.ds.mpg.de> 1439915906 +0200	commit: +print score in test plots +generate annotations of the whatever sections specified in the train set
+83083c46c6fc4153934a0b33b73b4af9089f2079 a0ac09a841e1ecdc6ca611f747af0b155b68c2fe floreencia <flo@nld.ds.mpg.de> 1440698589 +0200	commit: normalized waveform reading of the prediction set + comments
+a0ac09a841e1ecdc6ca611f747af0b155b68c2fe 34093301976ce3b075df754767654ecaef95a191 floreencia <flo@nld.ds.mpg.de> 1440754643 +0200	commit: class frequecies added to summary file printing
+34093301976ce3b075df754767654ecaef95a191 afea7016df0c996611c971eb7fc2ab2627801cb5 floreencia <flo@nld.ds.mpg.de> 1440776377 +0200	commit: +-summary file switch changed to boolean +plots and annotations switch added to prediction sets
+afea7016df0c996611c971eb7fc2ab2627801cb5 62be022e7208d5ef6f24e4b065277746bc11b6a8 floreencia <flo@nld.ds.mpg.de> 1440789236 +0200	commit: absolute path -> relative path
+62be022e7208d5ef6f24e4b065277746bc11b6a8 7f9035d8f6085d9d47fa03d040f020ed7ac85159 floreencia <flo@nld.ds.mpg.de> 1440869869 +0200	commit: textureWinSz default -> 0.2 + comments added to iterfile printing + clsStr : str w/ info about the classes
+7f9035d8f6085d9d47fa03d040f020ed7ac85159 bdbb2ecfda13fd27ba5651285b1796f9906d2c00 floreencia <flo@nld.ds.mpg.de> 1443022749 +0200	commit: wav file collection input added for predicting annotations
+bdbb2ecfda13fd27ba5651285b1796f9906d2c00 348629917f929c0aae557fcdabecd56614ef07c5 floreencia <flo@nld.ds.mpg.de> 1443112286 +0200	commit: argparser text reordered, outArgs added + wavAnnPairsFi added
+348629917f929c0aae557fcdabecd56614ef07c5 7428150896d85839918993ce4a263d74f349d2c5 floreencia <flo@nld.ds.mpg.de> 1447771992 +0100	commit: computeFeatures added to featureExtraction
+7428150896d85839918993ce4a263d74f349d2c5 4c37588f120a7a73e29d9451309f693603ccb5f6 floreencia <flo@nld.ds.mpg.de> 1447781021 +0100	commit: read file functions separated from compute and save features
+4c37588f120a7a73e29d9451309f693603ccb5f6 4b9fe8cda961612073c4e00cfd14fde9e9073a84 floreencia <flo@nld.ds.mpg.de> 1447788616 +0100	commit: readFeaturesFileList2Xy + read columns ignoring comments - lines starting with "#" + prints commented + .npy extension added to index file
+4b9fe8cda961612073c4e00cfd14fde9e9073a84 03f31bedbcbcfefced0402a68dc26252be3b25aa floreencia <flo@nld.ds.mpg.de> 1447868286 +0100	commit: addColParsingCol added and importing was modified
+03f31bedbcbcfefced0402a68dc26252be3b25aa c4f4c1dc9358ac10ffa3f678077d4b39aa8998dd floreencia <flo@nld.ds.mpg.de> 1448362700 +0100	commit: function txt2WavAnnCollectionList to read the columns of a file into a collectio removed
+c4f4c1dc9358ac10ffa3f678077d4b39aa8998dd 440aafdf9bb3bb532c759f25bbb05bba788d3a33 floreencia <flo@nld.ds.mpg.de> 1448379074 +0100	commit: wavFeatureExtraction class for wav feature extraction added and wavAnnCollection2datXy for getting wav features ready to use
+440aafdf9bb3bb532c759f25bbb05bba788d3a33 36d5f805503fa90d7dad66b7961a0372fa65bbd6 floreencia <flo@nld.ds.mpg.de> 1448446834 +0100	commit: tuple-->list at readCols
+36d5f805503fa90d7dad66b7961a0372fa65bbd6 585ed7aa090ce9a73c7d45dc68175f44070507da floreencia <flo@nld.ds.mpg.de> 1448469013 +0100	commit: predictionTools.py added
+585ed7aa090ce9a73c7d45dc68175f44070507da e970aa4378b39fdd705a8c538d30f43fb8c98c39 floreencia <flo@nld.ds.mpg.de> 1448654483 +0100	commit: plconplConfusionMatrix added
+e970aa4378b39fdd705a8c538d30f43fb8c98c39 e9ee38850ba9f6de797cdbd486b5b737eed303b2 floreencia <flo@nld.ds.mpg.de> 1449255387 +0100	commit: prediction probabilities added to pred
+e9ee38850ba9f6de797cdbd486b5b737eed303b2 8a987fabfd761f285b0f5129d24436001ec5df09 floreencia <flo@nld.ds.mpg.de> 1449257085 +0100	commit: loadAndFlattenX and readFeaturesFileList2Xy shape dilema solved
+8a987fabfd761f285b0f5129d24436001ec5df09 7f08a4fb6a2255f7bd9fa8608a0cc77042741411 floreencia <flo@nld.ds.mpg.de> 1449267789 +0100	commit: wavAnn2sectionsXy added + comments@readFeaturesFileList2Xy() + class wavFeatureExtraction splited into _.walk and _.split
+7f08a4fb6a2255f7bd9fa8608a0cc77042741411 e8a30f20e0dba679182ab0756609df243b484b3c floreencia <flo@nld.ds.mpg.de> 1449340016 +0100	commit: wavAnnCollection2featureFiles: comments + featExtFun checkup changed ; + predictAndWrite: name changed for predictFeatureCollectionAndWrite; + predictAnnotationSections for writting predictions on annotated recording added
+e8a30f20e0dba679182ab0756609df243b484b3c 65ebe337e117d0e3106daca750613612c72c2551 floreencia <flo@nld.ds.mpg.de> 1449340115 +0100	commit: comments added
+65ebe337e117d0e3106daca750613612c72c2551 1f8b3dc329b4a8d0dd885043a4bdda0430b3a42b floreencia <flo@nld.ds.mpg.de> 1449341832 +0100	commit: wavAnnCollection2featureFiles modified
+1f8b3dc329b4a8d0dd885043a4bdda0430b3a42b eaf23d9762f438225a984510a26087ab8ed69730 floreencia <flo@nld.ds.mpg.de> 1451602726 -0800	commit: wavAnn2sectionsXy_ensemble added
+eaf23d9762f438225a984510a26087ab8ed69730 4395cb7090fd0b1c9812fa70bf454b944839e04f floreencia <flo@nld.ds.mpg.de> 1455212695 +0100	commit: pip installable + MLtools_beta added
+4395cb7090fd0b1c9812fa70bf454b944839e04f d44b41218022803fade157650210da2802d93500 floreencia <flo@nld.ds.mpg.de> 1455291199 +0100	commit: pip installable paths
+d44b41218022803fade157650210da2802d93500 5fac35e427835d4b1c8a478883e506bea9610929 floreencia <flo@nld.ds.mpg.de> 1455292768 +0100	commit: wav preprocessing added to wavAnnCollection2datXy
+5fac35e427835d4b1c8a478883e506bea9610929 44ba1470a12bc6c3dc6179263f2e19bb290a83d9 floreencia <flo@nld.ds.mpg.de> 1455370744 +0100	commit: chose features added
+44ba1470a12bc6c3dc6179263f2e19bb290a83d9 30bb5dc241a85c9dcf082fbd78643a7b11c6cdc0 floreencia <flo@nld.ds.mpg.de> 1455557377 +0100	commit: commenst added to datXy
+30bb5dc241a85c9dcf082fbd78643a7b11c6cdc0 7e8e1967a1b3e44fb6473f3cdc4ce1439cdfcdc0 floreencia <flo@nld.ds.mpg.de> 1455637741 +0100	commit: y_labels --> y_names + datXy class modified
+7e8e1967a1b3e44fb6473f3cdc4ce1439cdfcdc0 bfd6d8a0fc2adb4559f91d8e9d60070aca2e16f1 floreencia <flo@nld.ds.mpg.de> 1455641761 +0100	commit: le added to print scores
+bfd6d8a0fc2adb4559f91d8e9d60070aca2e16f1 63c1fceeee65511f519244df8bd36e0840a1ead9 floreencia <flo@nld.ds.mpg.de> 1455642071 +0100	commit: datXy --> datXy_names
+63c1fceeee65511f519244df8bd36e0840a1ead9 d91d5822b59bbea6a7f5ebe0adb1e5fe6a09882c floreencia <flo@nld.ds.mpg.de> 1455724887 +0100	commit: f --> out_file and other fixes in chooseFeatures.py, _Labelencoder subclass and myLabelEncoder class created at myML
+d91d5822b59bbea6a7f5ebe0adb1e5fe6a09882c 7ba431c1dd0991d98fabb194bf3a3e29c3f0fe5e floreencia <flo@nld.ds.mpg.de> 1455725390 +0100	commit: fitLabelEncoder --> labelTransformer + le --> lt
+7ba431c1dd0991d98fabb194bf3a3e29c3f0fe5e 38d70b8808a5465650a62973a636c71fdad0aa74 floreencia <flo@nld.ds.mpg.de> 1456174223 +0100	commit: clfScoresO object added
+38d70b8808a5465650a62973a636c71fdad0aa74 e71efc2535ddfa3f97f93fa1c01dce5033262d8a floreencia <flo@nld.ds.mpg.de> 1456241995 +0100	commit: chooseFeatures.py added
+e71efc2535ddfa3f97f93fa1c01dce5033262d8a ae1a8b3523af4568190cf28f139471b2a7f9134d floreencia <flo@nld.ds.mpg.de> 1456242201 +0100	commit: file_close --> end
+ae1a8b3523af4568190cf28f139471b2a7f9134d 6bfbfcfaed6145620b27f38bbbb8c237d3379bd0 floreencia <flo@nld.ds.mpg.de> 1456249748 +0100	commit: scores2str added to scoresO
+6bfbfcfaed6145620b27f38bbbb8c237d3379bd0 ebca7038dd935282d04f6b7f4b5b9aa39750f3f0 floreencia <flo@nld.ds.mpg.de> 1456263742 +0100	commit: printing format changed atchooseFeatures.py
+ebca7038dd935282d04f6b7f4b5b9aa39750f3f0 6e2a514e1e5f21a213c75bd9c3900c2516136753 floreencia <flo@nld.ds.mpg.de> 1456319689 +0100	commit: le --> lt in predictionTools.py
+6e2a514e1e5f21a213c75bd9c3900c2516136753 d2941d9e7f1f517bb184d5da5bd227b3b6532dfb floreencia <flo@nld.ds.mpg.de> 1456324511 +0100	commit: gridSearch_clfStr removed from chooseFeatures.py
+d2941d9e7f1f517bb184d5da5bd227b3b6532dfb fde25860da93f06cf7427cdcec44043d3f96b6e9 floreencia <flo@nld.ds.mpg.de> 1456338055 +0100	commit: end time added to chooseFeatures.py
+fde25860da93f06cf7427cdcec44043d3f96b6e9 cc2249323d747464abdea555146b311cfd1ccdba floreencia <flo@nld.ds.mpg.de> 1456338151 +0100	commit: end time added to chooseFeatures.py
+cc2249323d747464abdea555146b311cfd1ccdba c4f204acecda2c9efe1d0ef90d3c4f4912132e20 floreencia <flo@nld.ds.mpg.de> 1456339332 +0100	commit: plCM added to chooseFeatures.py, comment garbage removed
+c4f204acecda2c9efe1d0ef90d3c4f4912132e20 6410cf068e2f939e5019c37dfe876a7d27f7ab33 floreencia <flo@nld.ds.mpg.de> 1456742978 +0100	commit: bestCVScoresfromGridSearch added to get cv scores from gridsearch obj
+6410cf068e2f939e5019c37dfe876a7d27f7ab33 a23a6700bf40558dbe2ee620a94d0aa6dbfc2ab0 floreencia <flo@nld.ds.mpg.de> 1456742993 +0100	commit: bestCVScoresfromGridSearch added to get cv scores from gridsearch obj
+a23a6700bf40558dbe2ee620a94d0aa6dbfc2ab0 2426d924701c1bd13b0efba8a136d32a36dc19b7 floreencia <flo@nld.ds.mpg.de> 1456743237 +0100	commit: bestCVScoresfromGridSearch added to get cv scores from gridsearch obj

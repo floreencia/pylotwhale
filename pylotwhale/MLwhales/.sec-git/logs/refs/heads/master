@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 98990ea1a0115c90e06d216ca1bac804e8b341ee floreencia <flo@nld.ds.mpg.de> 1439062428 +0200	commit (initial): train feature extraction
+98990ea1a0115c90e06d216ca1bac804e8b341ee 0ce51049c2b139fdcb9ecb1171e7670aadec6a16 floreencia <flo@nld.ds.mpg.de> 1439135519 +0200	commit: svc classifier script
+0ce51049c2b139fdcb9ecb1171e7670aadec6a16 0573ae38bd6f8d9e0b0b52422d3acfcd762f0d38 floreencia <flo@nld.ds.mpg.de> 1439215475 +0200	commit: controlable output -o added

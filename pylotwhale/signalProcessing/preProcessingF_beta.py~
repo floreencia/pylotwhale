@@ -1,0 +1,383 @@
+#!/usr/mprg/bin/python
+
+import numpy as np
+import pylab as pl
+import sys
+import pandas as pd
+import random
+import ast
+
+"""
+    Module for for the definition of sequences
+    florencia @ 06.05.14
+
+    Starting from a data frame and leading to the bigram counts.
+    -- data frame --> data frames by recording (groupByRec + sortedRecDatFr)
+    -- data frame --> time iterval distribution (plTimeIntervals)
+    -- data frame --> sequences ()
+    -- sequences --> bigram counts
+    
+"""
+
+
+###########################################################
+#####                     plotting                    #####
+###########################################################
+
+
+def plTimeIntervals(datB, groupN = '', outDir = "./images/", shuffl = 0 ):
+    """
+    time interval distributions
+    takes:
+    < datB, data frame we whant to look into the time stamps
+    < groupN, this is only given for the naming of the output plot
+    and returnsplots an histogram in the image folder
+    """
+    rec_datFrames, reccs = sortedRecDatFr(datB, shuff=shuffl) # reccording data frames
+
+    # time interval histogram
+    interDist = {rec: rec_datFrames[rec].intervals.values for rec in rec_datFrames} # intervals dictionary by reccording
+
+    # interval ditribution
+    allT = interDist.values() # all interval values
+    allT = np.asarray([item for subli in allT for item in subli]) # flattern the intervals
+    allT.reshape((len(allT), 1)) # reshape for dictionary
+    allT = allT[~np.isnan(allT)] #filter nans out
+    print np.shape(allT), allT.min(), allT.max()
+    
+    # histogram
+    figN = outDir+"timeDistHist_%s.pdf"%groupN
+    fig = pl.figure(figsize=(6,3))
+    ax = fig.add_subplot()
+    pl.hist(allT[~np.isnan(allT)], bins=allT.max() )
+    pl.xlim((0,19))
+    pl.title("%s"%groupN)
+    pl.xlabel('time [s]')
+    pl.ylabel('N')
+    pl.savefig(figN)
+    print "out:", figN
+
+
+def plTape(t, yRaw, plName = '', scaleF = 20):
+    """
+    plots the calls vs. time
+    """
+    assert( len(t) == len(yRaw) )
+    
+    yDict0 = {item: 0 for item in yRaw} # inicialize
+    i2c_tape = [thisCall for thisCall in yDict0.keys() ]
+    c2i_tape = {i2c_tape[ix] : ix for ix in range(len(i2c_tape)) } # c2i
+
+    y = [c2i_tape[item] for item in yRaw]
+    #print y[:5], i2c_tape, c2i_tape
+    # plot 
+
+    #if not tapeN: tapeN = "%s%s%s"%(i2c_tape[0],len(i2c_tape), i2c_tape[-1])
+    #figN = outDir+"tape_%s.pdf"%tapeN
+    #print figN
+    fig = pl.figure(figsize=(t[-1]/scaleF,3))
+    ax = fig.add_subplot(111)
+    pl.plot(t,y, 'bo')
+    ax.set_ylim(-0.5,len(c2i_tape))#+0.1)
+    ax.set_yticks( np.arange(len( c2i_tape ) ))
+    ax.set_yticklabels( i2c_tape ) 
+    ax.set_xlabel('time [s]')
+    if plName: pl.savefig(plName)
+
+def scattPlTape(t, yRaw, qualityRaw plName = '', scaleF = 20):
+    """
+    plots the calls vs. time
+    """
+    assert( len(t) == len(yRaw) )
+    
+    q2v = {'A' : 'b', 'B' : 'r', 'C':'g', 'D' : 'y'}
+    yDict0 = {item: 0 for item in yRaw} # inicialize
+    i2c_tape = [thisCall for thisCall in yDict0.keys() ]
+    c2i_tape = {i2c_tape[ix] : ix for ix in range(len(i2c_tape)) } # c2i
+
+    y = [c2i_tape[item] for item in yRaw]
+
+    fig = pl.figure(figsize=(t[-1]/scaleF,3))
+    ax = fig.add_subplot(111)
+    pl.scatter(x,y, c = q, s = 100)#, marker= 's')
+    ax.set_ylim(-0.5,len(c2i_tape))#+0.1)
+    ax.set_yticks( np.arange(len( c2i_tape ) ))
+    ax.set_yticklabels( i2c_tape ) 
+    ax.set_xlabel('time [s]')
+    if plName: pl.savefig(plName)
+
+###########################################################
+#####          litsting, sorting and counting         #####
+###########################################################
+
+
+def groupByRec(dataFr):
+    """
+    groups data by reccording
+    returns:
+    > 1 dictionary: recccordings --> indexes of the reccordings in same rec
+    > 2 an array of with the reccordig names
+    """
+    recSetsD = dataFr.groupby('recording').groups #dictionary with the reccordings
+    reccs = recSetsD.keys()
+    print "#reccordings", len(recSetsD)
+    return recSetsD, reccs
+
+
+def sortedRecDatFr(dataFr, shuff = 0):
+    """
+    data frames for each reccording sorted temporally
+    if studd != 0 the time series are shuffled
+    returns:
+    > a dictionary of the data frames sorted sorted acendengly
+    > an array of with the reccordig names
+    """
+    if(shuff):
+        f = shuffleSeries 
+    else:
+        f = lambda x: x
+    
+    recGr, reccs = groupByRec(dataFr)
+    sortedRecs = {}
+    
+    for thisRec in recGr: 
+        recDatFr = dataFr.ix[ recGr[thisRec] ].sort('timeSs') # select series
+        recDatFr = f(recDatFr) # shuffle or not
+        recDatFr['intervals'] = (recDatFr['timeSs']-recDatFr['timeSs'].shift()) #compute intervals
+        sortedRecs[thisRec] = recDatFr 
+        
+    print "#reccordings", len(sortedRecs)
+    return sortedRecs, reccs # data frames and labels
+
+
+def shuffleSeries(dataFr, shuffleCol = 'timeSs'):
+    """
+    shuffles a series (shuffleCol) from a data frame:
+    > data frame 
+    > name a of the column ti shuffle
+    """
+    x = dataFr[shuffleCol].values.copy() # select series
+    random.shuffle(x) #shuffle
+    shuffledRecs = dataFr.copy() # new series
+    shuffledRecs[shuffleCol] = x # set shuffled series
+
+    return shuffledRecs # data frames and labels
+
+
+def bigramCounts( li, adj0 = {}, call2index0 = {}, index2call0 = []):
+
+    """
+    sequences to dictionary of bigram counts
+    list a list and returns:
+    > the adjacency 2D-dictionary of consecutive elements
+    > the call to index dicitonary
+    > the index to call list
+
+    If an adjacency matrix is already given then we add the counts to it
+    """
+
+    ### CHECK INPUT
+    assert( len(call2index0) == len(index2call0))# and len(adj0) >= len(call2index0) -1 )
+    # dictionaries must have the same lenght and adj at least the same lenght - 1
+
+    ### INICIALIZATIONS
+    adj = adj0.copy() # adjacenct dicitonary
+    call2index = call2index0.copy()  # call to index dict
+    index2call = index2call0[:] # index to call dict
+    call_0 = 'INI' # previous call ini
+
+    if len(call2index) == 0: # if empty dict
+        print "inicializing"
+        call2index[call_0] = 0
+        index2call.insert(0, call_0) # inicialize it w/ INI
+             
+    n = len(index2call) # init with the no. of calls in the dict.
+    
+    ### ITERATE OVER THE SEQUECE
+    # call - index dictionaries
+    for call in li:
+        if call not in call2index.keys(): # dictionary, NEW CALL!
+            call2index[call] = n
+            index2call.insert(n,call)
+            n += 1
+        
+        # adjacency dictionary
+        if (call2index[call_0], call2index[call]) in adj.keys(): # plus one
+            adj[call2index[call_0], call2index[call]] += 1 
+        else:
+            adj[call2index[call_0], call2index[call]] = 1 
+        call_0 = call # reeset previous call
+        
+    return adj, call2index, index2call
+
+
+def listOfSeqs( datB0, groupN=[], timeT=5, feature = 'call', shuffl=0):
+    """
+    list of sequences
+    takes a data frame and returns a list of sequences
+    ! assumes that the reccording names are not repeated. CHECK whether this holds
+    < groupN = [], gives the option to create the list of sequences for various groups
+    """
+    seqsLi = []
+    for gr in groupN:
+        '''
+        defines the sequences
+        '''
+        datB = datB0.loc[datB0.group == gr] # select group data
+        rec_datFrames, reccs = sortedRecDatFr(datB, shuff=shuffl) # dataframes by reccording sorted temporally
+        seqsLi += [ seqsFromRec(rec_datFrames[rec], timeT, feature).sequences for rec in rec_datFrames ] # list of sequences by rec
+
+    thisGrSeqs = [item for sublist in seqsLi for item in sublist] # flatter the list of sequecne so taht they are no longer separated by reccording
+    return thisGrSeqs
+
+
+def listOfSeqs2BigramCounts(li, M = {}, c2i = {}, i2c = []):
+    """
+    transforms a list(li) of sequences into bigram counts
+    returns:
+    beta - because inicializes the dicionaries from the calling of the function
+    giving the chance countinue adding bigrams to existing counts
+    > bigrma counts dictionary (M)
+    > call to index dictionary (c2i)
+    > index to call array (i2c)
+    """
+
+    for thisLi in li:
+        M, c2i, i2c = bigramCounts(thisLi, M, c2i, i2c)#M2
+
+    return (M, c2i, i2c)
+
+
+
+###########################################################
+#####             bigram analysis functions           #####
+###########################################################
+
+def normalize_2grams_dict(biGrmDict):
+    """
+    this funciton gets a bigram dictionary with the bigram counts
+    and returns the normalized probablies
+    
+    Jul, 2014 (A)
+    """    
+    
+    assert( isinstance( biGrmDict, dict) ) # check input
+    counts2grm = {i_x[0]: 0 for i_x in biGrmDict.keys()} # inicialize normalized dictionary w/ zeros
+    
+    # count the bigrams
+    for A in counts2grm.keys(): # iterate the initial keys 'A'
+        #print A
+        for elem in biGrmDict.keys(): # iterate over the tuple key 
+            #print elem
+            if elem[0] == A: counts2grm[A] += biGrmDict[elem]            
+     
+    # normalize counts
+    norm1_BiGrmDict = {}
+    for elem in biGrmDict.keys(): 
+        norm1_BiGrmDict[elem] = 1.0*biGrmDict[elem]/counts2grm[elem[0]] if counts2grm[elem[0]] else np.nan
+        
+    return norm1_BiGrmDict
+
+def select2grmsDict_lrgr_NotIni( datFr_li, lgr = 5, INI_ix = 0, notINI = True ):
+    """
+    selects the relevant labels from a bigram dictionary. Labels:
+    - from the bigrams with more than lgr occurrences
+    - not taking into account the 0INI label
+    - INI_ix = c2i['INI'] (= 0, default value, better use c2i['INI'])
+    - the first line of the data frame contains the number of bigrams.
+    
+    Jul, 2014 (B)
+    """
+    myProbs = datFr_li[ datFr_li > lgr ] # larger than threshold
+    litu = [ ast.literal_eval(item) for item in myProbs.keys().values ] # string -> tuple
+    no0 = [ item for item in litu if not item[0] == INI_ix ] # filter out 'c2i[0INI] = 0'
+    return no0
+
+def plDistributionAndRealVal( dist, realVal, mu = False, h = False, nBins = 10, outFN = '', plLabel = ''):
+    """
+    Plots a the distribution (~histogram) of the distribution 'dist' and a line where the real value is
+    
+    Jul, 2014 (B)
+    """
+    #histogram
+    Nvec, binVec =np.histogram( dist, bins = nBins ) # shuffled data histogram
+    bincenters = 0.5*( binVec[1:] + binVec[:-1] )
+    #pl.plot(bincenters, Nvec, 'b-')
+    x = bincenters
+    y = Nvec
+    pl.fill_between( x, y, alpha = 0.5)
+    if plLabel:
+        pl.xlabel("%s"%plLabel)
+
+    # lines
+    pl.axvline( x = realVal, color = 'r', ls ='-', lw = 3.5) # real value
+    if mu: pl.axvline( x = mu, color = 'b', ls ='-', lw = 2) # mean 
+    if h:
+        pl.axvline( x = mu-h, color = 'b', ls ='--', lw = 2) # left conf int
+        pl.axvline( x = mu+h, color = 'b', ls ='--', lw = 2) # right conf int
+
+    
+    if(outFN):
+        print outFN
+        pl.savefig(outFN)
+    
+    
+def adjBining( dists, minBinCont = 3, maxNbins =100 ):
+    """
+    finds the number of bins such that no bin gets less than minBinCont
+    * dists, an array with the bigram probabilities of the shufflings
+    
+    Jul, 2014 (B)
+    """
+    #Adjusting the bining
+    n = 10
+    while True:    
+        n+=1
+        Nvec = np.histogram( dists, bins = n )[0] # shuffled data histogram
+    
+        if Nvec.min() < minBinCont or n > maxNbins:
+            print n, Nvec.min()
+            break
+    
+    return n
+
+
+#################################################################
+# OBJECTS
+#################################################################
+
+class seqsFromRec:
+    """
+    this class creates the sequences form a data frame with:
+        * a single reccording
+        * elements sorted temporally (out: sortedRecDatFr)
+    """
+
+    def __init__( self, data_frame, timeT = 5, feature ='call' ):
+
+        self.dataFr = data_frame #one recording data frame, 
+        self.timeT = timeT
+        self.feature = feature
+        self.sequences = self.rec2seqs()
+
+    def rec2seqs(self):
+        """
+        defines the sequences for each day-tape label
+        """
+        indx = self.dataFr.index
+        #print "#calls", len(indx)
+        seqs = []
+        thisSeq = [ self.dataFr[self.feature].ix[indx[0]] ] # the fist call in the rec
+        
+        for i in indx[1:]:
+            if self.dataFr.ix[i].intervals < self.timeT: # continue sequence
+                thisSeq.append(self.dataFr[self.feature].ix[i])
+            else: # new sequence
+                seqs.append(thisSeq)
+                thisSeq = [ self.dataFr[self.feature].ix[i]]
+
+        seqs.append(thisSeq) 
+                    
+        return seqs
+
+        

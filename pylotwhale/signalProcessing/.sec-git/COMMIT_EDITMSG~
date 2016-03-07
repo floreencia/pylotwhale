@@ -1,0 +1,81 @@
+bug fixed False is int!
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#	modified:   signalTools_beta.py
+#
+# Untracked files:
+#	#myCepstrogram-guakamole.py#
+#	#plot-cepstrum.py#
+#	.ipynb_checkpoints/
+#	0_wavFiles.ipynb
+#	A_cuttingTheSignal_beta.ipynb
+#	B_plotingSpectro_beta.ipynb
+#	C_binarize_beta.ipynb
+#	C_contZeros_beta.ipynb
+#	Ex_MeasuringPeriodicities.ipynb
+#	ExercisesDay2-flo.ipynb
+#	NPW-021-J-B-090713_f50-3_00_02_18.wav-460hamming9-new-x.pdf
+#	ThinkDSP/
+#	WAV_0111_001-48kHz_0-30sec_OV460_N512.pdf
+#	ceps-traking.ipynb
+#	cepsgram.ipynb
+#	cepstrum.ipynb
+#	fftSpectrograms-Copy0.ipynb
+#	fftSpectrograms.ipynb
+#	file.txt
+#	helps.ipynb
+#	inFFT.ipynb
+#	laGrafica.png
+#	myCepstrogram.pyc
+#	myCepstrogram.py~
+#	myCepstrograms.ipynb
+#	mySpectro.py~
+#	octave-workspace
+#	pcaPack.ipynb
+#	pitch.ipynb
+#	pitch_traking.ipynb
+#	pitch_traking_freqWin.ipynb
+#	pl-PCApack.py~
+#	plPCApack-chorizo.py~
+#	plPCApack.pyc
+#	plPCApack.py~
+#	plPCApackB.py~
+#	plPCApackpp.pyc
+#	plPCApackpp.py~
+#	plSpecgrams.py~
+#	plWavSpectro.py~
+#	plot-spectro.ipynb
+#	plotDataInPC.p.py~
+#	plotDataInPC.pyc
+#	plotDataInPC.py~
+#	preProcessingF_beta.py~
+#	run-mySpectro.py~
+#	run-plCepsgram.py~
+#	run-plPCApack.py~
+#	run-plSpecgrams.py~
+#	run-plWavSpectro.py~
+#	signalTools_beta.pyc
+#	signalTools_beta.py~
+#	signal_fft_play.ipynb
+#	sinusoides.ipynb
+#	spectrogramer-Copy0.ipynb
+#	spectrogramer.ipynb
+#	test.txt
+#	testData.txt
+#	testData.txt~
+#	think/
+#	trash/
+#	tut_cepstrum-beta.ipynb
+#	tut_signalTools_beta.ipynb
+#	tut_simpleFilter-beta.ipynb
+#	undertandingTheBeep.ipynb
+#	usingChop.ipynb
+#	waveform.jpg
+#	wavs-binMatrices_beta.py~
+#	wavs-dataFrame_beta.py~
+#	wavs-matrices_beta.py~
+#	wavs-spectros_beta.py~
+#

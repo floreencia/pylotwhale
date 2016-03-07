@@ -1,0 +1,16 @@
+0000000000000000000000000000000000000000 4e4846fe961b5ef3a6d491104d3139373e78b4eb floreencia <flo@nld.ds.mpg.de> 1447603652 +0100	commit (initial): initial commit
+4e4846fe961b5ef3a6d491104d3139373e78b4eb ba6c922aa55cd4a935d5c7f6796832afb6b97acd floreencia <flo@nld.ds.mpg.de> 1450287691 +0100	commit: filecollections added
+ba6c922aa55cd4a935d5c7f6796832afb6b97acd 38fe78246fe7142520c73fcf97ec506f30d7b84e floreencia <flo@nld.ds.mpg.de> 1451367848 -0800	commit: annotationsDir2wavAnnCollection - to create collection from annotations added + findFilePathInDir added
+38fe78246fe7142520c73fcf97ec506f30d7b84e d566ee9ba85757b8d4d073f2f8d0da5ed12a9f71 floreencia <flo@nld.ds.mpg.de> 1451370090 -0800	commit: annotationsList2wavAnnCollection - to create collection from annotations list added
+d566ee9ba85757b8d4d073f2f8d0da5ed12a9f71 ba7f3911176b1321232035afb2047b5b4e4b8206 floreencia <flo@nld.ds.mpg.de> 1451377215 -0800	commit: replaceInFile added
+ba7f3911176b1321232035afb2047b5b4e4b8206 0bbc23bf2e8ce89caca3f14f878932ebe06f3c52 floreencia <flo@nld.ds.mpg.de> 1451430903 -0800	commit: timeStamp2seconds - parses time stamp to seconds
+0bbc23bf2e8ce89caca3f14f878932ebe06f3c52 17242cbdf0a6839807f8087838283c28476f408c floreencia <flo@nld.ds.mpg.de> 1451447480 -0800	commit: annotation tools added
+17242cbdf0a6839807f8087838283c28476f408c 4024e8bbe745e585d5165ae14a421b5bb1e865ae floreencia <flo@nld.ds.mpg.de> 1451593190 -0800	commit: str0 and strRep added to create collections from annotations
+4024e8bbe745e585d5165ae14a421b5bb1e865ae 9e2a2b2aefa4f7b41644f2e6853a0f293658c079 floreencia <flo@nld.ds.mpg.de> 1451599157 -0800	commit: commented print
+9e2a2b2aefa4f7b41644f2e6853a0f293658c079 07baf9045bc9b44898ecfe6c4ddf2854c0c45d16 floreencia <flo@nld.ds.mpg.de> 1454666174 +0100	commit: anontatiosn converter added, sv --> aup @ fileCollections
+07baf9045bc9b44898ecfe6c4ddf2854c0c45d16 e1769290a473f1793fcab146a783ca2f70d2bfa3 floreencia <flo@nld.ds.mpg.de> 1454694525 +0100	commit: annT.parseAupFile bug fix for matching numeric labels
+e1769290a473f1793fcab146a783ca2f70d2bfa3 6acc055d50067517479f8fb854714e2a7a92b32d floreencia <flo@nld.ds.mpg.de> 1454702092 +0100	commit: c_Label2HeikesCallLabel added for replazing c with heikes label
+6acc055d50067517479f8fb854714e2a7a92b32d ee8b7b167fead8340a932e3d129b70a29170ec7e floreencia <flo@nld.ds.mpg.de> 1454946477 +0100	commit: annotation functions: replaceInFile, svAnn2t0_tf_label and commas2periods, moved to annotationTools
+ee8b7b167fead8340a932e3d129b70a29170ec7e 787cf1e2aa657de9fbd90230a5bc90d86e46f76b floreencia <flo@nld.ds.mpg.de> 1454946554 +0100	commit: annotation functions: replaceInFile, svAnn2t0_tf_label and commas2periods, removed from fileCollection
+787cf1e2aa657de9fbd90230a5bc90d86e46f76b 79b9411315cefcd8910b5bd0a179a873bca81900 floreencia <flo@nld.ds.mpg.de> 1455210615 +0100	commit: pip installed
+79b9411315cefcd8910b5bd0a179a873bca81900 0d357991d01ca5a81129889975c674c17d66c3ba floreencia <flo@nld.ds.mpg.de> 1455819676 +0100	commit: IO exception adde to replace

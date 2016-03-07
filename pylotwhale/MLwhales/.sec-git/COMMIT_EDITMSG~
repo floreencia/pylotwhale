@@ -1,0 +1,8 @@
+output realative to the wDir (working dir) varieble
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch newFeature
+# Changes to be committed:
+#	modified:   annAudio2SVMclf.py
+#

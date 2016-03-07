@@ -1,0 +1,65 @@
+0000000000000000000000000000000000000000 c5061ab9f977be1c44e4fc2b0e592b2ab790edec floreencia <flo@nld.ds.mpg.de> 1412778607 +0200	commit (initial): singal processing tools
+c5061ab9f977be1c44e4fc2b0e592b2ab790edec 11766d3895a55d7bf523ab6df093d2902a92d2d4 floreencia <flo@nld.ds.mpg.de> 1413292675 +0200	commit: included the functions in specgram. for plotting spectros
+11766d3895a55d7bf523ab6df093d2902a92d2d4 8bb76d5d09a9d2e869047d8cb49bde23322d5367 floreencia <flo@nld.ds.mpg.de> 1413993827 +0200	commit: wavs2spesctros -- plot multiple spectrograms
+8bb76d5d09a9d2e869047d8cb49bde23322d5367 7546951e02403d2006025f6a056335d2fe464ac9 floreencia <flo@nld.ds.mpg.de> 1414058213 +0200	commit: modified the 'reeScale_E' function so that spec_factor = 1, is all the spectro (lowest cutting E) and spec_factor = 0, is nothing of the spectro (highest cutting energy)
+7546951e02403d2006025f6a056335d2fe464ac9 02b419b26e255f6fe0d501a5fb24f24c5e95f1b0 floreencia <flo@nld.ds.mpg.de> 1431107979 +0200	commit: some improvements in the spectrogram plotting functions
+02b419b26e255f6fe0d501a5fb24f24c5e95f1b0 a2eec19b22980e16b19df510f3ec92f4f7a7a286 floreencia <flo@nld.ds.mpg.de> 1435071896 +0200	commit: mf2wavLi(), reads wav filen names from marsyas timeline collection
+a2eec19b22980e16b19df510f3ec92f4f7a7a286 0a613713de291aa3feda13a8deae170c78655b7a floreencia <flo@nld.ds.mpg.de> 1435072542 +0200	commit: outdir option added to saveSpectrogram
+0a613713de291aa3feda13a8deae170c78655b7a 66962200ac822e3c1a299e630a3bf70cacddbe52 floreencia <flo@nld.ds.mpg.de> 1436293020 +0200	commit: filter functions and power spectral density added
+66962200ac822e3c1a299e630a3bf70cacddbe52 dbf3ae8e5314b5370c0c357fa8d3dcc01dcd7fcb floreencia <flo@nld.ds.mpg.de> 1436372285 +0200	commit: bandDesomposer added
+dbf3ae8e5314b5370c0c357fa8d3dcc01dcd7fcb 93d451f006219419103e06f9763c830bc569bde1 floreencia <flo@nld.ds.mpg.de> 1436799804 +0200	commit: comments @specgramWav
+93d451f006219419103e06f9763c830bc569bde1 2c6f5eedefe214b774582cd5f4481f6a9517bc0f floreencia <flo@nld.ds.mpg.de> 1436977987 +0200	commit: filtered sum band energy spectrum + tsBandenergy (overthe whole signal)
+2c6f5eedefe214b774582cd5f4481f6a9517bc0f e20a8fbb69570395bc11a63c7a04d12cda5b4a81 floreencia <flo@nld.ds.mpg.de> 1437007177 +0200	commit: feature extraction function
+e20a8fbb69570395bc11a63c7a04d12cda5b4a81 7b0240d977376aeacac2fd69f338f08b0b37699a floreencia <flo@nld.ds.mpg.de> 1437082979 +0200	commit: find label in a stamp-label tuple
+7b0240d977376aeacac2fd69f338f08b0b37699a 4eecdeae6c5f4aa9b33570e98965b5c5879f00ba floreencia <flo@nld.ds.mpg.de> 1437128426 +0200	commit: spectral features
+4eecdeae6c5f4aa9b33570e98965b5c5879f00ba 751492d3e1386cc555e1ae0ea98d037c70f0980c floreencia <flo@nld.ds.mpg.de> 1437134542 +0200	commit: SVC for b call classificaiton of spectral features over a texture window ipynb
+751492d3e1386cc555e1ae0ea98d037c70f0980c 6207cb156d043ba29c1ab33f6a689588666f856c floreencia <flo@nld.ds.mpg.de> 1437381841 +0200	commit: spectralFeatures function added
+6207cb156d043ba29c1ab33f6a689588666f856c 18b4549d559e238cee6b5b744aaf548c4c170bdf floreencia <flo@nld.ds.mpg.de> 1437417862 +0200	commit: cepstral feature extractor added
+18b4549d559e238cee6b5b744aaf548c4c170bdf baa2f8709fbe961eecae2b60f60bbb5143bca2ef floreencia <flo@nld.ds.mpg.de> 1437569651 +0200	commit: usefull notebooks added
+baa2f8709fbe961eecae2b60f60bbb5143bca2ef c9c4900bc9eeea305151a53849b7f9c44db5aa09 floreencia <flo@nld.ds.mpg.de> 1437592742 +0200	commit: convert audacity annotations to (sample, annoations) list, annotations filter i.e. buzz
+c9c4900bc9eeea305151a53849b7f9c44db5aa09 ef8cb93fd60a12680302497049ffd3ed96cd9f62 floreencia <flo@nld.ds.mpg.de> 1437663889 +0200	commit: predictions filter added
+ef8cb93fd60a12680302497049ffd3ed96cd9f62 d0fb6a6c2c828e928c4ca6d7a10629648e921e6f floreencia <flo@nld.ds.mpg.de> 1437936093 +0200	commit: bugg fixed at dataObj
+d0fb6a6c2c828e928c4ca6d7a10629648e921e6f 3d6e1387c9b6dd3ec774ab724e5edc3dfe177fb0 floreencia <flo@nld.ds.mpg.de> 1437937463 +0200	commit: tut_feature extraction interms of dataObj
+3d6e1387c9b6dd3ec774ab724e5edc3dfe177fb0 b3a771abd4e79abc04b12e18ff0e945227742d4e floreencia <flo@nld.ds.mpg.de> 1438004799 +0200	commit: spectralFeatures --> spectralRep, feature extraction aid for cepstral features added
+b3a771abd4e79abc04b12e18ff0e945227742d4e 876fef9dd684bdddc05b4b7784f7234ebe8e7fea floreencia <flo@nld.ds.mpg.de> 1438265003 +0200	commit: wav2waveform added
+876fef9dd684bdddc05b4b7784f7234ebe8e7fea 7c3bc733871b739f3fa5d4d12b623979ed2582a0 floreencia <flo@nld.ds.mpg.de> 1438615966 +0200	commit: overlap frac --> noverlap fixes at sT.plspectro
+7c3bc733871b739f3fa5d4d12b623979ed2582a0 84512944ec5d08562f12e3c0fd44ce02aca6ebf7 floreencia <flo@nld.ds.mpg.de> 1438624896 +0200	commit: P and R added to clf measures
+84512944ec5d08562f12e3c0fd44ce02aca6ebf7 9c5622dfe2190d137f939e3508f1b45219804b9b floreencia <flo@nld.ds.mpg.de> 1438703384 +0200	commit: feature extracting method exchangeabl in waveform2featMatrix
+9c5622dfe2190d137f939e3508f1b45219804b9b e92c87c31a55d2e59bda75d7f75bf1818b42d6b0 floreencia <flo@nld.ds.mpg.de> 1438703426 +0200	commit (amend): feature extracting method exchangeable in waveform2featMatrix
+e92c87c31a55d2e59bda75d7f75bf1818b42d6b0 1932919c3e989d79da68fe002fc21843254961a1 floreencia <flo@nld.ds.mpg.de> 1438884240 +0200	commit: cepstralRep function added with librosa features. Instance normalization added in texturization function. Feature naming fixed in waveform2featureMatrix. + Comments
+1932919c3e989d79da68fe002fc21843254961a1 4a4b2aea5e20034f938377997b6fc44cb5e43d91 floreencia <flo@nld.ds.mpg.de> 1438886055 +0200	commit: clf with texturized features tutorial added
+4a4b2aea5e20034f938377997b6fc44cb5e43d91 11acae7108355cd896a8cf5bc0cf072bbc098212 floreencia <flo@nld.ds.mpg.de> 1439467826 +0200	commit: chromaRed added
+11acae7108355cd896a8cf5bc0cf072bbc098212 a3441005715a78940e6b8e39054cb37a6a9b2414 floreencia <flo@nld.ds.mpg.de> 1439825321 +0200	commit: chromaRep added
+a3441005715a78940e6b8e39054cb37a6a9b2414 5e3b5edda0c5f109e07b78813d1ceaed415368bf floreencia <flo@nld.ds.mpg.de> 1439916073 +0200	commit: matplotlib defaults restored
+5e3b5edda0c5f109e07b78813d1ceaed415368bf 1a8c92d1a374a02ad38a862b95e2e254464d4956 floreencia <flo@nld.ds.mpg.de> 1439995238 +0200	commit: delta function added
+1a8c92d1a374a02ad38a862b95e2e254464d4956 d1758b5c6d9f400864b11e69e1c7facabce59a21 floreencia <flo@nld.ds.mpg.de> 1440575396 +0200	commit: None option for getting the feature names added to featureExtractionFun
+d1758b5c6d9f400864b11e69e1c7facabce59a21 695d393b2ada9c8ef7d6bd61030b6774c83ede45 floreencia <flo@nld.ds.mpg.de> 1440579694 +0200	commit: feaature extraction combo added
+695d393b2ada9c8ef7d6bd61030b6774c83ede45 9d5db6dd0414d60a3d11931240d8cd299870cd4a floreencia <flo@nld.ds.mpg.de> 1440601005 +0200	commit: spectralDspecRep added for computing the spectral-delta, + comments added
+9d5db6dd0414d60a3d11931240d8cd299870cd4a dba3442d3586c7b777bb855a8b8b048977e64986 floreencia <flo@nld.ds.mpg.de> 1440869586 +0200	commit: varName: powerOfWinLen --> NFFTpow @spectralRep + explicit conversio of function parameters into float and int
+dba3442d3586c7b777bb855a8b8b048977e64986 2b5828b5b07526f56f21b9b3b9076e7f3ec3e8cc floreencia <flo@nld.ds.mpg.de> 1441716595 +0200	commit: comments added
+2b5828b5b07526f56f21b9b3b9076e7f3ec3e8cc edf4029026fd95f311ee54d60bc1ce8abcab088c floreencia <flo@nld.ds.mpg.de> 1441728351 +0200	commit: unwanted labels filter added to the annotations-reader (aup.txt) function "aupTxt2annTu"
+edf4029026fd95f311ee54d60bc1ce8abcab088c 5152af22d6d178c6f0b1a0c4dcca3ab6a7e68abd floreencia <flo@nld.ds.mpg.de> 1441835942 +0200	commit: option for feature extraction fun by NAME added to featMatrixAnnotations
+5152af22d6d178c6f0b1a0c4dcca3ab6a7e68abd b5d8efbfa1d78a2fda08904cb122d928687c621c floreencia <flo@nld.ds.mpg.de> 1444326698 +0200	commit: Nslices variable added to waveform2featMatrix to post-set nTextWS in a way that slices the features in Nslices equal length segments
+b5d8efbfa1d78a2fda08904cb122d928687c621c 75e0ed2da9917cb59bc329b54c0131297d8a40eb floreencia <flo@nld.ds.mpg.de> 1446562084 +0100	commit: +flatPartition added +-comments on spectralDspecRep +-array input midfied @testurizeFeatures.nTextWS +-nTextWS --> slicingIdx (np.array) @waveform2featMatrix
+75e0ed2da9917cb59bc329b54c0131297d8a40eb 79b58a2c15a82e05340e13be75f71e5d9f866af0 floreencia <flo@nld.ds.mpg.de> 1446736334 +0100	commit: bug fixed at sT.texturizeFeatures, mutable, indexes, etc
+79b58a2c15a82e05340e13be75f71e5d9f866af0 2e7fdfefde79125e3f90d459c74f6dc4ba239915 floreencia <flo@nld.ds.mpg.de> 1446736494 +0100	commit (amend): bug fixed at sT.texturizeFeatures, mutable, indexes, etc
+2e7fdfefde79125e3f90d459c74f6dc4ba239915 f09daa0da6feb4da32d764deb2353fa4ac3885bc floreencia <flo@nld.ds.mpg.de> 1446736635 +0100	commit (amend): bug fixed at sT.texturizeFeatures, mutable, indexes, etc
+f09daa0da6feb4da32d764deb2353fa4ac3885bc 400f3da7e30f30b6d454f8181df469287accb487 floreencia <flo@nld.ds.mpg.de> 1446737088 +0100	commit: bugging utils removed from texturizeFeatures
+400f3da7e30f30b6d454f8181df469287accb487 c94fcb6f7c06a3e4feba37cbabca61f5a821df67 floreencia <flo@nld.ds.mpg.de> 1447603829 +0100	commit: sys path appending fixed + np array reference fixed
+c94fcb6f7c06a3e4feba37cbabca61f5a821df67 c39314c51ecd291ed64b43fe43fabe312b870bcc floreencia <flo@nld.ds.mpg.de> 1447788694 +0100	commit: getwavannseciton while loop --> for loop
+c39314c51ecd291ed64b43fe43fabe312b870bcc 4b44d377770624bb98e5bd16e5a477b86fcd5e41 floreencia <flo@nld.ds.mpg.de> 1448018423 +0100	commit: bug fixed False is int!
+4b44d377770624bb98e5bd16e5a477b86fcd5e41 ac703190ed00e5e0dc4aff5a279e72e7477b94ae floreencia <flo@nld.ds.mpg.de> 1448018441 +0100	commit (amend): bug fixed False == int!
+ac703190ed00e5e0dc4aff5a279e72e7477b94ae 683361811acd7a2ee075c2cfc4f56dde583aeee5 floreencia <flo@nld.ds.mpg.de> 1448110358 +0100	commit: bug fixed at sT.texturezeFeatures (identation)
+683361811acd7a2ee075c2cfc4f56dde583aeee5 f4a02f84f6c9e2b97eaa324f958bdab63e113649 floreencia <flo@nld.ds.mpg.de> 1448201890 +0100	commit: tuLi2frameAnnotations furnction added
+f4a02f84f6c9e2b97eaa324f958bdab63e113649 2f1820c5dd3683970fb78a957c2a0e8acb5835c0 floreencia <flo@nld.ds.mpg.de> 1448223431 +0100	commit: comments added
+2f1820c5dd3683970fb78a957c2a0e8acb5835c0 c874ea3cc9b02531dea0763dc034e9763515e5e0 floreencia <flo@nld.ds.mpg.de> 1448323659 +0100	commit: cepstralDcepPer corrected and melSpecDRep added
+c874ea3cc9b02531dea0763dc034e9763515e5e0 135a8daa5fae7a0f16b95145002acc5780fe1421 floreencia <flo@nld.ds.mpg.de> 1448404770 +0100	commit: mel sepctro added to feat extr fun
+135a8daa5fae7a0f16b95145002acc5780fe1421 383e0732196c30ab898a88770b1a0ec8812a246f floreencia <flo@nld.ds.mpg.de> 1449266545 +0100	commit: identation bug at getAnnWavSec
+383e0732196c30ab898a88770b1a0ec8812a246f b3301891fdb9c2183ae13c091198188d46e29d3e floreencia <flo@nld.ds.mpg.de> 1449594324 +0100	commit: tileTillN and addToSignal functions added
+b3301891fdb9c2183ae13c091198188d46e29d3e 61f1b1212cab2d2d7a1678209ca82653044c0e91 floreencia <flo@nld.ds.mpg.de> 1449843707 +0100	commit: generateAddEnsemble to generate an ensemble of signals adding noise to a template
+61f1b1212cab2d2d7a1678209ca82653044c0e91 baf3e371f8aa6c729b239ada9c0c19b67118c656 floreencia <flo@nld.ds.mpg.de> 1451509603 -0800	commit: a2m changed for utils.annotationTools
+baf3e371f8aa6c729b239ada9c0c19b67118c656 c7fcd35e41858e320f3d2d5f40f10dd20de37df1 floreencia <flo@nld.ds.mpg.de> 1455030846 +0100	commit: plt.specgram cahnged for mlab.specgram in spectralRep
+c7fcd35e41858e320f3d2d5f40f10dd20de37df1 06e2e938628847013e39c140ad9ab5a84b4a08b8 floreencia <flo@nld.ds.mpg.de> 1455212753 +0100	commit: pip installable
+06e2e938628847013e39c140ad9ab5a84b4a08b8 1e16c1f6aa9e405384de972f575e68cea2536f0a floreencia <flo@nld.ds.mpg.de> 1455818478 +0100	commit: variable nameschanged in butter_bandpass_filter
+1e16c1f6aa9e405384de972f575e68cea2536f0a 9c300a41dea63ca7ade786b5656c3f41b43aca7c floreencia <flo@nld.ds.mpg.de> 1456829949 +0100	commit: whitening function added
+9c300a41dea63ca7ade786b5656c3f41b43aca7c 4d52e0264c0fa0619528f9178bd8f2d8bda59412 floreencia <flo@nld.ds.mpg.de> 1456847696 +0100	commit: waveform manipulation functions added to sT: feqshift, savewav, whitening

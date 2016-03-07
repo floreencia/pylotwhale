@@ -1,0 +1,16 @@
+#!/bin/bash
+
+N = 10
+
+for g in D #H F G J B
+do
+    for i in {1..6}
+    do
+	~/whales/scripts/NLP/csvDatFr-seqs-2gramN_shuffledDistributions.py ~/whales/NLP/NPWvocalRepertoire/wPandas/no_general_sounds/NPWVR-seqsData.csv $g -T $i -N $N;done
+
+	~/whales/scripts/NLP/csvShuffledDistributions-chiSqr.py ./no_general_sounds-shuffled/shuffledFreqsDist_NPWVR-seqsData__N100_$g_T$i.csv ./no_general_sounds-shuffled/dictionary_shuffledFreqsDist_NPWVR-seqsData__N$N_$g_T$i.dat -rn True
+
+	~/whales/scripts/NLP/csvShuffledDistributions-diffProportions.py ./no_general_sounds-shuffled/shuffledFreqsDist_NPWVR-seqsData__N100_$g_T$i.csv ./no_general_sounds-shuffled/dictionary_shuffledFreqsDist_NPWVR-seqsData__N$N_$g_T$i.dat -rn True
+
+done
+done
