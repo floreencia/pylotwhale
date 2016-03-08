@@ -60,7 +60,7 @@ import annotationTools as annT
 def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', label='label'):
     '''
     read annotated sections from a waveform
-    Parameters
+    Parameters:
     ----------
     wavFi : wav file name
     annFi : annotations file (*.txt)
@@ -68,7 +68,7 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', label='la
     t0Label : name of the label for the start time (used by annT.parseAupFile)
     tfLabel : name of the label for the end time (used by annT.parseAupFile)
     label : name of the label with the annotation label (used by annT.parseAupFile)
-    Returns
+    Returns:
     -------
     sectionsLi : a list with dictionaries with the label and waveform information
         { <label>, <waveFormSection (np.array)> }
@@ -94,15 +94,15 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', label='la
 def getWavSec(waveform, fs, t0, tf):
     '''
     get wav section
-    Parameters
-    ---------<
-    waveform : waveform
-    fs : sampling rate
-    t0 : initial time
-    tf : final time
-    Returns
-    ------>
-    waveform segment
+    Parameters:
+    ----------<
+        waveform : waveform
+        fs : sampling rate
+        t0 : initial time
+        tf : final time
+    Returns:
+    ------->
+        waveform segment
     '''
     n0 = int(np.floor(fs * float(t0)))
     nf = int(np.ceil(fs * float(tf)))
@@ -112,10 +112,10 @@ def getWavSec(waveform, fs, t0, tf):
 def flatPartition(nSlices, vec_size):
     '''
     returns the indexes that slice an array of size vec_size into nSlices
-    Parameters
-    ----------
-    nSlices : number of slices
-    vec_size : size of the vector to slice
+    Parameters:
+    ---------->
+        nSlices : number of slices
+        vec_size : size of the vector to slice
     '''
     idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
     return np.array([int(item) for item  in idx])
@@ -249,7 +249,8 @@ def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):
 
 def fitNinSqr(N):
     """
-    Returns the nukmber of columns and rows to optimally plot N images together, used by plotFiles
+    Returns the number of columns and rows to optimally plot N images 
+    together, used by plotFiles
     """
     nC = np.ceil(np.sqrt(N))
     if nC*(nC-1)>=N:
@@ -424,7 +425,7 @@ def specgramWav(wav_fileN, NFFTpow=12, overlap=0.5, saveData=False): #, max_freq
     '''
     this function creates spectrograms form a wav file
     wav_fileN = name of the wavfile we want to plot
-    max_freq = the maximum frequency we whant to display [KHz]
+    max_freq = the maximum frequency we want to display [KHz]
     powerOfWinLen = fft works optimally with widows sizes of the power of 2
     > M, spectro matrix
     > tf, final time
@@ -503,11 +504,14 @@ def saveSpecgram(wav_fileN, powerOfWinLen=12, overlap=0.9, freqFrac=1.0,
                  outDir='', figsize=None, cmN = 'gray_r'): #, max_freq = 8000):
     '''
     Draw spectrogram form a wav file
-    wav_fileN = name of the wavfile we want to plot
-    max_freq = the maximum frequency we want ot display [KHz]
-    powerOfWinLen = fft works optimally with widows sizes of the power of 2
-    freqFrac = fraction of the max frequency
-    outDir='' # if no output dir is given the image is stored in the same dir
+    Parameters:
+    -----------
+        wav_fileN : name of the wavfile we want to plot
+        max_freq : the maximum frequency we want ot display [KHz]
+        powerOfWinLen : log(NFFT)/log(2). fft works optimally with widows 
+                        sizes of the power of 2
+        freqFrac = fraction of the max frequency
+        outDir='' # if no output dir is given the image is stored in the same dir
                 as the wav file
     '''
     # settings
@@ -664,7 +668,6 @@ def wav2deltaCepsRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
     return dM, featureNames, tf, paramStr
 
 
-
 def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 numcep=13, NFilt=26, NFFT=512, lFreq=0, hFreq=None,
                 preemph=0.97, ceplifter=22):
@@ -674,7 +677,8 @@ def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
     < sRate : samplig rate
     < analysisWS : = 0.025 (seconds) ??!!! ...
     ...
-    --->
+    Returns:
+    --------
     > specM : spectral matrix (numpy array)
     > s2f : names of the features. Central frquency of the bin
     > tf : final time (s2t[-1])
