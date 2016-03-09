@@ -39,8 +39,8 @@ from sklearn.externals import joblib
 ##### SETTINGS
 ## preprocessing
 lb = 0; hb = 24000; order = 3
-wavPreprocessingFun = functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
-preproStr = 'bandfilter{}_{}'.format(lb, hb)
+wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
+preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
 ## features dictionary
 featConstD={}
 NFFTpow=9; featConstD["NFFTpow"] = NFFTpow
@@ -57,7 +57,7 @@ clfStr = 'cv{}'.format(cv)
 testFrac = 0.3
 oDir = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/featureSelection'
 collFi_test = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/collection-klein.txt'
-colFile = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/collections/cw-all_grB_grJ.txt' #'../data/collection.txt'
+collFile = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/collections/cw-all_grB_grJ.txt' #'../data/collection.txt'
 fN=os.path.join(oDir, 'out.dat')
 out_file=open(fN, 'a')
 outModelName=True
@@ -78,23 +78,18 @@ out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.
 out_file.write("#"+settingsStr)
 
 ## split collection
-WavAnnCollection = fex.readCols(colFile, colIndexes =(0,1))
-print("TEST:", len(WavAnnCollection), WavAnnCollection[-1])
-#trainColl, testColl = fex.splitCollectionRandomly(WavAnnCollection, trainFraction=0.85)
-
-
+WavAnnCollection = fex.readCols(collFile, colIndexes = (0,1))
+print("collection:", len(WavAnnCollection), WavAnnCollection[-1])
 
 ## extract features - train and test collections
 trainDat = fex.wavAnnCollection2datXy(WavAnnCollection, feExFun, wavPreprocesingT=wavPreprocessingFun)
-#testDat = fex.wavAnnCollection2datXy(testColl[:], feExFun)
-
 
 ## y_names train and test data
-
 X, y_names = trainDat.filterInstances(labs) # train
 lt = myML.labelTransformer(labs)
 y = lt.nom2num(y_names)
-X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=testFrac, random_state=0)
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, 
+                                                test_size=testFrac, random_state=0)
 
 out_file.write("\n#TRAIN, shape {}\n".format(np.shape(X_train)))
 out_file.write("#TEST, shape {}\n".format(np.shape(X_test))) 
@@ -108,6 +103,7 @@ out_file.write("#Target dict {}\t{}\n".format(labsD, trainDat.targetFrequencies(
 ##### CLF #######
 
 clf_scores_li=[]
+
 ##### SVC -grid
 metric='accuracy'
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=1) )])
@@ -131,7 +127,10 @@ out_file.write("SVC\t{}\tbest score ({}) {:.3f}\n".format(gs.best_params_, metri
 clf_svc_best = gs.best_estimator_
 #y_pred = clf_svc_best.predict(X_test)
 #cM = confusion_matrix(y_test, y_pred, labels=clf_svc_best.classes_)
-
+## test
+scO = myML.clfScoresO(clf_svc_best, X_train, y_test)
+out_file.write(scO.scores2str()+'\n')
+## train
 scO = myML.clfScoresO(clf_svc_best, X_test, y_test)
 out_file.write(scO.scores2str()+'\n')
 #print()
@@ -225,35 +224,5 @@ if outModelName:
     
 out_file.write("###---------   {}   ---------###\n".format(time.strftime("%H:%M:%S")))
     
-    
+
 out_file.close()
-
-
-
-'''
-## learning curve -- all data
-X = np.vstack((X_train, X_test)); y = np.hstack((y_train, y_test)) # full data set
-myML.plLearningCurve(clf, X, y, cv=10, y_min=0.7, n_jobs=-1,
-                     outFig=os.path.join(oDir, 'images', feature_str + gridSearch_clfStr(gs.best_params_)+'.png'))## scores
-## scores
-myML.printScoresFromCollection(clf, lt, collFi_test, out_file)
-
-
-### scores over full files
-coll = testColl
-
-clfL = [clf_svc_best, pipe_rf, clf_rf_best] #pipe_svc
-#myML.myClfScore(clf_rf_best, coll, feExFun, trainDat.le)
-sc=myML.clfGeneralizability(clfL, coll, feExFun, lt)#, labelSet=['c']) #consider only the calls
-scoresLi = ['acc', 'pre', 'rec', 'f1']
-
-for i in range(len(sc)):
-
-    for scName in scoresLi:
-        #print("{:.3f} +- {:.3f}".format(np.mean(sc[i][scName]), np.std(sc[i][scName]), end='\t'))
-        out_file.write("{:.3f} ".format(np.mean(sc[i][scName])))
-        out_file.write("{:.3f} ".format(np.std(sc[i][scName])))
-    fre, bi = np.histogram(sc[i]['acc'], bins=10, range=(0,1))
-    out_file.write("{}\n".format(fre))
-
-'''

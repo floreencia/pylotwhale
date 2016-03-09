@@ -22,7 +22,7 @@ import pylotwhale.utils.annotationTools as annT
 def predictSoundSections(wavF, clf, lt, feExFun, 
                          outF='default', annSections='default'):
     '''
-    predicts and generates the annotions of the given wavF
+    predicts and generates the annotations of the given wavF
     PARAMETERS:
     -----------
         wavF : path to wav file
