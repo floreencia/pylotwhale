@@ -174,9 +174,9 @@ def getSections(y, tf=None):
     sectionsDict = {}
     s0 = 0
     
-    for tr in np.where([y[i] != y[i-1] for i in range(len(y)) ] )[0]:
-        sectionsDict[(s0*scaleFac, tr*scaleFac)] = y[s0+1]
-        s0 = tr
+    for tr in np.where([y[i] != y[i-1] for i in range(1,len(y)) ] )[0]:
+        sectionsDict[(s0*scaleFac, (tr+1)*scaleFac)] = y[tr]
+        s0 = tr+1
 
     # write the last interval if there is still space for one 
     #print("interval:", s0, len(y)) 

@@ -74,7 +74,7 @@ class annotationsValidity():
 
 
 def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, 
-                         labelsHeight=10, cmapName='PiYG'): 
+                         labelsHeight=10, cmapName='seismic'): 
     '''
     plots the spectrogram with it's annotations
     Parameters
