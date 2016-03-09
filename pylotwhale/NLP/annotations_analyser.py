@@ -73,13 +73,15 @@ class annotationsValidity():
 ### plot
 
 
-def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None): 
+def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, 
+                         labelsHeight=10, cmapName='PiYG'): 
     '''
     plots the spectrogram with it's annotations
     Parameters
     ----------    
-    wavAnnCollection  : collecion of paths to wavs and annotations files
-    outDir : dir where the plots will be saved
+        wavAnnCollection  : collecion of paths to wavs and annotations files
+        outDir : dir where the plots will be saved
+        labelHeight : dictionary with the names of the labels and the height
     '''
     ## wav file
     try:
@@ -91,23 +93,27 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None):
     fig, ax = plt.subplots(figsize=figsize)
 
     ax.imshow(M.T, aspect='auto', origin='bottom', interpolation='nearest', 
-              extent=[0, tf, 0, fs/2000.])
+              extent=[0, tf, 0, fs/2/1000.])
     ax.set_xlabel('time (s)')
     ax.set_ylabel('frequecy (KHz)')
-    ## read annotations
+    ### read annotations
     annD = annT.parseAupFile(annFi)
-    annLabel = ''
+    ## custom ann clrs
+    idx2labs = list(set([item['label'] for item in annD]))
+    labs2idx  = { idx2labs[i] : i  for i in range(len(idx2labs)) }
+    cmap = plt.cm.get_cmap( cmapName, len(idx2labs))    
+    
+    annLabel=''
+    ### annotate
     for item in annD: # plot call segments - black line
-        ax.hlines(10, float(item['startTime']), float(item['endTime']))
+        ax.hlines(labelsHeight, float(item['startTime']), float(item['endTime']), 
+                  colors=cmap(labs2idx[item['label']]) )
         annLabel += '{}  '.format(item['label']) #read labels
         
     if callAsTitle:
         ax.set_title('{}'.format(annLabel))
         
-    #if callAsTitle: ax.set_title('{}'.format(fp.parseHeikesNameConv(wavFi)['call']))
-    
-        
-    
+    #if callAsTitle: ax.set_title('{}'.format(fp.parseHeikesNameConv(wavFi)['call']))    
     outPl = os.path.join( outDir, os.path.basename(wavFi).replace('wav', 'png'))
     plt.savefig(outPl)
     del fig, ax

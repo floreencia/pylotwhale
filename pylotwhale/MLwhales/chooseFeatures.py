@@ -45,7 +45,7 @@ preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
 featConstD={}
 NFFTpow=9; featConstD["NFFTpow"] = NFFTpow
 overlap=0.5; featConstD["overlap"]= overlap
-n_mels=2**5; featConstD["n_mels"]= n_mels
+n_mels=2**4; featConstD["n_mels"]= n_mels
 textWS=0.05 ; featConstD["textWS"]= textWS
 featExtract='melspectro' ; featConstD["featExtrFun"]= featExtract
 featExtFun = functools.partial(sT.waveform2featMatrix, **featConstD)

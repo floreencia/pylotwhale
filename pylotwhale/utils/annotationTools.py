@@ -166,7 +166,7 @@ def getSections(y, tf=None):
         (s0, sf) : label
         
     ASSUMPTIONS:
-        - no time overlappong regions in the annotations
+        - no time overlapping regions in the annotations
         
     '''
     scaleFac = 1.*tf/len(y) if tf else 1
@@ -187,11 +187,11 @@ def getSections(y, tf=None):
 
 def predictions2txt(y, outTxt, tf, sections='default'):
     '''
-    this functions transformed the predicted labels y into a txt annotation file
+    transforms the predicted labels y into a txt annotation file
     that can be read by audacity.
     < y : predicted samples
     < outTxt : output file name
-    < sR : sampling rate of the wave file corresponding to the annotation
+    < sR : samplingr rate of the wave file corresponding to the annotation
     < ws : size of the fft-analysis window
     < sections : an array with the sections (num) we are interested
         'default', means section '1'
