@@ -127,8 +127,9 @@ out_file.write("SVC\t{}\tbest score ({}) {:.3f}\n".format(gs.best_params_, metri
 clf_svc_best = gs.best_estimator_
 #y_pred = clf_svc_best.predict(X_test)
 #cM = confusion_matrix(y_test, y_pred, labels=clf_svc_best.classes_)
+### SCORES
 ## test
-scO = myML.clfScoresO(clf_svc_best, X_train, y_test)
+scO = myML.clfScoresO(clf_svc_best, X_train, y_train)
 out_file.write(scO.scores2str()+'\n')
 ## train
 scO = myML.clfScoresO(clf_svc_best, X_test, y_test)
@@ -139,7 +140,7 @@ scO.plConfusionMatrix( labs , outFig=os.path.join(oDir, 'images',
 
 train_sizes, train_scores, test_scores = myML.plLearningCurve(clf_svc_best, X_train, y_train, cv=cv, n_jobs=-1, y_min=0.7)
 
-### clf meassurementS
+### clf measurements
 clf = clf_svc_best
 ## learning curve
 myML.plLearningCurve(clf, X_train, y_train, cv=cv, y_min=0.7, n_jobs=-1,
@@ -156,11 +157,15 @@ pipe_rf.fit(X_train, y_train)
 
 #y_pred = pipe_rf.predict(X_test)
 out_file.write('RF\n')
+## test
+scO = myML.clfScoresO(pipe_rf, X_train, y_train)
+out_file.write(scO.scores2str()+'\n')
+# test
 scO = myML.clfScoresO(pipe_rf, X_test, y_test)
 out_file.write(scO.scores2str()+'\n')
 scO.plConfusionMatrix( labs , outFig=os.path.join(oDir, 'images', 
                     settingsStr +'-rf100-CM.png'))
-### clf meassurements
+### clf measurements
 clf = pipe_rf
 ## pl CM
 
@@ -188,12 +193,16 @@ clf_rf_best = gs.best_estimator_
 
 #y_pred = clf_rf_best.predict(X_test)
 #cM = confusion_matrix(y_test, y_pred, labels=clf_rf_best.classes_)
+## test
+scO = myML.clfScoresO(clf_rf_best, X_train, y_train)
+out_file.write(scO.scores2str()+'\n')
+# test
 scO = myML.clfScoresO(clf_rf_best, X_test, y_test)
 out_file.write(scO.scores2str()+'\tTest\n')
 scO.plConfusionMatrix( labs , outFig=os.path.join(oDir, 'images', 
                     settingsStr +'-rfgs-CM.png'))
 
-### clf meassurements
+### clf measurements
 clf = clf_rf_best
 ## learning curve
 myML.plLearningCurve(clf, X_train, y_train, cv=cv, y_min=0.7, n_jobs=-1,
