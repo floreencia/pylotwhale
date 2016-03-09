@@ -822,12 +822,13 @@ class clfScoresO():
         R = self.recc
         self.f1 = np.array([2.*R[i]*P[i]/(P[i]+R[i]) for i in range(len(P))])
         
-    def scores2str(self, fln=3):
+    def scores2str(self, fln=3, dgt=5):
         '''
         returns a string with the score of a classifier
         Parameters:
         -----------
         fln : float point precission
+        dgt : space digits for printing format
         Return:
         -------
         outS : a string with the acc, pre, recc and f1 scores for each class
@@ -835,7 +836,7 @@ class clfScoresO():
         '''
         outS='{1:.{0}}'.format(fln, self.accuracy)
         for i in range(len(self.classes)):
-            outS +=  "\t{1:.{0}} {2:.{0}} {3:.{0}}".format(fln, self.pre[i], self.recc[i], self.f1[i])
+            outS +=  "\t{2:{1}.{0}} {3:{1}.{0}} {4:{1}.{0}}".format(fln, dgt, self.pre[i], self.recc[i], self.f1[i])
 
         return outS    
         
