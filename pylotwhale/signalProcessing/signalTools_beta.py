@@ -1150,8 +1150,8 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
     computes the mean and the std over the features of M over a texture window of size nTextWS
     M : feature matrix (n_features x instances)
             tf : length of the recording in seconds
-    nTextWS :   int - size of the texture window in number of samples
-                array - or vector with the index values
+    nTextWS :   int - size of the texture window in number of samples (walk)
+                array - or vector with the index values (split)
     normalize : if True, normalizes the instances
     ------>
     fM : texturized feature matrix
@@ -1160,7 +1160,7 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
 
     mt, nf = np.shape(M)
 
-    if isinstance(nTextWS, int):
+    if isinstance(nTextWS, int): # walk
         ind = np.arange(0, mt - nTextWS + 1, nTextWS)
         m_instances = len(ind)
         fM = np.zeros((m_instances, 2*nf))
@@ -1184,10 +1184,10 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
             #"\t", ind[i+1], "%.3f"%M[ind[i+1], 0],#, np.max(np.abs(thisX)))
              #       "%.3f"%thisX[-1,0])#, np.mean(thisX), np.std(thisX))
 
-            if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
 
             fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
 
+        if normalize : fM /= np.max(np.abs(fM)) # the whole matrix
 
         #thisX = M[ind[-2] : , : ]
         #print("f", ind[-2], "M", M[ind[-2], 0], thisX[0,0], ind[-1], M[ind[-1], 0], # , np.max(np.abs(thisX))
