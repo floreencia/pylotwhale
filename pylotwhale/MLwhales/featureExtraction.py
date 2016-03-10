@@ -154,6 +154,8 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
     assert os.path.isfile(noiseWaveFi), "%s\ndoesn't exists"%noiseWaveFi
     ### load noise
     y_ns, sr = sT.wav2waveform(noiseWaveFi)  
+    y_ns=np.random.random_sample(100000)*2-1 # white noise
+
     
     ### extract features for each annotated section
     segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
