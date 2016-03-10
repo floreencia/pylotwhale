@@ -1184,7 +1184,6 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
             #"\t", ind[i+1], "%.3f"%M[ind[i+1], 0],#, np.max(np.abs(thisX)))
              #       "%.3f"%thisX[-1,0])#, np.mean(thisX), np.std(thisX))
 
-
             fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
 
         if normalize : fM /= np.max(np.abs(fM)) # the whole matrix

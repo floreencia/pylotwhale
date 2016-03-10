@@ -119,7 +119,8 @@ def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
     
     return datO
     
-def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, intensity_grid=None):
+def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPreprocesingT=None,
+                               intensity_grid=None):
     """
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
@@ -145,12 +146,14 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, intensi
     ### check feature extraction function
     if not callable(featExtFun): # dictionary or None (defaul parameters)
         featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
+    if not callable(wavPreprocesingT): 
+        wavPreprocesingT = lambda x, y : x
     ### check existance of provided files    
     assert os.path.isfile(wavF), "%s\ndoesn't exists"%wavF
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
     assert os.path.isfile(noiseWaveFi), "%s\ndoesn't exists"%noiseWaveFi
     ### load noise
-    y_ns, sr = sT.wav2waveform(noiseWaveFi)    
+    y_ns, sr = sT.wav2waveform(noiseWaveFi)  
     
     ### extract features for each annotated section
     segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
@@ -161,6 +164,8 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, intensi
     for annIndex in range(len(segmentsLi)): 
         label = segmentsLi[annIndex]['label']
         waveform = segmentsLi[annIndex]['waveform']
+        waveform = wavPreprocesingT(waveform, fs)  # preproces waveform
+
         Y = sT.generateAddEnsemble( waveform, y_ns, intensity_grid)
         #print("TEST", np.shape(Y)[0])
         for i in range(np.shape(Y)[0]):

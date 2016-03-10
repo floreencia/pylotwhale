@@ -31,7 +31,7 @@ from sklearn import svm
 from sklearn import grid_search
 
 from sklearn.pipeline import Pipeline
-#from sklearn.decomposition import PCA
+from sklearn.decomposition import DictionaryLearning#PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 
@@ -151,7 +151,8 @@ myML.printScoresFromCollection(feExFun, clf, lt, collFi_test, out_file)
 clf_scores_li.append(('svc', myML.bestCVScoresfromGridSearch(gs)))
 
 ##########     RANDOM FOREST #############
-pipe_rf = Pipeline([('clf', RandomForestClassifier(n_estimators=100, random_state=1 ))])
+pipe_rf = Pipeline([ #('dictLearn', DictionaryLearning(trainDat.m_instances)),
+                    ('clf', RandomForestClassifier(n_estimators=100, random_state=1 ))])
 pipe_rf.fit(X_train, y_train)
 # tests set
 

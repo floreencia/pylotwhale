@@ -14,6 +14,8 @@ import os
 import featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.utils.annotationTools as annT
+import pylotwhale.MLwhales.MLtools_beta as myML
+
 
 ### split
 
