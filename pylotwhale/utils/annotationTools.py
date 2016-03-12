@@ -6,6 +6,8 @@ import numpy as np
 import re
 import os
 import scikits.audiolab as au
+#import warnings
+
 
 """
 tools for the preparation of annotated files
@@ -34,8 +36,14 @@ def parseAupFile(inFilename, sep='.'):
     data = []
     
     for line in lines:
-        m = re.search('([-0-9%s]*)\t([-0-9%s]*)\t(\w*)'%(sep, sep), line)
-        assert m, "lines don't match the RE"
+        try:
+            m = re.search('([-0-9%s]*)\t([-0-9%s]*)\t(\w*)'%(sep, sep), line)
+            assert m, "{}\nlines don't match the RE".format(line)
+            pass
+        except:
+            print("{}\nnot parsed: {}".format(inFilename, line))
+            continue
+            
         startTime = float(m.group(1).replace(sep, '.')) # replaces separator for dot
         endTime = float(m.group(2).replace(sep, '.'))
         label = m.group(3)

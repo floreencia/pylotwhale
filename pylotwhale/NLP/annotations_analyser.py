@@ -79,7 +79,7 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
     plots the spectrogram with it's annotations
     Parameters
     ----------    
-        wavAnnCollection  : collecion of paths to wavs and annotations files
+        wavAnnCollection  : collection of paths to wavs and annotations files
         outDir : dir where the plots will be saved
         labelHeight : dictionary with the names of the labels and the height
     '''

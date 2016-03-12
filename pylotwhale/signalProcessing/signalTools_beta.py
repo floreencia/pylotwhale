@@ -1178,6 +1178,8 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
         m_instances = len(ind)-1 # #(instances) = #(slicing indexes) - 1
         fM = np.zeros((m_instances, 2*nf))
 
+        if normalize : M /= np.max(np.abs(M), axis=0) # the whole matrix
+
         for i in np.arange(m_instances):
             thisX = np.array(M[ind[i] : ind[i+1]+1, : ])
             #print(i, ind[i], "M", "%.3f"%M[ind[i],0], "%.3f"%thisX[0,0],
@@ -1186,7 +1188,6 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
 
             fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
 
-        if normalize : fM /= np.max(np.abs(fM)) # the whole matrix
 
         #thisX = M[ind[-2] : , : ]
         #print("f", ind[-2], "M", M[ind[-2], 0], thisX[0,0], ind[-1], M[ind[-1], 0], # , np.max(np.abs(thisX))
