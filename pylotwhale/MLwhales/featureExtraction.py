@@ -154,13 +154,13 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
     assert os.path.isfile(noiseWaveFi), "%s\ndoesn't exists"%noiseWaveFi
     ### load noise
-    y_ns, sr = sT.wav2waveform(noiseWaveFi)  
+    #y_ns, sr = sT.wav2waveform(noiseWaveFi)  
     y_ns=np.random.random_sample(100000)*2-1 # white noise
 
     
     ### extract features for each annotated section
     segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
-    assert sr==fs, "noise and signal waves have different sampling rates"
+    #assert sr==fs, "noise and signal waves have different sampling rates"
 
     datO = myML.dataXy_names()     
     ## for each annotation in the wavfile compute the features
@@ -168,11 +168,12 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
         label = segmentsLi[annIndex]['label']
         waveform = segmentsLi[annIndex]['waveform']
         waveform = wavPreprocesingT(waveform, fs)  # preproces waveform
-
-        Y = sT.generateAddEnsemble( waveform, y_ns, intensity_grid)
+        #Y = sT.generatePitchShiftEnsemble( waveform, fs, None) ## frequency
+        #Y = sT.generateTimeStreachEnsemble( waveform, None) ## time
+        Y = sT.generateAddEnsemble( waveform, y_ns, intensity_grid) ## noise
         #print("TEST", np.shape(Y)[0])
-        for i in range(np.shape(Y)[0]):
-            M, _, _, featStr = featExtFun(Y[i,:], fs)
+        for i in range(len(Y)):#np.shape(Y)[0]):
+            M, _, _, featStr = featExtFun(Y[i], fs) #M, _, _, featStr = featExtFun(Y[i,:], fs)
             datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])                                           
     
     return datO    

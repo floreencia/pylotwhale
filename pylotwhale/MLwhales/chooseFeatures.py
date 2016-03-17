@@ -46,7 +46,7 @@ featConstD={}
 NFFTpow=10; featConstD["NFFTpow"] = NFFTpow
 overlap=0.6; featConstD["overlap"]= overlap
 #n_mels=128; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
-textWS=0.05 ; featConstD["textWS"]= textWS
+textWS=0.02 ; featConstD["textWS"]= textWS
 Nceps=30; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
 feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
 featExtFun = feExOb.featExtrFun() #functools.partial(sT.waveform2featMatrix, **featConstD)

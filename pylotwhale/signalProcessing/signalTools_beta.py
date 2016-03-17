@@ -155,6 +155,44 @@ def generateAddEnsemble(y_template, y_add , intensity_grid=None):
         #y_template + intensity_grid[i]*tileTillN(y_add, len(y_template), np.random.randint(0,len(y_template)))
     
     return Y    
+    
+def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
+    '''
+    generate an ensemble of y_template-singnals shifting the pitch of the original signal
+    normalizes both signals and adds different amplitudes of y_add to y_template
+    Parameters:
+    -----------
+        shift_grid : 12 steps per octave
+    Returns:
+        Y : a matrix, with the sum of y_template and y_add in each row
+    '''
+    if shift_grid is None:
+        shift_grid = np.linspace(-2, 2, 5)
+     
+    #print(len(intensity_grid), len(y_template))
+    Y = np.zeros((len(shift_grid), len(y_template)))
+    for i in range(len(shift_grid)):
+        Y[i,:] = lf.effects.pitch_shift(y_template, fs, shift_grid[i])
+        #y_template + intensity_grid[i]*tileTillN(y_add, len(y_template), np.random.randint(0,len(y_template)))
+    
+    return Y    
+    
+def generateTimeStreachEnsemble(y_template, streach_grid=None):
+    '''
+    generate an ensemble of y_template-singnals adding y_add
+    normalizes both signals and adds different amplitudes of y_add to y_template
+    Returns:
+    Y : a matrix, with the sum of y_template and y_add in each row
+    '''
+    if streach_grid is None:
+        streach_grid = np.linspace(0.8, 1.2, 5)
+     
+    #print(len(intensity_grid), len(y_template))
+    Y = []#np.zeros((len(streach_grid), len(streach_grid)))
+    for i in range(len(streach_grid)):
+        Y.append(lf.effects.time_stretch(y_template, streach_grid[i]))
+    
+    return Y 
 
 def freqshift(data, Fs, fshift=100):
     """Frequency shift the signal by constant
@@ -1206,7 +1244,7 @@ def texturizeFeatures(M, nTextWS=100, normalize=True):
 
 
 def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
-                        annotations=None,
+                        annotations=None, nTextWS=False,
                         featExtrFun='cepsDelta', **featExArgs):
     '''
     1. extract audio features
@@ -1217,7 +1255,7 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
     ----------<
     < waveform :  waveform array
     < fs :  sampling rate of the waveform
-    < textWS : size of the texture window [ms]
+    < textWS : size of the texture window 
         nTextWs is assigned here from this value.
         instead on can set Nslices
     < annotations : list with the time stamp, label pairs. The stamp can be in
@@ -1241,16 +1279,21 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
     m0 = np.shape(M0)[0] ## number of frames
 
     ## set the textWS
-    if Nslices is False: ### WALKING - no number of slices was given
+    if Nslices is False and nTextWS is False: ### WALKING - texture window size given
         nTextWS_0 = 1.0*m0*float(textWS)/tf
-        assert nTextWS_0 >= 1, 'the window size is too small {:2.f}'.format(nTextWS_0)
         nTextWS = int(nTextWS_0) ###
+        assert nTextWS >= 1, 'the texture window is too small {:.2f}'.format(nTextWS_0)
         slicingIdx = nTextWS # integer
-    else: # SPLITTING - slice the featMtx into Nslices!
+    elif isinstance(nTextWS, int): # walk!, number of frames given
+        slicingIdx = nTextWS # integer
+        textWS = 1.0*nTextWS*tf/m0
+    elif isinstance(Nslices, int) : # SPLITTING - slice the featMtx into Nslices!
         slicingIdx = flatPartition(Nslices+1, m0) # numpy array
         assert slicingIdx[-1] > 1, 'the texture window is too small %d'%slicingIdx[-1]
         textWS = slicingIdx[1] - slicingIdx[0]
         nTextWS = int(1.0*m0*float(textWS)/tf) ###
+    else:
+        assert False, 'you must give a valid summarization'
 
     featStr+='-txWin%dms%d'%(textWS*1000, nTextWS)
     if normalize: featStr+='-TxWinNormalized'
