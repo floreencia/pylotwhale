@@ -562,7 +562,7 @@ def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True)
     return cepstralDcepRep(waveform, sRate, NFFTpow=NFFTpow, overlap=overlap, Nceps=Nceps,
                 logSc=logSc, order=0)
 
-def cepstralDcepRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
+def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True):
 
     '''
@@ -584,14 +584,13 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
     > paramStr : settings string
     '''
     ## settings																
-    #NFFT = 2**int(NFFTpow)
-    #overlap = float(overlap)
-    #hopSz = int(NFFT*(1 - overlap) )
+    NFFT = 2**int(NFFTpow)
+    overlap = float(overlap)
+    hopSz = int(NFFT*(1 - overlap) )
     Nceps = int(Nceps)			
     paramStr = '-Nceps%d'%(Nceps)
     ## CEPSTROGRAM
-    M0 = lf.feature.mfcc(waveform, sr=sRate, n_mfcc=Nceps)
-                       #n_fft=NFFT, hop_length=hopSz)
+    M0 = lf.feature.mfcc(waveform, sr=sRate, n_mfcc=Nceps, n_fft=NFFT, hop_length=hopSz)#, hop_length=hopSz)
     m = np.shape(M0)[1]
     M=np.zeros((Nceps*(order+1), m))
     M[:Nceps, :] = M0
@@ -609,26 +608,26 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
     return M, featureNames, tf, paramStr
 
 
-def melSpecDRep(waveform, sRate, NFFTpow=9, overlap=0.5, n_mels=2**4,
+def melSpecDRep(waveform, sRate, NFFTpow=10, overlap=0.5, n_mels=2**4,
                 order=1, logSc=True):
 
     '''
     melspectrum Feature Matrix and the delta orders horizontaly appended
-    Parameters
-    ------------
-    < waveform : numpy array
-    < sRate : samplig rate
-    < NFFTpow : exponent of the fft window lenght in base 2
-    < overlap : [0,1)
-    < n_mels : number of cepstral coefficients
-    < logSc : retunrn features in logarithmic scale
-    < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
-    Returns
-    -------
-    > M : cepstral feature matrix ( m_instances x n_features )
-    > featureNames : list
-    > tf : final time [s]
-    > paramStr : settings string
+    Parameters:
+    -----------
+        < waveform : numpy array
+        < sRate : samplig rate
+        < NFFTpow : exponent of the fft window lenght in base 2
+        < overlap : [0,1)
+        < n_mels : number of mel filterbanks
+        < logSc : retunrn features in logarithmic scale
+        < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
+    Returns:
+    --------
+        > M : cepstral feature matrix ( m_instances x n_features )
+        > featureNames : list
+        > tf : final time [s]
+        > paramStr : settings string
     '''
     ## settings																
     NFFT = 2**int(NFFTpow)
@@ -1044,12 +1043,12 @@ def tuLi2frameAnnotations(tuLiAnn, m_instances, tf):
 
 def featureExtractionFun(funName=None):
     '''
-    Dictionary of feature extracing functions
+    Dictionary of feature extracting functions
     that return a dictionary of features
     ------
     > feature names (if None)
     > feature function
-        this funcitons take the waveform and return an instancited feature matrix
+        this functions take the waveform and return an instancited feature matrix
         m (instances) - rows
         n (features) - columns
     '''
@@ -1063,7 +1062,6 @@ def featureExtractionFun(funName=None):
         'chroma' : chromaRep,
         'melspectroDelta' : melSpecDRep,
         'melspectro' : functools.partial(melSpecDRep, order=0)
-
         }
 
     if funName == None: # retuns a list of posible feature names
@@ -1244,10 +1242,12 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
 
     ## set the textWS
     if Nslices is False: ### WALKING - no number of slices was given
-        nTextWS = int(1.0*m0*float(textWS)/tf) ###
-        slicingIdx = nTextWS
+        nTextWS_0 = 1.0*m0*float(textWS)/tf
+        assert nTextWS_0 >= 1, 'the window size is too small {:2.f}'.format(nTextWS_0)
+        nTextWS = int(nTextWS_0) ###
+        slicingIdx = nTextWS # integer
     else: # SPLITTING - slice the featMtx into Nslices!
-        slicingIdx = flatPartition(Nslices+1, m0)
+        slicingIdx = flatPartition(Nslices+1, m0) # numpy array
         assert slicingIdx[-1] > 1, 'the texture window is too small %d'%slicingIdx[-1]
         textWS = slicingIdx[1] - slicingIdx[0]
         nTextWS = int(1.0*m0*float(textWS)/tf) ###

@@ -38,17 +38,18 @@ from sklearn.externals import joblib
 
 ##### SETTINGS
 ## preprocessing
-lb = 0; hb = 24000; order = 3
+lb = 1500; hb = 24000; order = 3 # None
 wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
 preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
 ## features dictionary
 featConstD={}
-NFFTpow=9; featConstD["NFFTpow"] = NFFTpow
-overlap=0.5; featConstD["overlap"]= overlap
-n_mels=2**4; featConstD["n_mels"]= n_mels
+NFFTpow=10; featConstD["NFFTpow"] = NFFTpow
+overlap=0.6; featConstD["overlap"]= overlap
+#n_mels=128; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
 textWS=0.05 ; featConstD["textWS"]= textWS
-featExtract='melspectro' ; featConstD["featExtrFun"]= featExtract
-featExtFun = functools.partial(sT.waveform2featMatrix, **featConstD)
+Nceps=30; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
+featExtFun = feExOb.featExtrFun() #functools.partial(sT.waveform2featMatrix, **featConstD)
 print("Feature extraction settings", featConstD)
 ## clf
 cv = 10
@@ -58,9 +59,9 @@ testFrac = 0.3
 oDir = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/featureSelection'
 collFi_test = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/collection-klein.txt'
 collFile = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/collections/cw-all_grB_grJ.txt' #'../data/collection.txt'
-fN=os.path.join(oDir, 'out.dat')
-out_file=open(fN, 'a')
-outModelName=True
+fN = os.path.join(oDir, 'out.dat')
+out_file = open(fN, 'a')
+outModelName = True
 labs = ['b', 'c', 'w']
 print(fN)
 

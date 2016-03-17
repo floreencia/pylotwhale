@@ -74,7 +74,7 @@ class annotationsValidity():
 
 
 def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, 
-                         labelsHeight=10, cmapName='seismic'): 
+                         labelsHeight=10, cmapName='seismic', lw = 1, cmapIm=None, **kwargs): 
     '''
     plots the spectrogram with it's annotations
     Parameters
@@ -92,8 +92,8 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
     plt.ioff()
     fig, ax = plt.subplots(figsize=figsize)
 
-    ax.imshow(M.T, aspect='auto', origin='bottom', interpolation='nearest', 
-              extent=[0, tf, 0, fs/2/1000.])
+    ax.imshow(M.T, aspect='auto', origin='bottom', cmap=cmapIm, #interpolation='nearest', 
+              extent=[0, tf, 0, fs/2/1000.], **kwargs)
     ax.set_xlabel('time (s)')
     ax.set_ylabel('frequecy (KHz)')
     ### read annotations
@@ -107,7 +107,7 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
     ### annotate
     for item in annD: # plot call segments - black line
         ax.hlines(labelsHeight, float(item['startTime']), float(item['endTime']), 
-                  colors=cmap(labs2idx[item['label']]) )
+                  colors=cmap(labs2idx[item['label']]) , lw=lw)
         annLabel += '{}  '.format(item['label']) #read labels
         
     if callAsTitle:
@@ -119,7 +119,8 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
     del fig, ax
     
     
-def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True, figsize=None):
+def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True, 
+                                     figsize=None, **kwargs):
     '''
     plots the spectros with it's annotations calling plotAnnotatedSpectro
     Parameters
@@ -128,7 +129,8 @@ def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True
     outDir : dir where the plots will be saved
     '''
     for wF, annF in wavAnnCollection:
-        plotAnnotatedSpectro(wF, annF, outDir, callAsTitle=callAsTitle, figsize=figsize)
+        plotAnnotatedSpectro(wF, annF, outDir, callAsTitle=callAsTitle, 
+                             figsize=figsize, **kwargs)
 
 
 class annotationsDF():

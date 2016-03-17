@@ -13,7 +13,8 @@ import os
 import functools
 
 import pylotwhale.signalProcessing.signalTools_beta as sT
-import pylotwhale.MLwhales.MLtools_beta as myML
+import MLtools_beta as myML
+
 import pylotwhale.utils.whaleFileProcessing as fp
 
 
