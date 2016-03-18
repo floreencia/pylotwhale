@@ -1284,14 +1284,15 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
         nTextWS = int(nTextWS_0) ###
         assert nTextWS >= 1, 'the texture window is too small {:.2f}'.format(nTextWS_0)
         slicingIdx = nTextWS # integer
-    elif isinstance(nTextWS, int): # walk!, number of frames given
-        slicingIdx = nTextWS # integer
-        textWS = 1.0*nTextWS*tf/m0
     elif isinstance(Nslices, int) : # SPLITTING - slice the featMtx into Nslices!
         slicingIdx = flatPartition(Nslices+1, m0) # numpy array
+        #print("TEST",slicingIdx)
         assert slicingIdx[-1] > 1, 'the texture window is too small %d'%slicingIdx[-1]
         textWS = slicingIdx[1] - slicingIdx[0]
         nTextWS = int(1.0*m0*float(textWS)/tf) ###
+    elif isinstance(nTextWS, int): # walk!, number of frames given
+        slicingIdx = nTextWS # integer
+        textWS = 1.0*nTextWS*tf/m0
     else:
         assert False, 'you must give a valid summarization'
 

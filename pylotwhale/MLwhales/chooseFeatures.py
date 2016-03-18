@@ -43,11 +43,12 @@ wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=l
 preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
 ## features dictionary
 featConstD={}
-NFFTpow=10; featConstD["NFFTpow"] = NFFTpow
+NFFTpow=8; featConstD["NFFTpow"] = NFFTpow
 overlap=0.6; featConstD["overlap"]= overlap
 #n_mels=128; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
 textWS=0.02 ; featConstD["textWS"]= textWS
-Nceps=30; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+#Nceps=30; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
 featExtFun = feExOb.featExtrFun() #functools.partial(sT.waveform2featMatrix, **featConstD)
 print("Feature extraction settings", featConstD)

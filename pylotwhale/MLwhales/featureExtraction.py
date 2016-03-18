@@ -156,7 +156,6 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
     ### load noise
     #y_ns, sr = sT.wav2waveform(noiseWaveFi)  
     y_ns=np.random.random_sample(100000)*2-1 # white noise
-
     
     ### extract features for each annotated section
     segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
@@ -173,7 +172,8 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
         Y = sT.generateAddEnsemble( waveform, y_ns, intensity_grid) ## noise
         #print("TEST", np.shape(Y)[0])
         for i in range(len(Y)):#np.shape(Y)[0]):
-            M, _, _, featStr = featExtFun(Y[i], fs) #M, _, _, featStr = featExtFun(Y[i,:], fs)
+            #M, _, _, featStr = featExtFun(Y[i], fs) #
+            M, _, _, featStr = featExtFun(Y[i,:], fs)
             datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])                                           
     
     return datO    
