@@ -133,6 +133,8 @@ def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True
                              figsize=figsize, **kwargs)
 
 
+
+
 class annotationsDF():
     def __init__(self, df, names=None):
         """
@@ -210,3 +212,36 @@ class file2annotationsDF(annotationsDF):
         self.annotations_file = path2file
         df = pd.read_csv(self.annotations_file, sep ='\t', names=names )
         annotationsDF.__init__(self, df, names)           
+        
+        
+        
+
+#### sequences
+
+def annsDf2lisOfSeqs(df, Dt=None, l='l'):
+    '''
+    reads an annotations dataframe [t0, tf, l] into a list of sequences
+    Parameters:
+    -----------
+        Dt : 2-dim tuple time interval for filtering the sequences 
+                None :  (0, 0.5) seconds        
+    '''
+    if Dt is None: Dt = (None, 0.5)
+    assert len(Dt) == 2, "Dt must be 2 dimesional"
+    
+    df = df.reset_index(drop=True)
+    annO = annotationsDF(df)
+    ict = annO.ict
+    seqsLi = []
+    subLi = [df[l].ix[0]]
+
+    for i in range(len(ict))[:]:
+        if Dt[0] <= ict[i] <= Dt[1]:
+            subLi.append(df['l'].ix[i+1])
+        else:
+            seqsLi.append(subLi)
+            subLi = [df['l'].ix[i+1]]
+        
+    seqsLi.append(subLi)
+    
+    return seqsLi        

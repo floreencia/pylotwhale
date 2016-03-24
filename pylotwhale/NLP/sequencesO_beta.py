@@ -179,6 +179,13 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
     draws a beautiful color plot
     tickLabsDict     dictionary where the keys are the label of the cba ticks
                     and the vallues a re te postions
+    Parameters:
+    ------------                    
+        X : 2d numpy array
+        vmax : max value to plot
+        vmin : cutoff min value
+        maxN : maximum number of columns
+        
     '''
 
     fig, ax = plt.subplots()

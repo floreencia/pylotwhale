@@ -3,6 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import scipy.io.arff as arff
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 
@@ -719,7 +720,7 @@ def printIterClfScores( fileN, clf, X, y, c0, comments=None, commtLi='#'):
 
 ### confusion matrix
 
-def plConfusionMatrix(cM, labels, outFig='', figsize=None):
+def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None):
     '''
     plots confusion matrix
     cM : confusion matrix
@@ -728,6 +729,7 @@ def plConfusionMatrix(cM, labels, outFig='', figsize=None):
     outFig : name where to save fig
     '''
     # myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
+    font = {'size' : fontSz}; matplotlib.rc('font', **font)
         
     fig, ax = plt.subplots(figsize=figsize)#(5, 5))
     ax.imshow(cM, cmap=plt.cm.Blues, alpha=0.3, interpolation='nearest')
