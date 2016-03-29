@@ -248,8 +248,8 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocesingT=No
     for wavF, l in wavLabelCollection:
         waveForm, fs = sT.wav2waveform(wavF)
         waveForm = wavPreprocesingT(waveForm, fs)        
-        M, _, _, featStr = featExtFun(waveform, fs)
-        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])  
+        M, _, _, featStr = featExtFun(waveForm, fs)
+        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])  
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
     return datO    
     
