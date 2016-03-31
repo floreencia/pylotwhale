@@ -173,7 +173,7 @@ def plNgrams(df0, tau, outFN='', xLim=None, yScale='log',
     
 def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
                   tickLabsDict='', outplN='', plTitle='', xL='N', yL=r'$\tau$',
-                  figureScale=(), extendCbar='both'):
+                  figureScale=(), extendCbar='both', extent=None):
     
     '''
     draws a beautiful color plot
@@ -185,6 +185,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
         vmax : max value to plot
         vmin : cutoff min value
         maxN : maximum number of columns
+        extent : scalars (left, right, bottom, top)
         
     '''
 
@@ -199,7 +200,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
     #plot
     cax=ax.imshow(X[:,:maxN], aspect ='auto', interpolation='nearest', 
                norm = colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
-               cmap=cmap)
+               cmap=cmap, extent=extent)
     #labels
     ax.set_xlabel(xL)
     ax.set_ylabel(yL)

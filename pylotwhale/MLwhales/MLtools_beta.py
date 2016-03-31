@@ -442,12 +442,13 @@ class dataXy_names(dataX):
     def targetFrequencies(self):
         return( dict(Counter(self.y_names) ))
         
-    def filterInstances(self, y_namesSet, A=None, a=None ):
+    def filterInstances(self, y_namesSet=None, A=None, a=None ):
         '''
         returns the instances with y_names in the y_namesSet
         Parameters
         ----------        
         y_namesSet : list of y_names to keep
+                        if None, don't filter
         A : feature matrix
         b : target vector (nominal)
         
@@ -460,8 +461,12 @@ class dataXy_names(dataX):
             #print("TEST ------ default")
             A = self.X
             a = self.y_names
-        selector = np.in1d(a, y_namesSet)
-        return( A[selector, :], a[selector])
+            
+        if y_namesSet is None: # don't filter
+            return( A, a)
+        else: 
+            selector = np.in1d(a, y_namesSet)
+            return( A[selector, :], a[selector])
   
 
 class dataXy(dataXy_names):
@@ -720,7 +725,8 @@ def printIterClfScores( fileN, clf, X, y, c0, comments=None, commtLi='#'):
 
 ### confusion matrix
 
-def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None):
+def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None, 
+                      display_nums=True, alpha=0.3, title=None):
     '''
     plots confusion matrix
     cM : confusion matrix
@@ -732,14 +738,15 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None):
     font = {'size' : fontSz}; matplotlib.rc('font', **font)
         
     fig, ax = plt.subplots(figsize=figsize)#(5, 5))
-    ax.imshow(cM, cmap=plt.cm.Blues, alpha=0.3, interpolation='nearest')
+    ax.imshow(cM, cmap=plt.cm.Blues, alpha=alpha, interpolation='nearest')
     
     r,c = np.shape(cM)
     
     ## display numbers in the matrix
-    for i in range(r):
-        for j in range(c):
-            ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center')
+    if display_nums:
+        for i in range(r):
+            for j in range(c):
+                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center')
     
     ## ticks labels
     ax.set_xticks(range(c))        
@@ -749,6 +756,7 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None):
     ## axis labels
     ax.set_xlabel('predicted label')
     ax.set_ylabel('true label')
+    if title: ax.set_title(title)
     
     if outFig: fig.savefig(outFig)    
     
