@@ -121,7 +121,8 @@ def flatPartition(nSlices, vec_size):
     return np.array([int(item) for item  in idx])
     
 #### WAVEFORM MANIPULATIONS    
-    
+"""    
+########### moved to effects.py
 def normalizeWF(waveform):
     return 1.0*waveform/np.max(np.abs(waveform))
     
@@ -195,8 +196,8 @@ def generateTimeStreachEnsemble(y_template, streach_grid=None):
     return Y 
 
 def freqshift(data, Fs, fshift=100):
-    """Frequency shift the signal by constant
-    """
+    '''Frequency shift the signal by constant
+    '''
     x = np.fft.rfft(data)
     T = len(data)/float(Fs)
     df = 1.0/T
@@ -205,6 +206,7 @@ def freqshift(data, Fs, fshift=100):
     y = np.roll(x.real,nbins) + 1j*np.roll(x.imag,nbins)
     z = np.fft.irfft(y)
     return z
+"""    
 
 ##### wav files
 
