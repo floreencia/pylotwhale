@@ -251,6 +251,9 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocesingT=No
     
 def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, wavPreprocesingT=None):
     """
+    !!!! split it into wavAnn2datXy + a for loop that does it for the whole collection
+    !!!! see wavAnn2secionsXy and wavAnnCollection2sectionsXy
+    
     returns the data object of a collection of annotated wavs.
             
         ( •_•)O*¯`·. whale sound detector (classification) .·´¯`°Q(•_• )
@@ -271,6 +274,7 @@ def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, wavPreprocesingT=N
     > datO :  a file with the paths to the features and their labels
     """   
     if isinstance(featExtFun, dict):
+        #!!! featExtFun = wavFeatureExtractionWalk(featExtFun).featExtrFun()
         featExtFun = functools.partial(sT.waveform2featMatrix, **featExtFun)
     if not callable(wavPreprocesingT): 
         wavPreprocesingT = lambda x, y : x

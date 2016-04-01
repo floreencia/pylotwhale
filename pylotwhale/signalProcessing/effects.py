@@ -110,6 +110,9 @@ def waveformEffectsDictionary(funName=None):
 #### waveform ensembles   
     
 def generateWaveformEnsemble(y_template, effect=None, grid=None, **kwEffect):
+    '''
+    !!! only works for white noise addition
+    '''
     
     if grid is None: grid = np.ones(1)
     if effect is None: 
