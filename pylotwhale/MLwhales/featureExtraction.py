@@ -173,8 +173,7 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=Non
 
     Return
     ------    
-    > X : features matrix
-    > y : labels
+    > datXy_names : data object
     """
 
     ### check feature extraction function
@@ -208,6 +207,17 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=Non
     
     return datO    
     
+def wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun=None, wavPreprocesingT=None,
+                               ensembleSettings=None):
+    datO = myML.dataXy_names() 
+    for wavF, annF in wavAnnColl[:]:
+        datO_new = wavAnn2sectionsXy_ensemble( wavF, annF, featExtFun=featExtFun, 
+                                                   wavPreprocesingT=wavPreprocesingT,
+                                                   ensembleSettings=ensembleSettings) 
+        datO.addInstances(datO_new.X, datO_new.y_names )
+    
+    return datO
+
     
 def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocesingT=None):
     """
