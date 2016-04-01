@@ -13,6 +13,8 @@ import os
 import functools
 
 import pylotwhale.signalProcessing.signalTools_beta as sT
+import pylotwhale.signalProcessing.effects as eff
+
 import MLtools_beta as myML
 
 import pylotwhale.utils.whaleFileProcessing as fp
@@ -152,8 +154,8 @@ def wavAnnCollection2sectionsXy(wavAnnColl, featExtFun=None):
     
     return datO_test
     
-def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPreprocesingT=None,
-                               intensity_grid=None):
+def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=None,
+                               ensembleSettings=None):
     """
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
@@ -166,9 +168,8 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
     < featExtFun :  feature extraction function (callable)
                     or a dictionary with the feature extraction settings
                     featureExtrationParams = dict(zip(i, i))
-    < noiseWaveFi :  wave file with noise to add
-    < intensity_grid :  array of intensities that will be used to multiply the adding signal
-                        before is added
+    < wavPreprocesingT : callable
+    < ensembleSettings : dictionary with the instructions for ensemeble generation
 
     Return
     ------    
@@ -181,14 +182,12 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
         featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
     if not callable(wavPreprocesingT): 
         wavPreprocesingT = lambda x, y : x
+    if ensembleSettings is None:
+        ensembleSettings = dict(effectName='addWhiteNoise', param_grid=np.ones(1) )
     ### check existance of provided files    
     assert os.path.isfile(wavF), "%s\ndoesn't exists"%wavF
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
-    assert os.path.isfile(noiseWaveFi), "%s\ndoesn't exists"%noiseWaveFi
-    ### load noise
-    #y_ns, sr = sT.wav2waveform(noiseWaveFi)  
-    y_ns=np.random.random_sample(100000)*2-1 # white noise
-    
+                
     ### extract features for each annotated section
     segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
     #assert sr==fs, "noise and signal waves have different sampling rates"
@@ -199,10 +198,9 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, noiseWaveFi, featExtFun=None, wavPrep
         label = segmentsLi[annIndex]['label']
         waveform = segmentsLi[annIndex]['waveform']
         waveform = wavPreprocesingT(waveform, fs)  # preproces waveform
-        #Y = sT.generatePitchShiftEnsemble( waveform, fs, None) ## frequency
-        #Y = sT.generateTimeStreachEnsemble( waveform, None) ## time
-        Y = sT.generateAddEnsemble( waveform, y_ns, intensity_grid) ## noise
-        #print("TEST", np.shape(Y)[0])
+
+        Y = eff.generateWaveformEnsemble( waveform,  **ensembleSettings) ## noise
+        
         for i in range(len(Y)):#np.shape(Y)[0]):
             #M, _, _, featStr = featExtFun(Y[i], fs) #
             M, _, _, featStr = featExtFun(Y[i,:], fs)

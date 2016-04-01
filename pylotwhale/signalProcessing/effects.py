@@ -52,12 +52,12 @@ def tileTillN(arr, N, n0=0):
     #np.tile(arr, int(n/len(arr))+1)[:n]
     return arr[np.array([i for i in np.arange(n0, N + n0)%len(arr)])]
     
-def addWhiteNoise(y, a=1.0):
+def addWhiteNoise(y, param=1.0):
     """
-    adds white noise with amplitude a to y
+    adds white noise with amplitude 'param" to y
     """
     y_ns=np.random.random_sample(len(y))*2-1 # white noise
-    return y + a*y_ns
+    return y + param*y_ns
 
     
 def addToSignal(y1, y2, noiseIndex):
@@ -67,13 +67,13 @@ def addToSignal(y1, y2, noiseIndex):
     return y1 + tileTillN(y2, len(y1), noiseIndex)    
     
 
-def freqshift(y, Fs, fshift=100):
-    """Frequency shift the signal by constant
+def freqshift(y, Fs, param=100):
+    """Frequency shift the signal by param
     """
     x = np.fft.rfft(y)
     T = len(y)/float(Fs)
     df = 1.0/T
-    nbins = int(fshift/df)
+    nbins = int(param/df)
     # print T,df,nbins,x.real.shape
     y = np.roll(x.real,nbins) + 1j*np.roll(x.imag,nbins)
     z = np.fft.irfft(y)
@@ -94,10 +94,10 @@ def waveformEffectsDictionary(funName=None):
             this functions take the waveform an alteration if the later
     '''
     D = {
-        'addWhiteNoise' : addWhiteNoise,
+        'addWhiteNoise' : addWhiteNoise,# param : amplitud of the white noise waveform 
         'addSignals' : addToSignal,
-        'freqShift' : freqshift,
-        'timeStreach' : lf.effects.time_stretch,
+        'freqShift' : freqshift, # y, Fs, fshift=100
+        'timeStreach' : lf.effects.time_stretch, # time_stretch(y, 1.5)
         'pitchshift' : lf.effects.pitch_shift
         }
 
@@ -109,26 +109,34 @@ def waveformEffectsDictionary(funName=None):
     
 #### waveform ensembles   
     
-def generateWaveformEnsemble(y_template, effect=None, grid=None, **kwEffect):
+def generateWaveformEnsemble(y_template, effectName=None, param_grid=None):#, **kwEffect):
     '''
     !!! only works for white noise addition
+    Params:
+    -------
+        y_template : waveform np.arrat
+        effect : name of the effect to use (string)
+        grid : parameter grid for the effect
+        kwEffect : kwargs for the effect
+    Returns:
+    -------
+        Y : waveform ensemble (np.array), one waveform per row
     '''
     
-    if grid is None: grid = np.ones(1)
-    if effect is None: 
-        effect = waveformEffectsDictionary("addWhiteNoise")
+    if param_grid is None: param_grid = np.ones(1)
+    if effectName is None: 
+        effectFun = waveformEffectsDictionary("addWhiteNoise")
     else:
-        effect = waveformEffectsDictionary(effect)
+        effectFun = waveformEffectsDictionary(effectName)
     
-    Y = np.zeros((len(grid), len(y_template)))
+    Y = np.zeros((len(param_grid), len(y_template)))
         
-    for i in range(len(grid)):
-        Y[i,:] = effect(y_template, grid[i], **kwEffect)
+    for i in range(len(param_grid)):
+        Y[i,:] = effectFun(y_template, param=param_grid[i])#, **kwEffect)
     return(Y)
         
         
 
-    
 def generateAddEnsemble(y_template, y_add, intensity_grid=None, normalize=True):
     '''
     generate an ensemble of y_template-singnals adding y_add

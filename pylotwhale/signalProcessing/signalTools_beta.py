@@ -120,12 +120,13 @@ def flatPartition(nSlices, vec_size):
     idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
     return np.array([int(item) for item  in idx])
     
-#### WAVEFORM MANIPULATIONS    
-"""    
+#### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py
 def normalizeWF(waveform):
     return 1.0*waveform/np.max(np.abs(waveform))
     
+    
+"""    
 def tileTillN(arr, N, n0=0):
     '''returns an arrray of size N (>0) from tiling of arr. n0 is the starting index'''
     #np.tile(arr, int(n/len(arr))+1)[:n]
