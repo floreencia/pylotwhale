@@ -75,6 +75,24 @@ def readCols(fName, colIndexes, sep='\t'):
     #li = [tuple([line.strip().split(sep)[ci] for ci in colIndexes]) for line in lines if not line.startswith('#')]
     li = [[line.strip().split(sep)[ci] for ci in colIndexes] for line in lines if not line.startswith('#')]
     return li  
+
+
+def getLabelSet_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
+    '''
+    parses the annotations of a collection
+    Parameters:
+    -----------
+        collection : 
+        anncollLabel : number of the column with the annotations
+        labelCol : column of the label in the annotation file
+    '''
+    labels = []
+    for li in collection:
+        annF=li[annCollLabel]
+        l = readCols(annF, [labelCol])
+        labels.extend(reduce(lambda x,y: x+y,l))
+    
+    return labels  
     
 
 ### text file editing
