@@ -25,7 +25,7 @@ def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
     """
     Computes and saves the features of a collection of annotated wavs.
     The features are saved in the outDir and alongside an index file is created with
-    the paths to the festures and the labels.
+    the paths to the features and the labels.
     
     ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
     
@@ -182,7 +182,7 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=Non
     if not callable(wavPreprocesingT): 
         wavPreprocesingT = lambda x, y : x
     if ensembleSettings is None:
-        ensembleSettings = dict(effectName='addWhiteNoise', param_grid=np.ones(1) )
+        ensembleSettings = dict(effectName='addWhiteNoise', generate_data_grid=np.ones(1) )
     ### check existance of provided files    
     assert os.path.isfile(wavF), "%s\ndoesn't exists"%wavF
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF

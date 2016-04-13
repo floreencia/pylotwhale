@@ -6,7 +6,7 @@ Created on Wed Dec 16 16:41:04 2015
 from __future__ import print_function
 import os
 import glob
-#import warnings
+import warnings
 
 def areListItemsUnique(mylist):
     '''checks for duplcated items in a list'''
@@ -21,12 +21,12 @@ def uniqueItemIndexes(mylist):
     i.e. excluding duplicates'''
     uniqueLi = list(set(mylist))
     if len(mylist) != len(uniqueLi):
-        print("WARNING! Duplicated items")
+        warnings.warn("WARNING! Duplicated items")
         #warnings.warn("Duplicated items")
-        return [mylist.index(item) for item in uniqueLi]
-    else:
-        print("unique items list")
-        return(range(len(mylist)))
+        return sorted([mylist.index(item) for item in uniqueLi])
+    else: # no dup indexes
+        #"unique items list")
+        return(range(len(mylist))) # return all indexes
         
     
 def filterListForUniqueItems(myList):

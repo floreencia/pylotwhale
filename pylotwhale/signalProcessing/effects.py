@@ -109,30 +109,30 @@ def waveformEffectsDictionary(funName=None):
     
 #### waveform ensembles   
     
-def generateWaveformEnsemble(y_template, effectName=None, param_grid=None):#, **kwEffect):
+def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=None):#, **kwEffect):
     '''
     !!! only works for white noise addition
     Params:
     -------
         y_template : waveform np.arrat
         effect : name of the effect to use (string)
-        grid : parameter grid for the effect
+        generate_data_grid : parameter grid for the effect
         kwEffect : kwargs for the effect
     Returns:
     -------
         Y : waveform ensemble (np.array), one waveform per row
     '''
     
-    if param_grid is None: param_grid = np.ones(1)
+    if generate_data_grid is None: generate_data_grid = np.ones(1)
     if effectName is None: 
         effectFun = waveformEffectsDictionary("addWhiteNoise")
     else:
         effectFun = waveformEffectsDictionary(effectName)
     
-    Y = np.zeros((len(param_grid), len(y_template)))
+    Y = np.zeros((len(generate_data_grid), len(y_template)))
         
-    for i in range(len(param_grid)):
-        Y[i,:] = effectFun(y_template, param=param_grid[i])#, **kwEffect)
+    for i in range(len(generate_data_grid)):
+        Y[i,:] = effectFun(y_template, param=generate_data_grid[i])#, **kwEffect)
     return(Y)
         
         

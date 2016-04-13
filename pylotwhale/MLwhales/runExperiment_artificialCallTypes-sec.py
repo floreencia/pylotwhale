@@ -22,13 +22,19 @@ from sklearn import svm
 import time
 
 
-####################### SETTINGS
+#######################   SETTINGS   ######################################
 
 ###### Iter parameters
 parameter = 'noiseAmplitude'
-amp = np.linspace(0.0, 0.05, 10) 
-param_grid = np.repeat(amp, 15)
+n_artificial_samples = 15 # number of artificial samples to generate
+n_experiments = 20 # identical experiment repetitions
+a0 = 0
+a = 0.2
+amp = np.linspace(a0, a, 10) # paramter domain
+param_grid = np.repeat(amp, n_experiments) # reapet expriment
 metric='accuracy'
+preproStr="n_idExperiments{}-n_trainSamples{}_in_{}_{}".format(n_experiments,
+                                                 n_artificial_samples, a0, a)
 
 ##### out files
 oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
@@ -43,13 +49,13 @@ out_file = os.path.join(oDir, "scores.txt")
 ## preprocessing
 lb = 1500; hb = 24000; order = 3 # None
 wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
-preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
+preproStr +=''#'bandfilter{}_{}'.format(lb, hb)
 
 ## features dictionary
 featConstD = {}
 NFFTpow = 10; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"]= overlap
-Nslices = 8; featConstD["Nslices"]= Nslices
+Nslices = 6; featConstD["Nslices"]= Nslices
 normalize = True; featConstD["normalize"]= normalize
 #featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 #n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
@@ -94,25 +100,79 @@ y_test = lt.nom2num(y_test_labels)
 ## feature extraction object / function
 settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 
+#### functions
 
-################### TASK
+def train_clf(X, y):
+    gs = grid_search.GridSearchCV(**gs_settings)
+    gs.fit(X, y)
+    clf = gs.best_estimator_
+    del gs
+    return(clf)
+    
+def genrateData_ensembleSettings(param):
+    ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}
+    ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
+    return(ensembleSettings)
+    
+def run_clf_experiment(param_grid,  feExFun, callSet, lt,
+                       scores_file,
+                       wavAnnColl_tr, Xy_test = (X_test, y_test), 
+                       predictions_file=None ):
+    
+    for param in param_grid:
+        print("param", param)
+        
+        ensembleSettings = genrateData_ensembleSettings(param)
+        datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
+                                                ensembleSettings=ensembleSettings)
+                                                
+        X_train, y_train_labels = datO.filterInstances(callSet)
+        y_train = lt.nom2num(y_train_labels)    
+        X_train, y_train = X_train, y_train
+        
+        clf = train_clf(X_train, y_train) # train   
+        
+        X_test, y_test = Xy_test
+        scores = clf.score(X_test, y_test)
+     
+        ## print
+        with open(scores_file, 'a') as f:
+            f.write("{}\t{}\n".format(param, "\t".join("{}".format(scores).split(","))))
+            
+    return(scores_file, predictions_file)    
+
+
+###################  TASK  ####################
 
 ## print experiment settings header
 with open(out_file, 'w') as f:
     f.write("#{}\n#TRAIN: {}\n#TEST: {}\n#{}\n#{}\t{}\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S"), 
             collFi_train, collFi_test, settingsStr, parameter, metric))
 
-print(out_file)
-#sys.exit()            
+
+
+run_clf_experiment(param_grid,  feExFun=feExFun, callSet=callSet, lt=lt,
+                       wavAnnColl_tr=wavAnnColl_tr, Xy_test=(X_test, y_test),
+                       scores_file=out_file, predictions_file=None)
+
+
     
 #### Ensemble settings
-ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}
 
+
+
+
+
+
+
+
+
+sys.exit()
 for param in param_grid:
     print("param", param)
     
     #### generate data
-    ensembleSettings["param_grid"] = np.ones(10)*param
+    ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
     datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
                                             ensembleSettings=ensembleSettings)
     X_train, y_train_labels = datO.filterInstances(callSet)    
@@ -120,9 +180,7 @@ for param in param_grid:
     X_train, y_train = shuffle(X_train, y_train)
     
     #### train   
-    gs = grid_search.GridSearchCV(**gs_settings)
-    gs.fit(X_train, y_train)
-    clf = gs.best_estimator_
+    clf = train_clf(X_train, y_train)
     
     #### scores
     scores = clf.score(X_test, y_test)
@@ -132,6 +190,10 @@ for param in param_grid:
         f.write("{}\t{}\n".format(param, "\t".join("{}".format(scores).split(","))))
     
     del gs
+
+
+
+
 
 '''
     ## format
