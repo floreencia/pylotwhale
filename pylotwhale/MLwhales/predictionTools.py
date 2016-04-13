@@ -32,7 +32,7 @@ def predictSoundSections(wavF, clf, lt, feExFun,
         lt : label transformer object
         feExFun : feature extraction callable
         out : annotations out file name, default = wav base name + '-predicitons'
-        annSextions : setions to print, defaulf = 'c'
+        annSections : setions to print, defaulf = 'c'
     '''
     if outF =='default':
         bN = os.path.basename(wavF)
@@ -102,7 +102,8 @@ def predictAnnotationSections(wavF, annF, clf, feExtParams, lt, outFile=None,
         predictions = np.hstack((predictions, clf.predict_proba(predO.X)))
         header = '{}'.format(le.classes_)
     ## save file
-    A = np.loadtxt(annF, delimiter='\t', dtype='|S')#, usecols=[0,1])
+    A = np.loadtxt(annF, delimiter='\t', dtype='|S', ndmin=2)#,usecols=[0,1])
+    print("TEST", np.shape(A), np.shape(predictions))
     np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s', 
                delimiter = '\t', header=header)
     return outFile

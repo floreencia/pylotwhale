@@ -26,8 +26,8 @@ import time
 
 ###### Iter parameters
 parameter = 'noiseAmplitude'
-amp = np.linspace(0.0, 0.05, 10) 
-param_grid = np.repeat(amp, 15)
+amp = np.linspace(0.0, 0.05, 3) 
+param_grid = np.repeat(amp, 10)
 metric='accuracy'
 
 ##### out files
@@ -36,7 +36,7 @@ try:
     os.makedirs(oDir)
 except OSError:
     pass
-out_file = os.path.join(oDir, "scores.txt")
+out_file = os.path.join(oDir, "scores-copy.txt")
 
 ##### feature extraction 
 
@@ -112,7 +112,7 @@ for param in param_grid:
     print("param", param)
     
     #### generate data
-    ensembleSettings["param_grid"] = np.ones(10)*param
+    ensembleSettings["generate_data_grid"] = np.ones(10)*param
     datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
                                             ensembleSettings=ensembleSettings)
     X_train, y_train_labels = datO.filterInstances(callSet)    

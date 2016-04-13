@@ -77,7 +77,7 @@ def readCols(fName, colIndexes, sep='\t'):
     return li  
 
 
-def getLabelSet_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
+def getLabels_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
     '''
     parses the annotations of a collection
     Parameters:

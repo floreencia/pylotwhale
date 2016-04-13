@@ -26,11 +26,13 @@ import time
 
 ###### Iter parameters
 parameter = 'noiseAmplitude'
-n_artificial_samples = 15 # number of artificial samples to generate
-n_experiments = 20 # identical experiment repetitions
+n_artificial_samples = 10 # number of artificial samples to generate
+n_experiments = 10 # identical experiment repetitions
+# noise amplitude
+n_amps=3
 a0 = 0
-a = 0.2
-amp = np.linspace(a0, a, 10) # paramter domain
+a = 0.05
+amp = np.linspace(a0, a, n_amps) # paramter domain
 param_grid = np.repeat(amp, n_experiments) # reapet expriment
 metric='accuracy'
 preproStr="n_idExperiments{}-n_trainSamples{}_in_{}_{}".format(n_experiments,
@@ -44,7 +46,7 @@ except OSError:
     pass
 out_file = os.path.join(oDir, "scores.txt")
 
-##### feature extraction 
+##### Feature extraction 
 
 ## preprocessing
 lb = 1500; hb = 24000; order = 3 # None
@@ -55,7 +57,7 @@ preproStr +=''#'bandfilter{}_{}'.format(lb, hb)
 featConstD = {}
 NFFTpow = 10; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"]= overlap
-Nslices = 6; featConstD["Nslices"]= Nslices
+Nslices = 8; featConstD["Nslices"]= Nslices
 normalize = True; featConstD["normalize"]= normalize
 #featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 #n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
@@ -84,7 +86,7 @@ gs = grid_search.GridSearchCV(**gs_settings)
 callSet=['126i', '130', '127', '129', '128i', '131i', '093ii']
 lt = myML.labelTransformer(callSet)
 
-##### data
+##### Data
 ## collection files
 collFi_train = '/home/florencia/whales/data/Vocal-repertoire-catalogue-Pilot-whales-Norway/flo/wavs/wavFiles-wavAnnCollection-prototypes.txt'
 collFi_test = '/home/florencia/whales/MLwhales/callClassification/data/collections/grB-balanced14collection.txt'
@@ -100,7 +102,7 @@ y_test = lt.nom2num(y_test_labels)
 ## feature extraction object / function
 settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 
-#### functions
+######### Functions #######
 
 def train_clf(X, y):
     gs = grid_search.GridSearchCV(**gs_settings)
