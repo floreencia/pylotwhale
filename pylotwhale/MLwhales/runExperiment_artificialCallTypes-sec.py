@@ -116,32 +116,35 @@ def genrateData_ensembleSettings(param):
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
     return(ensembleSettings)
     
-def run_clf_experiment(param_grid,  feExFun, callSet, lt,
-                       scores_file,
-                       wavAnnColl_tr, Xy_test = (X_test, y_test), 
-                       predictions_file=None ):
+def clf_experiment(param):
+                           
+    ensembleSettings = genrateData_ensembleSettings(param)
+    datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
+                                                ensembleSettings=ensembleSettings)
+                                                
+    X_train, y_train_labels = datO.filterInstances(callSet)
+    y_train = lt.nom2num(y_train_labels)    
+    X_train, y_train = X_train, y_train
+        
+    clf = train_clf(X_train, y_train) # train   
+        
+    #X_test, y_test = Xy_test
+    scores = clf.score(X_test, y_test)
+    return scores
+    
+    
+def run_iter_clf_experiment(param_grid, scores_file=out_file, predictions_file=None):
     
     for param in param_grid:
         print("param", param)
         
-        ensembleSettings = genrateData_ensembleSettings(param)
-        datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
-                                                ensembleSettings=ensembleSettings)
-                                                
-        X_train, y_train_labels = datO.filterInstances(callSet)
-        y_train = lt.nom2num(y_train_labels)    
-        X_train, y_train = X_train, y_train
-        
-        clf = train_clf(X_train, y_train) # train   
-        
-        X_test, y_test = Xy_test
-        scores = clf.score(X_test, y_test)
+        scores = clf_experiment(param)
      
         ## print
         with open(scores_file, 'a') as f:
             f.write("{}\t{}\n".format(param, "\t".join("{}".format(scores).split(","))))
             
-    return(scores_file, predictions_file)    
+    return( scores_file, predictions_file )    
 
 
 ###################  TASK  ####################
@@ -151,11 +154,7 @@ with open(out_file, 'w') as f:
     f.write("#{}\n#TRAIN: {}\n#TEST: {}\n#{}\n#{}\t{}\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S"), 
             collFi_train, collFi_test, settingsStr, parameter, metric))
 
-
-
-run_clf_experiment(param_grid,  feExFun=feExFun, callSet=callSet, lt=lt,
-                       wavAnnColl_tr=wavAnnColl_tr, Xy_test=(X_test, y_test),
-                       scores_file=out_file, predictions_file=None)
+run_iter_clf_experiment(param_grid, scores_file=out_file, predictions_file=None)
 
 
     
