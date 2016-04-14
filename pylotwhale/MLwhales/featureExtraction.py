@@ -154,6 +154,37 @@ def wavAnnCollection2sectionsXy(wavAnnColl, featExtFun=None):
     
     return datO_test
     
+def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
+    """
+    Computes the Xy-data-object and save it as a dictionary, 
+    using the wavF and annF as dictionary keys,
+    for a collection of annotated wav files
+    ment to be used with feature extraction 'split' 
+
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+    
+    Parameters
+    ----------
+    < wavAnnColl : collection of annotated wavfiles
+    < featExtFun :  feature extraction function (callable)
+                    or a dictionary with the feature extraction settings
+                    featureExtrationParams = dict(zip(i, i))
+    Return
+    ------    
+    > XyDict : dictinary of features object
+    """
+    ### check feature extraction function
+    if not callable(featExtFun): # dictionary or None (defaul parameters)
+        featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
+
+    XyDict = {}
+
+    for wF, annF in wavAnnColl[:]:
+        datO_test_new = wavAnn2sectionsXy( wF, annF, featExtFun=featExtFun) #wavPreprocesingT = wavPreprocessingFun )
+        XyDict['{}, {}'.format(wF, annF)]=(datO_test_new.X, datO_test_new.y_names )
+    
+    return XyDict
+    
 def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=None,
                                ensembleSettings=None):
     """

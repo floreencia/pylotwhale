@@ -103,7 +103,6 @@ def predictAnnotationSections(wavF, annF, clf, feExtParams, lt, outFile=None,
         header = '{}'.format(le.classes_)
     ## save file
     A = np.loadtxt(annF, delimiter='\t', dtype='|S', ndmin=2)#,usecols=[0,1])
-    print("TEST", np.shape(A), np.shape(predictions))
     np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s', 
                delimiter = '\t', header=header)
     return outFile
