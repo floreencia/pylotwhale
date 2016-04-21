@@ -27,9 +27,9 @@ import time
 ###### Iter parameters
 parameter = 'noiseAmplitude'
 n_artificial_samples = 10 # number of artificial samples to generate
-n_experiments = 10 # identical experiment repetitions
+n_experiments = 2 # identical experiment repetitions
 # noise amplitude
-n_amps=3
+n_amps=2
 a0 = 0
 a = 0.05
 amp = np.linspace(a0, a, n_amps) # paramter domain
@@ -44,7 +44,9 @@ try:
     os.makedirs(oDir)
 except OSError:
     pass
-out_file = os.path.join(oDir, "scores.txt")
+out_file_scores = os.path.join(oDir, "scores.txt")
+out_file_votes = os.path.join(oDir, "-votes.txt")
+
 
 ##### Feature extraction 
 
@@ -95,7 +97,9 @@ wavAnnColl_tr = fex.readCols(collFi_train, (0,1))
 wavAnnColl_te = fex.readCols(collFi_test, (0,1))
 
 ## test data
-X_test, y_test_labels = fex.wavAnnCollection2sectionsXy(wavAnnColl_te, feExFun).filterInstances(callSet)
+XyDict_test=fex.wavAnnCollection2XyDict(wavAnnColl_te, feExFun)
+XyO_test = fex.XyDict2XyO(XyDict_test)
+X_test, y_test_labels = XyO_test.filterInstances(callSet)
 lt = myML.labelTransformer(y_test_labels)
 y_test = lt.nom2num(y_test_labels)
 
@@ -123,38 +127,97 @@ def clf_experiment(param):
                                                 ensembleSettings=ensembleSettings)
                                                 
     X_train, y_train_labels = datO.filterInstances(callSet)
-    y_train = lt.nom2num(y_train_labels)    
-    X_train, y_train = X_train, y_train
-        
-    clf = train_clf(X_train, y_train) # train   
-        
-    #X_test, y_test = Xy_test
-    scores = clf.score(X_test, y_test)
-    return scores
+    y_train = lt.nom2num(y_train_labels)            
+    clf = train_clf(X_train, y_train) # train           
+    return clf
     
     
-def run_iter_clf_experiment(param_grid, scores_file=out_file, predictions_file=None):
+class clf_experimentO():
+    def __init__(self, param):
+        self.clf = clf_experiment(param)
+        
+    def print_scores(self, scores_file, X_test, y_test, param=None):
+        scores = self.clf.score(X_test, y_test)
+
+        with open(scores_file, 'a') as f:
+            f.write("{}\t{}\n".format(param, "\t".join("{}".format(scores).split(","))))
+            
+    def accumPredictions(self, XyDict, param=None, predictionsDict=None):
+        
+        if predictionsDict is None: 
+            predictionsDict = {}
+            yDict = {}
+            for li in XyDict.keys():
+                X, y = XyDict[li]
+                predictionsDict[li] = np.hstack((np.array(y).reshape(len(y),1), 
+                                            np.zeros((len(y), len(callSet)))))
+            
+        for li in XyDict.keys():
+            X, y = XyDict[li]
+            y_pred = self.clf.predict(X)
+            for i in range(len(y_pred)):
+                print(y_pred[i])
+                predictionsDict[li][i, 1 + y_pred[i]] += 1    
+            
+        return predictionsDict, yDict
+        
+            
+    def print_predictions(self, accumFile, scoresDict ):
+        """prints the predictions for each wav ann"""
+        
+        with open(accumFile, 'w') as f:
+            f.write("#{}".format(",".join(callSet)))
+        
+        with open(accumFile, 'a') as f:
+            print(scoresDict.keys())
+            for li in scoresDict:
+                f.write("#{}\n".format(li))
+                for item in scoresDict[li]:
+                    f.write("{}\t{}\n".format(item))
+        
+        return accumFile
+        
+    
+def run_iter_clf_experiment(param_grid, 
+                            print_score_params=(None, None, None), 
+                            print_predictions_params=(None, None)):
+    """
+    print_scores_params : (X, y, out_file)
+    print_predictions_params : (XyDict, out_file)
+    """
+           
+    scores_file, X, y = print_score_params
+    XyDict, accumFile = print_predictions_params
+    scoresDict=None
     
     for param in param_grid:
         print("param", param)
         
-        scores = clf_experiment(param)
-     
-        ## print
-        with open(scores_file, 'a') as f:
-            f.write("{}\t{}\n".format(param, "\t".join("{}".format(scores).split(","))))
+        clfExp = clf_experimentO(param)
+        
+        if scores_file is not None:
+            clfExp.print_scores(scores_file, X, y, param)
             
-    return( scores_file, predictions_file )    
+        if XyDict is not None:
+            scoresDict = clfExp.accumPredictions(XyDict, param, 
+                                                      predictionsDict=scoresDict)
+   
+    if XyDict is not None:
+        clfExp.print_predictions( accumFile, scoresDict )
+                
+        
+    return True    
 
 
 ###################  TASK  ####################
 
 ## print experiment settings header
-with open(out_file, 'w') as f:
+with open(out_file_scores, 'w') as f:
     f.write("#{}\n#TRAIN: {}\n#TEST: {}\n#{}\n#{}\t{}\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S"), 
             collFi_train, collFi_test, settingsStr, parameter, metric))
 
-run_iter_clf_experiment(param_grid, scores_file=out_file, predictions_file=None)
+run_iter_clf_experiment(param_grid, print_score_params=(out_file_scores, X_test, y_test),
+                        print_predictions_params=(XyDict_test, out_file_votes))
 
 
     

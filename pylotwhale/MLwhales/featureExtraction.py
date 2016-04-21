@@ -166,7 +166,7 @@ def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
     Parameters
     ----------
     < wavAnnColl : collection of annotated wavfiles
-    < featExtFun :  feature extraction function (callable)
+    < featExtFun : feature extraction function (callable)
                     or a dictionary with the feature extraction settings
                     featureExtrationParams = dict(zip(i, i))
     Return
@@ -184,6 +184,18 @@ def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
         XyDict['{}, {}'.format(wF, annF)]=(datO_test_new.X, datO_test_new.y_names )
     
     return XyDict
+    
+def XyDict2XyO(XyDict):
+    '''
+    Transforms a dictionary of Xy into an X, y object
+    '''    
+    datO = myML.dataXy_names() 
+
+    for ky in XyDict:
+        X, y = XyDict[ky]
+        datO.addInstances(X, y)
+    return datO
+    
     
 def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=None,
                                ensembleSettings=None):
