@@ -146,35 +146,35 @@ class clf_experimentO():
         
         if predictionsDict is None: 
             predictionsDict = {}
-            yDict = {}
             for li in XyDict.keys():
                 X, y = XyDict[li]
+                predictionsDict[li]={}
                 for i in range(len(y)):
-                    predictionsDict[li][i, y[i]] = [y]
+                    predictionsDict[li][i, y[i].item()] = []
                 #                            np.zeros((len(y), len(callSet)))))
             
         for li in XyDict.keys():
             X, y = XyDict[li]
             y_pred = self.clf.predict(X)
             for i in range(len(y_pred)):
-                print(y_pred[i])
-                predictionsDict[li][i, y[i]] = y_pred[i]
+                #print(y_pred[i])
+                predictionsDict[li][i, y[i].item()].append( y_pred[i])
             
-        return predictionsDict, yDict
+        return predictionsDict
         
             
     def print_predictions(self, accumFile, scoresDict ):
         """prints the predictions for each wav ann"""
         
         with open(accumFile, 'w') as f:
-            f.write("#{}".format(",".join(callSet)))
+            f.write("#{}\n".format(",".join(["{} ({})".format(call, str(lt.nom2num(call))) for call in callSet])))
         
         with open(accumFile, 'a') as f:
             print(scoresDict.keys())
-            for li in scoresDict:
-                f.write("#{}\n".format(li))
-                for item in scoresDict[li]:
-                    f.write("{}\t{}\n".format(item))
+            for fiName in scoresDict:
+                f.write("#{}\n".format(fiName))
+                for annSec in scoresDict[fiName]:
+                    f.write("{}\t{}\n".format(annSec, scoresDict[fiName][annSec]))
         
         return accumFile
         
