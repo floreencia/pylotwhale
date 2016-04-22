@@ -149,15 +149,16 @@ class clf_experimentO():
             yDict = {}
             for li in XyDict.keys():
                 X, y = XyDict[li]
-                predictionsDict[li] = np.hstack((np.array(y).reshape(len(y),1), 
-                                            np.zeros((len(y), len(callSet)))))
+                for i in range(len(y)):
+                    predictionsDict[li][i, y[i]] = [y]
+                #                            np.zeros((len(y), len(callSet)))))
             
         for li in XyDict.keys():
             X, y = XyDict[li]
             y_pred = self.clf.predict(X)
             for i in range(len(y_pred)):
                 print(y_pred[i])
-                predictionsDict[li][i, 1 + y_pred[i]] += 1    
+                predictionsDict[li][i, y[i]] = y_pred[i]
             
         return predictionsDict, yDict
         
