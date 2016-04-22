@@ -27,9 +27,9 @@ import time
 ###### Iter parameters
 parameter = 'noiseAmplitude'
 n_artificial_samples = 10 # number of artificial samples to generate
-n_experiments = 2 # identical experiment repetitions
+n_experiments = 20 # identical experiment repetitions
 # noise amplitude
-n_amps=2
+n_amps = 20
 a0 = 0
 a = 0.05
 amp = np.linspace(a0, a, n_amps) # paramter domain
@@ -45,7 +45,7 @@ try:
 except OSError:
     pass
 out_file_scores = os.path.join(oDir, "scores.txt")
-out_file_votes = os.path.join(oDir, "-votes.txt")
+out_file_votes = os.path.join(oDir, "votes.txt")
 
 
 ##### Feature extraction 
@@ -167,14 +167,16 @@ class clf_experimentO():
         """prints the predictions for each wav ann"""
         
         with open(accumFile, 'w') as f:
-            f.write("#{}\n".format(",".join(["{} ({})".format(call, str(lt.nom2num(call))) for call in callSet])))
+            f.write("#{}\n".format(", ".join(["{} {}".format(call, lt.nom2num(call)) for call in callSet])))
         
         with open(accumFile, 'a') as f:
             print(scoresDict.keys())
             for fiName in scoresDict:
                 f.write("#{}\n".format(fiName))
                 for annSec in scoresDict[fiName]:
-                    f.write("{}\t{}\n".format(annSec, scoresDict[fiName][annSec]))
+                    i, annLabel = annSec
+                    f.write("{}, {}, {}, {}\n".format(i, lt.nom2num(annLabel), annLabel,
+                            ", ".join([str(pred) for pred in scoresDict[fiName][annSec]])))
         
         return accumFile
         

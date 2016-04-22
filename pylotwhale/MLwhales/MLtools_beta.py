@@ -525,21 +525,38 @@ class labelTransformer():
         self.le = _LabelEncoder()
         self.le.fit_transform(y_names)
         self.classes_ = self.le.classes_
-              
-    def num2nom(self, num):
-        '''nominal --> numeric'''
-        if np.ndim(num) == 0: num = [num]
+        
+    def _num2nom(self, num):  
         try:
             return self.le.inverse_transform(num)
         except ValueError:
-            print('ERROR! y contains new labels')
-    
-    def nom2num(self, nom):
+            print('ERROR! y contains new labels')     
+            return np.array([None])
+        
+    def num2nom(self, num):
+        '''nominal --> numeric'''
+        if np.ndim(num) == 0: 
+            num = np.array([num])
+            return self._num2nom(num).item()
+        else:
+            return self._num2nom(num)  
+            
+    def _nom2num(self, nom):
         '''target name (nominal) --> target (numeric)'''
         try:
             return self.le.transform(nom)
         except ValueError:
             print('ERROR! y contains new labels')
+            return np.array([None])    
+            
+    def nom2num(self, nom):
+        '''target name (nominal) --> target (numeric)'''
+        if np.ndim(nom) == 0: 
+            nom = np.array([nom])
+            return self._nom2num(nom).item()
+        else:
+            return self._nom2num(nom)
+        
         
     def targetNumNomDict(self):
         '''> target dict { num : label }'''
