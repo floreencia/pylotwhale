@@ -50,4 +50,4 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     ax.set_xticklabels(freq_arr_names)
     if xlabel: ax.set_xlabel(xlabel)
     if ylabel : ax.set_ylabel(ylabel)
-    if outFigName:fig.save(outFigName)
+    if outFigName:fig.savefig(outFigName)

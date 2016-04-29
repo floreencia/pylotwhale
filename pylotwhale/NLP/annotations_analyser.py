@@ -218,6 +218,26 @@ class file2annotationsDF(annotationsDF):
 
 #### sequences
 
+
+def df2listOfSeqs(df, Dt=None,l='call'):
+
+    if Dt is None: Dt = (None, 0.5)
+
+    ict = df['ict'].values
+    seqsLi = []
+    subLi = [df[l].iloc[0]]
+
+    for i in range(len(ict))[:]:
+        if Dt[0] <= ict[i] <= Dt[1]:
+            subLi.append(df[l].iloc[i+1])
+        elif ict[i] >= Dt[1]:
+            seqsLi.append(subLi)
+            subLi = [df[l].iloc[i+1]]
+        
+    seqsLi.append(subLi)
+    
+    return seqsLi    
+
 def annsDf2lisOfSeqs(df, Dt=None, l='l'):
     '''
     reads an annotations dataframe [t0, tf, l] into a list of sequences
@@ -226,7 +246,6 @@ def annsDf2lisOfSeqs(df, Dt=None, l='l'):
         Dt : 2-dim tuple time interval for filtering the sequences 
                 None :  (0, 0.5) seconds        
     '''
-    if Dt is None: Dt = (None, 0.5)
     assert len(Dt) == 2, "Dt must be 2 dimesional"
     
     df = df.reset_index(drop=True)
@@ -237,10 +256,10 @@ def annsDf2lisOfSeqs(df, Dt=None, l='l'):
 
     for i in range(len(ict))[:]:
         if Dt[0] <= ict[i] <= Dt[1]:
-            subLi.append(df['l'].ix[i+1])
+            subLi.append(df[l].ix[i+1])
         else:
             seqsLi.append(subLi)
-            subLi = [df['l'].ix[i+1]]
+            subLi = [df[l].ix[i+1]]
         
     seqsLi.append(subLi)
     
