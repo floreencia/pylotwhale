@@ -9,7 +9,7 @@ from __future__ import print_function
 #import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
+import matplotlib.colors as colors
 
 def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
                    key_labels=None, figsize=None, outFigName=None, cmap = plt.cm.Accent_r):
@@ -51,3 +51,64 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     if xlabel: ax.set_xlabel(xlabel)
     if ylabel : ax.set_ylabel(ylabel)
     if outFigName:fig.savefig(outFigName)
+        
+    return fig, ax     
+        
+        
+### 2D plots ###
+
+def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15, 
+                  xTicks=None, yTicks=None,
+                  tickLabsDict='', outplN='', plTitle='', xL='N', yL=r'$\tau$ (s)',
+                  figureScale=(), extendCbar='both', extent=None):
+    
+    '''
+    draws a beautiful color plot
+    tickLabsDict     dictionary where the keys are the label of the cba ticks
+                    and the vallues a re te postions
+    Parameters:
+    ------------                    
+        X : 2d numpy array
+        vmax : max value to plot
+        vmin : cutoff min value
+        maxN : maximum number of columns
+        extent : scalars (left, right, bottom, top)     
+        yTicks : (<tick_location>, <tick_names>), 
+            <tick_location> array with the tick locations
+            <tick_names>, array with the labels of the previous array
+    '''
+    fig, ax = plt.subplots()
+
+    #colors setting
+    #cmap = plt.cm.get_cmap('jet', clrBarGaps)    # discrete colors
+    cmap.set_under((0.9, 0.9, 0.8)) #min
+    cmap.set_over((1, 0.6, 0.6)) #max
+    #cmap.set_nan((1, 0.6, 0.6)) #nan
+
+    #plot
+    cax=ax.imshow(X[:,:maxN], aspect ='auto', interpolation='nearest', 
+               norm = colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
+               cmap=cmap, extent=extent)
+    #labels
+    ax.set_xlabel(xL)
+    ax.set_ylabel(yL)
+    if plTitle: ax.set_title(plTitle)
+    
+    # axis ticks
+    if xTicks is not None: plt.xticks(xTicks)
+    if yTicks is not None: plt.yticks(*yTicks)
+
+    #clrbar
+    cbar = fig.colorbar(cax, extend=extendCbar) #min, max, both
+    cbar.set_clim((vmin, vmax)) # normalize cbar colors
+    if not tickLabsDict: 
+        tickLabsDict = {vmin: vmin, int(vmax/2):int(vmax/2), vmax:vmax} # tick labels
+    cbar.set_ticks(tickLabsDict.values())        
+    cbar.set_ticklabels(tickLabsDict.keys())
+    
+    #figScale
+    if len(figureScale)==2: fig.set_size_inches(figureScale)        
+    
+    if outplN: fig.savefig(outplN, bbox_inches='tight')   
+
+    return fig, ax     
