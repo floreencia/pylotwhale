@@ -219,24 +219,43 @@ class file2annotationsDF(annotationsDF):
 #### sequences
 
 
-def df2listOfSeqs(df, Dt=None,l='call'):
-
+def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict'):
+    '''
+    returns the sequences of <l>, chains of elements separated by the interval Dt
+    Parameters:
+    -----------
+        df : datadrame, must have a time column (time_param)
+        time_param : name of the sequence definition time, default "ict"
+        l : specifies the sequence type. default "calls"
+        Dt : time inteval for sequence definition, default (-infty, 0.5)
+    creates a list with the sequences (lists)
+    '''
     if Dt is None: Dt = (None, 0.5)
 
-    ict = df['ict'].values
+    ict = df[time_param].values
     seqsLi = []
     subLi = [df[l].iloc[0]]
 
     for i in range(len(ict))[:]:
-        if Dt[0] <= ict[i] <= Dt[1]:
+        if Dt[0] <= ict[i] <= Dt[1]: # is part of the sequence?
             subLi.append(df[l].iloc[i+1])
-        elif ict[i] >= Dt[1]:
+        elif ict[i] >= Dt[1]: # nope, then start a new sequence
             seqsLi.append(subLi)
             subLi = [df[l].iloc[i+1]]
         
     seqsLi.append(subLi)
     
     return seqsLi    
+    
+def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
+    """retuns the sequences of l
+    see df2listOfSeqs"""
+    seqsLi=[]
+
+    for thisdf in dfDict.values():
+        seqsLi += df2listOfSeqs(thisdf, Dt=Dt, l=l, time_param='ict') # sequences objec
+    return seqsLi
+    
 
 def annsDf2lisOfSeqs(df, Dt=None, l='l'):
     '''
@@ -246,13 +265,14 @@ def annsDf2lisOfSeqs(df, Dt=None, l='l'):
         Dt : 2-dim tuple time interval for filtering the sequences 
                 None :  (0, 0.5) seconds        
     '''
-    assert len(Dt) == 2, "Dt must be 2 dimesional"
+    #assert len(Dt) == 2, "Dt must be 2 dimesional"
     
     df = df.reset_index(drop=True)
     annO = annotationsDF(df)
     ict = annO.ict
     seqsLi = []
     subLi = [df[l].ix[0]]
+    #return df2listOfSeqs(df)
 
     for i in range(len(ict))[:]:
         if Dt[0] <= ict[i] <= Dt[1]:
