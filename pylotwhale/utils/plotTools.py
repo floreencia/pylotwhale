@@ -11,7 +11,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
+import scipy
+import pylab
+import scipy.cluster.hierarchy as sch
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None, 
                    key_labels=None, figsize=None, outFigName=None, cmap = plt.cm.Accent_r):
     '''
     plot freq_arr stacked
@@ -112,3 +118,95 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
     if outplN: fig.savefig(outplN, bbox_inches='tight')   
 
     return fig, ax     
+    
+    
+def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
+              plTitle='', clrMap = 'winter_r', cBarAxSize=2, 
+              cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
+              cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
+              figsize=None,
+              underClr = 'white', badClr='gray'):
+    """
+    plot a matrix with ticks
+    fraction=0.0
+        axsize : colorbar tickness
+    """
+   
+    fig, ax = plt.subplots(figsize=figsize)
+
+    cmap = plt.cm.get_cmap(clrMap, Nclrs)    # 11 discrete colors
+    cmap.set_under(underClr) #min
+    cmap.set_bad(badClr) #nan
+
+    im = ax.imshow(A, interpolation = 'nearest', cmap = cmap)#, origin='bottom')
+                   # extent = [0, len(xTickL),0,len(yTickL)], origin='bottom')
+    
+    ax.set_yticks( np.arange( len(yTickL ) ))# + 0.5 ) #flo -> +0.1)
+    ax.set_yticklabels( yTickL ) 
+    ax.set_xticks( np.arange(len(xTickL)))# + 0.5 ) 
+    ax.set_xticklabels( xTickL, rotation=90 ) 
+    if plTitle: ax.set_title(plTitle)
+    if xLabel : ax.set_xlabel(xLabel)
+    if yLabel : ax.set_ylabel(yLabel)
+    #COLOR BAR
+    if isinstance(cbarLim, tuple): im.set_clim(cbarLim) # cmap lims
+
+    divider = make_axes_locatable(ax)
+    if cbar: 
+        cax = divider.append_axes("right", size="{}%".format(cBarAxSize), pad=0.1)
+        cbar = fig.colorbar(im, cax = cax)#, fraction=0.046, pad=0.04)#, extend='min')
+        if isinstance(cbarLim, tuple): cbar.set_clim(cbarLim) # cbar limits
+        if isinstance(cbarTicks, list): cbar.set_ticks(cbarTicks)
+        if isinstance(cbarTickLabels, list): cbar.set_ticklabels(cbarTickLabels)  
+
+        
+    if outFig: 
+        fig.savefig(outFig, bbox_inches = 'tight')
+        #print len(i2c), "\nout:%s"%outFig
+    
+    return fig, ax
+
+### Clustering plosts
+
+
+
+def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu):
+    
+    Y = linkage_matrix = sch.ward(distM)
+    
+    fig = pylab.figure(figsize=(8,8))
+
+    # FIRST DENDROGRAM
+    ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
+    #Y = sch.linkage(linkage_matrix, method='centroid')
+    Z1 = sch.dendrogram(Y, orientation='right')
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+
+    # SECOND DENDROGRAM
+    ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
+    #Y = sch.linkage(linkage_matrix, method='single')
+    Z2 = sch.dendrogram(Y)
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+
+    # DISTANCE MATRIX
+    axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
+    idx1 = Z1['leaves']
+    idx2 = Z2['leaves']
+    D = distM[idx1,:][:,idx2]
+    #D = distM[:,idx2]
+    im = axmatrix.matshow(D, aspect='auto',cmap=cmap)#origin='lower'
+    
+    # Distance matrix tick labels
+    axmatrix.set_xticks(range(len(idx1)))
+    axmatrix.set_xticklabels(labels[idx1], minor=False)
+    axmatrix.xaxis.set_label_position('bottom')
+    axmatrix.xaxis.tick_bottom()
+    pylab.xticks(rotation=-90)#, fontsize=8)
+
+    axmatrix.set_yticks((range(len(idx2))))
+    axmatrix.set_yticklabels(labels[idx2], minor=False)
+    axmatrix.yaxis.set_label_position('right')
+    axmatrix.yaxis.tick_right()
+        

@@ -247,9 +247,20 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict'):
     
     return seqsLi    
     
+def seqsLi2iniEndSeq(seqsLi, ini='_ini', end="_end"):
+    '''list of sequences (list) --> sequence with delimiting tockens <ini> and <end>
+        eg seqsLi2iniEndSeq([[A, B], [A, A, B]])
+            [_ini, A, B, _end, _ini, A, A, B, _end]'''
+    newL = []
+    for item in seqsLi:
+        newL.extend([ini])
+        newL.extend(item)
+        newL.extend([end])
+    return newL
+    
 def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
-    """retuns the sequences of l
-    see df2listOfSeqs"""
+    """takes a dictionary of dataframes (eg. tape-dataframes) and retuns the sequences as
+    a list of sequences see df2listOfSeqs"""
     seqsLi=[]
 
     for thisdf in dfDict.values():

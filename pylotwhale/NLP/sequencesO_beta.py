@@ -379,7 +379,7 @@ def shuffleSeries(dataFr, shuffleCol='timeSs'):
     return shuffledRecs # data frames and labels
 
 
-def bigramCounts( li, adj0 = {}, call2index0 = {}, index2call0 = []):
+def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
 
     """
     sequences to dictionary of bigram counts
@@ -393,6 +393,8 @@ def bigramCounts( li, adj0 = {}, call2index0 = {}, index2call0 = []):
     """
 
     ### CHECK INPUT
+    if adj0 is None or call2index0 is None or index2call0 is None:
+        adj0 = {}; call2index0 = {}; index2call0 = []
     assert( len(call2index0) == len(index2call0))# and len(adj0) >= len(call2index0) -1 )
     # dictionaries must have the same lenght and adj at least the same lenght - 1
 

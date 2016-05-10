@@ -8,6 +8,13 @@ Created on Fri Apr 29 15:34:06 2016
 import numpy as np
 from collections import Counter
 
+def dictOfGroupedDataFrames(df0, groupingKey='tape'):
+    '''groups a dataframe according to groupingKey and returns a dictionary of data frames'''
+    df = {}
+    keysSet = set(df0[groupingKey])
+    for t in keysSet:
+        df[t] = df0[df0[groupingKey] == t]        
+    return df
 
 def groupedCountsInDataFrame(df, group_key, count_key):
     '''group data frame by group_key and count the frequencies of group_key

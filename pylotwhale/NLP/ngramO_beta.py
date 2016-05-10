@@ -28,8 +28,9 @@ import matrixTools as mt
 
 def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0, 
               Bname='bigram', ext='eps', plTitle='', clrMap = 'winter_r', 
-              labSize='18', cbarLim=False, cbarOrientation='vertical', 
-              cbarTicks=False, cbarTickLabels=False, cbar=True, outFig=''):
+              labSize='18', cbarLim=None, cbarOrientation='vertical', 
+              cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
+              figsize=None):
     """
     plots a bigram matrix
     A : bigram matrix    
@@ -52,7 +53,7 @@ def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0,
     if not yM: yM = len(i2c) #masked labels
     '''
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
 
     cmap = plt.cm.get_cmap(clrMap, 11)    # 11 discrete colors
     cmap.set_under('white') #min
@@ -67,7 +68,7 @@ def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0,
     yM = len(i2c) #masked labels
     ax.set_yticks( np.arange(len( i2c[:yM+1]) ) + 0.5 ) #flo -> +0.1)
     ax.set_yticklabels( i2c[:yM+1] ) 
-    ax.set_xticks( np.arange(len( i2c[:xM+1]) ) +0.5 ) 
+    ax.set_xticks( np.arange(len( i2c[:xM+1]) ) + 0.5 ) 
     ax.set_xticklabels( i2c[:xM+1], rotation=90 ) 
     if plTitle: ax.set_title(plTitle)
     #COLOR BAR
@@ -253,7 +254,7 @@ def call2mkUpIx(mkUp_arr, c2i, call):
     When sellecting the calls to work with (make-upping), i.e. the most frequent
     whe work with the make up indexes that evaluate the i2c list in a way that
     the bigrams are sorted in the desired way (see getElementsLArgerThan()).
-    However, somethimes we whant to mak up the indexes according to the 
+    However, sometimes we whant to mak up the indexes according to the 
     name of the call, i.e. eliminate the index that corresonds to tha pseudo-call
     __INI or __END. In this case we need to map the "call" back to the make-up
     index. and this is what this function.
