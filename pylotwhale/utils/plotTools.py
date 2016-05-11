@@ -7,15 +7,18 @@ Created on Thu Apr 28 16:56:58 2016
 
 from __future__ import print_function
 #import sys
+#import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+from matplotlib import ticker
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 import scipy
 import pylab
 import scipy.cluster.hierarchy as sch
 
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None, 
                    key_labels=None, figsize=None, outFigName=None, cmap = plt.cm.Accent_r):
@@ -170,28 +173,29 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
 
 
-def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu):
+def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
+                         NcbarTicks=4, cbarAxis=None):
     
     Y = linkage_matrix = sch.ward(distM)
     
     fig = pylab.figure(figsize=(8,8))
 
     # FIRST DENDROGRAM
-    ax1 = fig.add_axes([0.09,0.1,0.2,0.6])
+    ax1 = fig.add_axes([0.09,0.1,0.2,0.6]) # left
     #Y = sch.linkage(linkage_matrix, method='centroid')
     Z1 = sch.dendrogram(Y, orientation='right')
     ax1.set_xticks([])
     ax1.set_yticks([])
 
     # SECOND DENDROGRAM
-    ax2 = fig.add_axes([0.3,0.71,0.6,0.2])
+    ax2 = fig.add_axes([0.3,0.71,0.6,0.2]) # up
     #Y = sch.linkage(linkage_matrix, method='single')
     Z2 = sch.dendrogram(Y)
     ax2.set_xticks([])
     ax2.set_yticks([])
 
     # DISTANCE MATRIX
-    axmatrix = fig.add_axes([0.3,0.1,0.6,0.6])
+    axmatrix = fig.add_axes([0.3,0.1,0.6,0.6]) # [x0, y0, Dx, Dy ]
     idx1 = Z1['leaves']
     idx2 = Z2['leaves']
     D = distM[idx1,:][:,idx2]
@@ -204,9 +208,19 @@ def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu):
     axmatrix.xaxis.set_label_position('bottom')
     axmatrix.xaxis.tick_bottom()
     pylab.xticks(rotation=-90)#, fontsize=8)
-
+    
+    # image ticks
     axmatrix.set_yticks((range(len(idx2))))
     axmatrix.set_yticklabels(labels[idx2], minor=False)
     axmatrix.yaxis.set_label_position('right')
     axmatrix.yaxis.tick_right()
+    
+    # cbar
+    if cbarAxis is None: cbarAxis = [0.91, 0.71, 0.03, 0.2 ]  
+    axcolor = fig.add_axes(cbarAxis)#[0.96,0.1,0.02,0.6])
+    cbar = fig.colorbar(im, cax = axcolor)#
+    tick_locator = ticker.MaxNLocator(nbins=NcbarTicks)
+    cbar.locator = tick_locator
+    cbar.update_ticks() 
+    
         
