@@ -8,6 +8,8 @@ import sys
 import itertools as it
 #import os
 import ast
+import pandas as pd
+import nltk
 
 #import sequencesO_beta as seqs
 sys.path.append('/home/florencia/whales/scripts/')
@@ -28,7 +30,7 @@ import matrixTools as mt
 
 def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0, 
               Bname='bigram', ext='eps', plTitle='', clrMap = 'winter_r', 
-              labSize='18', cbarLim=None, cbarOrientation='vertical', 
+              labSize='18', cbarLim=(1,None), cbarOrientation='vertical', 
               cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
               figsize=None):
     """
@@ -130,6 +132,40 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
     if figN: 
         fig.savefig(figN, bbox_inches='tight')
         print figN
+
+
+####### NLTK - pandas - related ngram code
+
+def bigrams2Dict(bigrams_tu):
+    '''
+    converts a 2D-tuples list into a 2D-dicionary
+    eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
+    :bigrams_tu: bigrams as a list of tuples
+    '''
+    cfd = nltk.ConditionalFreqDist(bigrams_tu)
+    return cfd
+
+def twoDimDict2DataFrame(kykyDict):
+    '''two key dict D[a][b] = x --> pandas dataframe
+    P (c|r), columns are the condition, rows are sampes'''
+    return pd.DataFrame(kykyDict).fillna(0)
+    
+def bigramsdf2bigramsMatrix(df, conditionsList=None, sampleList=None):
+    '''returns the bigram matrix of the conditionsList and sampleList'''
+    if conditionsList is None: conditionsList = df.columns
+    if sampleList is None: sampleList = df.index
+        
+    bigrsDF = df[conditionsList].loc[sampleList]
+    samps = bigrsDF.index
+    conds = bigrsDF.columns
+    M = bigrsDF.as_matrix().T
+    return M, samps, conds
+    
+def bigrams2CountsMatrix(bigrams_tu, conditionsList=None, sampleList=None):
+    df=twoDimDict2DataFrame((bigrams2Dict(bigrams_tu)))
+    return bigramsdf2bigramsMatrix(df, conditionsList, sampleList)
+    
+
 
 
 #############################    LISTS AND ARRAYS    ##################################

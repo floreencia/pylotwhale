@@ -74,7 +74,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
     '''
     draws a beautiful color plot
     tickLabsDict     dictionary where the keys are the label of the cba ticks
-                    and the vallues a re te postions
+                    and the values a the postions
     Parameters:
     ------------                    
         X : 2d numpy array
@@ -124,7 +124,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
     
     
 def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
-              plTitle='', clrMap = 'winter_r', cBarAxSize=2, 
+              plTitle='', clrMap = 'winter_r', cbarAxSize=2, 
               cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
               cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
               figsize=None,
@@ -141,7 +141,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
     cmap.set_under(underClr) #min
     cmap.set_bad(badClr) #nan
 
-    im = ax.imshow(A, interpolation = 'nearest', cmap = cmap)#, origin='bottom')
+    im = ax.imshow(A, interpolation = 'nearest', cmap = cmap, origin='bottom')
                    # extent = [0, len(xTickL),0,len(yTickL)], origin='bottom')
     
     ax.set_yticks( np.arange( len(yTickL ) ))# + 0.5 ) #flo -> +0.1)
@@ -156,7 +156,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
     divider = make_axes_locatable(ax)
     if cbar: 
-        cax = divider.append_axes("right", size="{}%".format(cBarAxSize), pad=0.1)
+        cax = divider.append_axes("right", size="{}%".format(cbarAxSize), pad=0.1)
         cbar = fig.colorbar(im, cax = cax)#, fraction=0.046, pad=0.04)#, extend='min')
         if isinstance(cbarLim, tuple): cbar.set_clim(cbarLim) # cbar limits
         if isinstance(cbarTicks, list): cbar.set_ticks(cbarTicks)

@@ -9,6 +9,8 @@ import random
 import ast
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+import functools
+
 
 
 """
@@ -334,7 +336,7 @@ def groupByRec(dataFr, categ='recording'):
     return recSetsD, recs
 
 
-def sortedRecDatFr(dataFr, shuff=0, categ='recording', sortL='timeSs'):
+def sortedRecDatFr(dataFr, shuff=0, categ='recording', sortL='timeSs', shuffleCol='call'):
     """
     Params:
     -----
@@ -347,7 +349,7 @@ def sortedRecDatFr(dataFr, shuff=0, categ='recording', sortL='timeSs'):
     > recs : an array of with the recording names
     """
     if(shuff):
-        f = shuffleSeries
+        f = functools.partial(shuffleSeries, shuffleCol=shuffleCol)
     else:
         f = lambda x: x
 
@@ -393,15 +395,15 @@ def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
     """
 
     ### CHECK INPUT
-    if adj0 is None or call2index0 is None or index2call0 is None:
+    if call2index0 is None or index2call0 is None:
         adj0 = {}; call2index0 = {}; index2call0 = []
     assert( len(call2index0) == len(index2call0))# and len(adj0) >= len(call2index0) -1 )
     # dictionaries must have the same lenght and adj at least the same lenght - 1
 
     ### INICIALIZATIONS
     ## copy the values o avoid operating over a global mutable variable
-    adj = adj0.copy()  # adjacenct dicitonary 
-    call2index = call2index0.copy()  # call to index dict
+    adj = dict(adj0) # adjacenct dicitonary 
+    call2index = dict(call2index0)#.copy()  # call to index dict
     index2call = index2call0[:]  # index to call dict
     
     ##
@@ -474,7 +476,7 @@ def listOfSeqs( datB0, groupN=[], timeT=5, feature='call', shuffl=0):
     return thisGrSeqs
 
 
-def listOfSeqs2BigramCounts(li, M = None, c2i = None, i2c = None):
+def listOfSeqs2BigramCounts(li, M=None, c2i=None, i2c=None):
     """
     transforms a list(li) of sequences into bigram counts
     returns:
