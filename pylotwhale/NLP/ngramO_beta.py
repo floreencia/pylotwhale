@@ -10,6 +10,8 @@ import itertools as it
 import ast
 import pandas as pd
 import nltk
+from nltk.probability import ConditionalProbDist, MLEProbDist
+
 
 #import sequencesO_beta as seqs
 sys.path.append('/home/florencia/whales/scripts/')
@@ -134,38 +136,78 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
         print figN
 
 
-####### NLTK - pandas - related ngram code
+##### NLTK - pandas - related ngram code  #####
 
 def bigrams2Dict(bigrams_tu):
     '''
-    converts a 2D-tuples list into a 2D-dicionary
+    converts a 2D-tuples list into a 2D-dictionary
     eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
     :bigrams_tu: bigrams as a list of tuples
     '''
     cfd = nltk.ConditionalFreqDist(bigrams_tu)
     return cfd
-
-def twoDimDict2DataFrame(kykyDict):
-    '''two key dict D[a][b] = x --> pandas dataframe
-    P (c|r), columns are the condition, rows are sampes'''
-    return pd.DataFrame(kykyDict).fillna(0)
-    
-def bigramsdf2bigramsMatrix(df, conditionsList=None, sampleList=None):
+ 
+def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     '''returns the bigram matrix of the conditionsList and sampleList'''
     if conditionsList is None: conditionsList = df.columns
-    if sampleList is None: sampleList = df.index
+    if samplesList is None: samplesList = df.index
         
-    bigrsDF = df[conditionsList].loc[sampleList]
+    bigrsDF = df[conditionsList].loc[samplesList]
     samps = bigrsDF.index
     conds = bigrsDF.columns
     M = bigrsDF.as_matrix().T
     return M, samps, conds
     
-def bigrams2CountsMatrix(bigrams_tu, conditionsList=None, sampleList=None):
-    df=twoDimDict2DataFrame((bigrams2Dict(bigrams_tu)))
+def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, sampleList=None):
+    '''2dim bigram counts dict --> bigrams matrix'''
+    df = twoDimDict2DataFrame(bigramsDict)
     return bigramsdf2bigramsMatrix(df, conditionsList, sampleList)
     
+def bigrams2countsMatrix(bigrams_tu, conditionsList=None, sampleList=None):
+    '''bigrams --> bigrams matrix'''
+    return bigramsDict2countsMatrix((bigrams2Dict(bigrams_tu)))
+    
 
+### + CONDITIONAL PROBABILITIES
+    
+def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
+    '''estimates the conditional probabilities (dict) form cond freq dist'''
+    
+    if conditions is None or samples is None:
+        conditions = condFreqDict.keys()
+        samples = condFreqDict.keys()
+        
+    cpd = nltk.ConditionalProbDist(condFreqDict, MLEProbDist)
+    P={}
+    for cond in conditions:
+        P[cond]={}
+        for samp in samples:
+            P[cond][samp] = cpd[cond].prob(samp)
+    return P    
+
+def condProbDict2matrix(cpd, conditions, samples):
+    '''
+    return the matrix of consitional probabilities
+    M, x_tick_labels, y_tick_labels
+    '''
+    return bigramsdf2bigramsMatrix(twoDimDict2DataFrame(cpd), 
+                                   conditionsList=conditions, samplesList=samples)#, condsLi, samplesLi)
+    
+def condFreqDict2matrix(cfd, conditions, samples): 
+    '''
+    return the matrix of conditional probabilities
+    > M, x_tick_labels, y_tick_labels
+    '''
+    cpd = condFreqDictC2condProbDict(cfd)
+    return condProbDict2matrix(cpd, conditions, samples)
+
+
+### + GENERAL
+
+def twoDimDict2DataFrame(kykyDict):
+    '''two key dict D[a][b] = x --> pandas dataframe
+    P (c|r), columns are the condition, rows are sampes'''
+    return pd.DataFrame(kykyDict).fillna(0)
 
 
 #############################    LISTS AND ARRAYS    ##################################

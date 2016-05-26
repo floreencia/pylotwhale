@@ -212,9 +212,7 @@ class file2annotationsDF(annotationsDF):
         self.annotations_file = path2file
         df = pd.read_csv(self.annotations_file, sep ='\t', names=names )
         annotationsDF.__init__(self, df, names)           
-        
-        
-        
+                
 
 #### sequences
 
