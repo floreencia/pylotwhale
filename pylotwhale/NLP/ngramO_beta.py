@@ -159,7 +159,8 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     return M, samps, conds
     
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, sampleList=None):
-    '''2dim bigram counts dict --> bigrams matrix'''
+    '''2dim bigram counts dict --> bigrams matrix
+    > M, samps, conds'''
     df = twoDimDict2DataFrame(bigramsDict)
     return bigramsdf2bigramsMatrix(df, conditionsList, sampleList)
     
@@ -193,7 +194,7 @@ def condProbDict2matrix(cpd, conditions, samples):
     return bigramsdf2bigramsMatrix(twoDimDict2DataFrame(cpd), 
                                    conditionsList=conditions, samplesList=samples)#, condsLi, samplesLi)
     
-def condFreqDict2matrix(cfd, conditions, samples): 
+def condFreqDict2condProbMatrix(cfd, conditions, samples): 
     '''
     return the matrix of conditional probabilities
     > M, x_tick_labels, y_tick_labels
