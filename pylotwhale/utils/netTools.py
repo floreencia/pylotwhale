@@ -13,8 +13,9 @@ import pygraphviz as pgv
 import matplotlib.pyplot as plt
 
 
-#### graphviz
+#### pygraphviz
 def nxGraph2pgv(G):
+    '''converts a nx network into a pygraphviz net'''
     return nx.to_agraph(G)    
     
 def drawGraphviz(A, dotFile=None, figName=None):
@@ -22,7 +23,6 @@ def drawGraphviz(A, dotFile=None, figName=None):
     if dotFile: A.write(dotFile)  # write previously positioned graph to PNG file
     A.layout(prog='dot')
     if figName: A.draw(figName)
-    
 
 def conceptualiseNodes(graphO, nodeLi=None):
     '''invisibilises nodes in nodeLi kkeping the edge label if any,
@@ -78,3 +78,41 @@ def drawNetwCbar(G, pos, nodeAttr='callFreq', edgeAttr='cpd',
     cedges = nx.draw_networkx_edges(G, pos=pos, edge_color=edgeW, edge_cmap=edgeCmap)
     plt.colorbar(cedges)
     plt.axis('off')
+    
+    
+#### gatherer functions
+
+def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
+                        edgeLabelDict=None, labelDecimals=1, 
+                        rmEdge='default', invisibleNodes='default'):
+                            
+    '''2dim dictionaty to graphviz network
+    Parameters:                            
+    -----------
+    twoDimDict : two dim dictionary to define the network
+    dot_file : graphviz netwotk generator
+    fig_file : graph figure
+    edgeLabel : dicitonary (~twoDimDict) with the edge labels
+    labelDecimal : number of decimals to print in the edge label
+    rmEdge : default removes the edge ('_end', '_ini')
+    invisibleNodes : default invisibilises the nodes '_ini' and '_end'
+    '''
+    
+    if invisibleNodes == 'default': invisibleNodes =['_ini', '_end'] 
+    if rmEdge is 'default': rmEdge = '_end', '_ini'
+
+    G = nx.DiGraph(twoDimDict)
+    G.remove_edge(*rmEdge)
+
+    ## edge attribute --> cpd
+    if edgeLabelDict:
+        cpdw = ["{0:.{1}f}".format(edgeLabelDict[u][v], labelDecimals) for u, v in G.edges()]
+        nx.set_edge_attributes(G, 'label', dict(zip(G.edges(), cpdw)))
+
+    # node attribute
+    #nw = [len(df[df['call']== c]) for c in G.nodes()]
+    #nx.set_node_attributes(G, 'callFreq', dict(zip(G.nodes(), nw)))
+     
+
+    A = conceptualiseNodes( nx.to_agraph(G), invisibleNodes )
+    drawGraphviz(A, dot_file, fig_file)    
