@@ -84,7 +84,8 @@ def drawNetwCbar(G, pos, nodeAttr='callFreq', edgeAttr='cpd',
 
 def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
                         edgeLabelDict=None, labelDecimals=1, 
-                        rmEdge='default', invisibleNodes='default'):
+                        rmEdge='default', rmNodes=None,
+                        invisibleNodes='default'):
                             
     '''2dim dictionaty to graphviz network
     Parameters:                            
@@ -100,9 +101,11 @@ def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
     
     if invisibleNodes == 'default': invisibleNodes =['_ini', '_end'] 
     if rmEdge is 'default': rmEdge = '_end', '_ini'
-
+    
     G = nx.DiGraph(twoDimDict)
     G.remove_edge(*rmEdge)
+    try: G.remove_nodes_from(rmNodes)
+    except TypeError: 'canot remove nodes'
 
     ## edge attribute --> cpd
     if edgeLabelDict:

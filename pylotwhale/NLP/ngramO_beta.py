@@ -3,14 +3,18 @@
 import numpy as np
 #import pylab as pl
 import matplotlib.pyplot as plt
+import seaborn as sns
 import sys
 #import time 
 import itertools as it
+from collections import Counter
+
 #import os
 import ast
 import pandas as pd
 import nltk
 from nltk.probability import ConditionalProbDist, MLEProbDist
+import pylotwhale.utils.dataTools as daT
 
 
 #import sequencesO_beta as seqs
@@ -136,6 +140,34 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
         print figN
 
 
+### stats plots
+
+
+def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig=None, 
+                       violinInner='stick', yrange='default', ylabel='time (s)', npl=5):
+    
+    if ignoreKeys == 'default': ignoreKeys = ['_ini', '_end']
+        
+    topBigrams = daT.removeFromList(daT.returnSortingKeys(Counter(my_bigrams)), ignoreKeys)
+    bigrTimes=[]
+    for seq in topBigrams:
+        df = daT.returnSequenceDf(df0, seq, label=label)
+        #print(len(df))
+        ict = df.ict.values
+        #bigrTimesD[tuple(seq)] = ict[ ~ np.isnan(ict)]
+        bigrTimes.append(ict[ ~ np.isnan(ict)]) 
+        
+    kys = ["{}{}".format(a,b) for a,b in topBigrams ]
+    sns.violinplot( bigrTimes[:npl], names=kys[:npl], inner=violinInner)
+            
+    if yrange == 'default':
+        meanVls = [np.mean(item) for item in bigrTimes if len(item) > 1]
+        yrange = (0, np.mean(meanVls))
+    plt.ylim(yrange)
+    plt.ylabel(ylabel)
+    plt.savefig(oFig)  
+
+
 ##### NLTK - pandas - related ngram code  #####
 
 def bigrams2Dict(bigrams_tu):
@@ -179,9 +211,9 @@ def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
         samples = condFreqDict.keys()
         
     cpd = nltk.ConditionalProbDist(condFreqDict, MLEProbDist)
-    P={}
+    P = {}
     for cond in conditions:
-        P[cond]={}
+        P[cond] = {}
         for samp in samples:
             P[cond][samp] = cpd[cond].prob(samp)
     return P    

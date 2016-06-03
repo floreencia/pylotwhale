@@ -62,6 +62,8 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     if outFigName:fig.savefig(outFigName)
         
     return fig, ax     
+    
+    
         
         
 ### 2D plots ###
@@ -169,7 +171,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
     
     return fig, ax
 
-### Clustering plosts
+### Clustering plots
 
 
 
