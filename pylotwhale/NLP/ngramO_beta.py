@@ -144,21 +144,38 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
 
 
 def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig=None, 
-                       violinInner='stick', yrange='default', ylabel='time (s)', npl=5):
-    
+                       violinInner='box', yrange='default', ylabel='time (s)',
+                       minNumBigrams=5):
+    '''violin plot of the ict of a my_bigrams
+    Parameters:
+    -----------
+        df0 : pandas dataframe wirth ict column
+        mu_bigrams : sequence to search for
+        ignoteKeys : 'default' removes  ['_ini', '_end']
+        label : type of sequence
+        oFig : output figure
+        violinInner : viloin lor parameter
+        yrange : 'default' (0, mu*2)
+    '''
+        
     if ignoreKeys == 'default': ignoreKeys = ['_ini', '_end']
         
     topBigrams = daT.removeFromList(daT.returnSortingKeys(Counter(my_bigrams)), ignoreKeys)
     bigrTimes=[]
+    bigrNames=[]
+
     for seq in topBigrams:
         df = daT.returnSequenceDf(df0, seq, label=label)
         #print(len(df))
         ict = df.ict.values
-        #bigrTimesD[tuple(seq)] = ict[ ~ np.isnan(ict)]
-        bigrTimes.append(ict[ ~ np.isnan(ict)]) 
+        if len(ict) > minNumBigrams:
+            #bigrTimes[tuple(seq)] = ict[ ~ np.isnan(ict)]
+            bigrTimes.append(ict[ ~ np.isnan(ict)]) 
+            bigrNames.append(seq)
         
-    kys = ["{}{}".format(a,b) for a,b in topBigrams ]
-    sns.violinplot( bigrTimes[:npl], names=kys[:npl], inner=violinInner)
+    kys = ["{}{}".format(a,b) for a,b in bigrNames ]
+    sns.violinplot( bigrTimes, names=kys, inner=violinInner)
+    #sns.boxplot( bigrTimes, names=kys)
             
     if yrange == 'default':
         meanVls = [np.mean(item) for item in bigrTimes if len(item) > 1]

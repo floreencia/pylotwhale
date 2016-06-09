@@ -31,7 +31,8 @@ def groupedCountsInDataFrame(df, group_key, count_key):
     return cd
 
 def arrangeDict(di, ordering_keys):
-    '''returns a numpy array with the values of the keys ordered according to ordering_keys'''
+    '''returns a numpy array with the values of the keys ordered according to ordering_keys
+    if oredering key not in di.keys(), then the entry will be 0'''
     return np.array([di[ky] if ky in di.keys() else 0 for ky in ordering_keys ])
 
 def ignoredKeys(di, ignoreKeys):
@@ -40,9 +41,10 @@ def ignoredKeys(di, ignoreKeys):
 def removeFromList(l0, l_ignore=['_ini', '_end']):
     return [item for item in l0 if not any(set(l_ignore).intersection(item))]    
 
-def returnSortingKeys(di):
+def returnSortingKeys(di, minCounts=None):
+    '''keys that sort a dictionary'''
     return np.array([item[0] for item in 
-            sorted(di.items(), key = lambda x:x[1], reverse=True)])
+            sorted(di.items(), key = lambda x:x[1], reverse=True) if item[1] > minCounts])
             
 ### search sequence in PANDAS dataframe           
             

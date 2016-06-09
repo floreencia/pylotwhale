@@ -188,7 +188,6 @@ def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
     Z1 = sch.dendrogram(Y, orientation='right')
     ax1.set_xticks([])
     ax1.set_yticks([])
-
     # SECOND DENDROGRAM
     ax2 = fig.add_axes([0.3,0.71,0.6,0.2]) # up
     #Y = sch.linkage(linkage_matrix, method='single')
@@ -198,7 +197,7 @@ def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
 
     # DISTANCE MATRIX
     axmatrix = fig.add_axes([0.3,0.1,0.6,0.6]) # [x0, y0, Dx, Dy ]
-    idx1 = Z1['leaves']
+    idx1 = Z1['leaves'][::-1]
     idx2 = Z2['leaves']
     D = distM[idx1,:][:,idx2]
     #D = distM[:,idx2]
