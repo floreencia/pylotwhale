@@ -197,11 +197,11 @@ def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
 
     # DISTANCE MATRIX
     axmatrix = fig.add_axes([0.3,0.1,0.6,0.6]) # [x0, y0, Dx, Dy ]
-    idx1 = Z1['leaves'][::-1]
+    idx1 = Z1['leaves']#[::-1]
     idx2 = Z2['leaves']
     D = distM[idx1,:][:,idx2]
     #D = distM[:,idx2]
-    im = axmatrix.matshow(D, aspect='auto',cmap=cmap)#origin='lower'
+    im = axmatrix.matshow(D, aspect='auto', cmap=cmap, origin='lower')
     
     # Distance matrix tick labels
     axmatrix.set_xticks(range(len(idx1)))
