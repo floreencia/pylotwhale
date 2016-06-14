@@ -3,6 +3,11 @@
 Created on Fri Apr 29 15:34:06 2016
 
 @author: florencia
+
+Various handy functions (sorting, spliting, searching) for working with data
+    - pandas dataframes
+    - dictionaries
+    - lisits
 """
 
 import numpy as np
@@ -56,8 +61,8 @@ def search_sequence_numpy(arr,seq):
         arr    : input 1D array
         seq    : input 1D array
 
-    Output
-    ------    
+    Return:
+    -------   
         Output : 1D Array of indices in the input array that satisfy the 
         matching of input sequence in the input array.
         In case of no match, empty array is returned.
@@ -75,7 +80,7 @@ def search_sequence_numpy(arr,seq):
 
     # Get the range of those indices as final output
     if M.any>0:
-        return np.where(np.convolve(M,np.ones((Nseq),dtype=int)) > 0 )[0]
+        return np.where(np.convolve(M, np.ones((Nseq),dtype=int)) > 0 )[0]
     else:
         return np.array([])
     

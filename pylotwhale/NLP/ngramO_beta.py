@@ -174,8 +174,8 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
             bigrNames.append(seq)
         
     kys = ["{}{}".format(a,b) for a,b in bigrNames ]
-    sns.violinplot( bigrTimes, names=kys, inner=violinInner)
-    #sns.boxplot( bigrTimes, names=kys)
+    #sns.violinplot( bigrTimes, names=kys, inner=violinInner)
+    sns.boxplot( bigrTimes, names=kys)
             
     if yrange == 'default':
         meanVls = [np.mean(item) for item in bigrTimes if len(item) > 1]
