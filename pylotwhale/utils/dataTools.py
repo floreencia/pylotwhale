@@ -18,7 +18,7 @@ def dictOfGroupedDataFrames(df0, groupingKey='tape'):
     df = {}
     keysSet = set(df0[groupingKey])
     for t in keysSet:
-        df[t] = df0[df0[groupingKey] == t]        
+        df[t] = df0[df0[groupingKey] == t].reset_index(drop=True)
     return df
 
 def groupedCountsInDataFrame(df, group_key, count_key):
