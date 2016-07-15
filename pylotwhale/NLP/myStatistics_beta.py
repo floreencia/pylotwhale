@@ -22,9 +22,8 @@ import scipy.stats as st
 
 """
 
-
 #################################################################################
-##############################    FUNCTOINS    ##################################
+##############################    FUNCTIONS    ##################################
 #################################################################################
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -126,3 +125,36 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
         else:
             #print("H0 cannot be rejected!")
             return(-1, z, zc)
+            
+            
+            
+def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
+    '''elementwise diff of proportions test between X and Y, H0: X=Y
+    Parameters:
+    -----------
+        X : observed frequencies [2-dim-numpy array]
+        Y : expected frequencies [2-dim-numpy array]
+        min_counts : min number of counts
+        pcValue=0.9999
+    Returns:
+    --------
+        {-1, 0, 1} - numpy array with the outcome of H0
+        -1 reject, 1 cannot reject H0, 0 cannot apply test
+    '''
+    XYtest = np.full(np.shape(X), 0)    
+    nr, nc = np.shape(X)
+    nx = X.sum(axis = 1)*1.
+    ny = Y.sum(axis = 1)*1.
+    
+    for r in range(nr)[:]:
+        for c in range(nc)[:]:
+            if X[r,c] >= min_counts:
+                px = 1.0*X[r,c]/nx[r]
+                py = 1.0*Y[r,c]/ny[r]
+                XYtest[r,c] = testDiffProportions(px, py, nx[r], ny[r], 
+                                                    pcValue=pcValue)[0]
+            else:
+                XYtest[r,c] = np.NaN
+                
+    return XYtest
+                

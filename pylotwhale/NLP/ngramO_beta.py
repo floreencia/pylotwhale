@@ -16,7 +16,6 @@ import nltk
 from nltk.probability import ConditionalProbDist, MLEProbDist
 import pylotwhale.utils.dataTools as daT
 
-
 #import sequencesO_beta as seqs
 sys.path.append('/home/florencia/whales/scripts/')
 import matrixTools as mt 
@@ -28,7 +27,7 @@ import matrixTools as mt
 """
 
 #################################################################################
-##############################    FUNCTOINS    ##################################
+##############################    FUNCTIONS    ##################################
 #################################################################################
 
 
@@ -189,7 +188,7 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
 
 def bigrams2Dict(bigrams_tu):
     '''
-    converts a 2D-tuples list into a 2D-dictionary
+    converts a 2D-tuples list into a onditionalFreqDis (~2D-dictionary)
     eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
     :bigrams_tu: bigrams as a list of tuples
     '''
