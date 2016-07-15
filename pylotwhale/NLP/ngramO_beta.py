@@ -188,7 +188,7 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
 
 def bigrams2Dict(bigrams_tu):
     '''
-    converts a 2D-tuples list into a onditionalFreqDis (~2D-dictionary)
+    converts a 2D-tuples list into a conditionalFreqDist (~2D-dictionary)
     eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
     :bigrams_tu: bigrams as a list of tuples
     '''
@@ -254,8 +254,9 @@ def condFreqDict2condProbMatrix(cfd, conditions, samples):
 ### + GENERAL
 
 def twoDimDict2DataFrame(kykyDict):
-    '''two key dict D[a][b] = x --> pandas dataframe
-    P (c|r), columns are the condition, rows are sampes'''
+    '''two key dict D[condition][sample] = x --> pandas dataframe
+    P (sample = row |condition = column),
+    columns are the condition, rows are sampes'''
     return pd.DataFrame(kykyDict).fillna(0)
 
 
