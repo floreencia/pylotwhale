@@ -206,7 +206,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
         samplesList : list/np.array of samples to read (None reads all)
     Return:
     -------
-        M : matrix representations of the conditions
+        M : matrix representations of the df values
         samps : labels of the columns of the matrix
         conds : labels of the rows of the matrix
     NOTICE that the matrix is transposed with respect to the df
@@ -220,11 +220,22 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     M = bigrsDF.as_matrix().T # transpose to have consitions as rows
     return M, samps, conds
     
-def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, sampleList=None):
+def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     '''2dim bigram counts dict --> bigrams matrix
-    > M, samps, conds'''
+    Parameters:
+    -----------
+        bigramsDict : two entry dict, eg. D[a][b] (nltk.ConditionalFreqDist())
+        conditionsList : list/np.array of conditions to read (None reads all)
+        samplesList : list/np.array of samples to read (None reads all)
+     Return:
+    -------
+        M : matrix representations of the frequency values, with:
+            conditions as the rows and the saples as columns
+        samps : labels of the columns of the matrix
+        conds : labels of the rows of the matrix        
+    '''
     df = twoDimDict2DataFrame(bigramsDict)
-    return bigramsdf2bigramsMatrix(df, conditionsList, sampleList)
+    return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
     
 def bigrams2countsMatrix(bigrams_tu, conditionsList=None, sampleList=None):
     '''bigrams --> bigrams matrix'''
