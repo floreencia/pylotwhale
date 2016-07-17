@@ -196,14 +196,28 @@ def bigrams2Dict(bigrams_tu):
     return cfd
  
 def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
-    '''returns the bigram matrix of the conditionsList and sampleList'''
+    '''returns the bigram matrix of the conditionsList and samplesList, with:
+        conditions as the rows
+        and the saples as columns
+    Parameters:
+    -----------
+        df : conditional data frame (output of twoDimDict2DataFrame)
+        conditionsList : list/np.array of conditions to read (None reads all)
+        samplesList : list/np.array of samples to read (None reads all)
+    Return:
+    -------
+        M : matrix representations of the conditions
+        samps : labels of the columns of the matrix
+        conds : labels of the rows of the matrix
+    NOTICE that the matrix is transposed with respect to the df
+    '''
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
         
     bigrsDF = df[conditionsList].loc[samplesList]
     samps = bigrsDF.index
     conds = bigrsDF.columns
-    M = bigrsDF.as_matrix().T
+    M = bigrsDF.as_matrix().T # transpose to have consitions as rows
     return M, samps, conds
     
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, sampleList=None):
