@@ -90,6 +90,10 @@ def Gstatistics(O, E):
     G = 2*np.sum(O*np.log(O/E))
     return G, st.chisqprob(G, df)
     
+    
+    
+    
+    
 def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
     z-test for the difference of proportions
@@ -134,8 +138,9 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     -----------
         X : observed frequencies [2-dim-numpy array]
         Y : expected frequencies [2-dim-numpy array]
-        min_counts : min number of counts
-        pcValue=0.9999
+        min_counts : min number of counts used to compute the 
+            proportion of the class in matter
+        pcValue : critical p-value
     Returns:
     --------
         {-1, 0, 1} - numpy array with the outcome of H0

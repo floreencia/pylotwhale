@@ -7,7 +7,7 @@ import seaborn as sns
 import sys
 #import time 
 import itertools as it
-from collections import Counter
+from collections import Counter, defaultdict
 
 #import os
 import ast
@@ -283,6 +283,48 @@ def twoDimDict2DataFrame(kykyDict):
     P (sample = row |condition = column),
     columns are the condition, rows are sampes'''
     return pd.DataFrame(kykyDict).fillna(0)
+
+
+### bigrams and time
+
+def dictOfBigramIcTimes(listOfBigrams, df, ict=None, label='call'):
+    '''searches sequences (listOfBigrams) of type <label> in the dataframe
+    Parameters:
+    -----------
+        listOfBigrams : list of bigrams
+        df : pandas data frame
+        ict : dictionary with the bigrams as keys and the ict of the bigrams as values
+        label : type of squence, or name of the column in df where to look for the sequences
+    Return:
+    -------
+        ict : ictimes bigram dictionary
+    '''
+    if ict is None: ict = defaultdict(list)
+    for seq in listOfBigrams:
+        try:
+            seqdf = daT.returnSequenceDf(df, seq, label='call')
+        except ValueError: #sequence not found, continue with the next seq
+            continue
+        ky = ''.join(seq) # seqdf.head(20)
+        ict[ky].extend(seqdf.ict.values)
+    return ict
+
+def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict=None, label='call'):
+    '''searches sequences (listOfBigrams) in the dataframes from dfDict'''
+    for thisdf in dfDict.values():
+        ict=dictOfBigramIcTimes(listOfBigrams, thisdf, ict=ict, label=label)
+    return ict
+    
+def selectBigramsAround_dt(ictDict, dt=None):
+    '''takes a dictionary of ict-bigrams (ict) and returns the keys in the dt interval'''
+    if dt is None : dt = (None, np.inf)
+    collector=[]
+    ict_mean = dict([(item, np.mean(ict[item])) for item in ictDict.keys()])
+    for ky in ict_mean.keys():
+        if ict_mean[ky] > dt[0] and ict_mean[ky] < dt[1]:
+            collector.append(ky)
+    return(collector)    
+
 
 
 #############################    LISTS AND ARRAYS    ##################################

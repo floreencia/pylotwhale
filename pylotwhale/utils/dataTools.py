@@ -103,4 +103,19 @@ def returnSequenceDf(df0, seq, label='call'):
     arr = df0[label].values
     ix=filterIndexesForIct(search_sequence_numpy(arr, np.array(seq)))
     return df0.loc[ix].reset_index()
+    
+    
+### matrixes \\ 2dim numpy arrat
+
+def matrixSubsample(M, rwl, cll, rwsuset, cllsuset):
+    '''Resturns a subset of a matrix
+    Parameters:
+    -----------
+        M : matrix
+        rwl, cll : rows and column labels
+        rwsuset, cllsuset : row and label subsets
+    Returns: subset (Matrix, rw_labels, col_labels)'''
+    IOrw=np.array([True if item in rwsuset else False for item in rwl ])
+    IOcl=np.array([True if item in cllsuset else False for item in cll ])
+    return M[IOrw,:][:, IOcl], rwl[IOrw], cll[IOcl]    
             
