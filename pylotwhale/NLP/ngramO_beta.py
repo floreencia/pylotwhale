@@ -319,7 +319,7 @@ def selectBigramsAround_dt(ictDict, dt=None):
     '''takes a dictionary of ict-bigrams (ict) and returns the keys in the dt interval'''
     if dt is None : dt = (None, np.inf)
     collector=[]
-    ict_mean = dict([(item, np.mean(ict[item])) for item in ictDict.keys()])
+    ict_mean = dict([(item, np.mean(ictDict[item])) for item in ictDict.keys()])
     for ky in ict_mean.keys():
         if ict_mean[ky] > dt[0] and ict_mean[ky] < dt[1]:
             collector.append(ky)
