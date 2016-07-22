@@ -315,11 +315,13 @@ def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict=None, label='call'):
         ict=dictOfBigramIcTimes(listOfBigrams, thisdf, ict=ict, label=label)
     return ict
     
-def selectBigramsAround_dt(ictDict, dt=None):
-    '''takes a dictionary of ict-bigrams (ict) and returns the keys in the dt interval'''
+def selectBigramsAround_dt(ictDict, dt=None, minCts=10):
+    '''takes a dictionary of ict-bigrams (ict) and returns the keys in the dt interval
+    with at least <minCts> counts'''
     if dt is None : dt = (None, np.inf)
     collector=[]
-    ict_mean = dict([(item, np.mean(ictDict[item])) for item in ictDict.keys()])
+    ict_mean = dict([(item, np.mean(ictDict[item])) for item in ictDict.keys() 
+                    if len(ictDict[item])>=minCts])
     for ky in ict_mean.keys():
         if ict_mean[ky] > dt[0] and ict_mean[ky] < dt[1]:
             collector.append(ky)
