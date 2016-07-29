@@ -44,10 +44,18 @@ def ignoredKeys(di, ignoreKeys):
     return [item for item in di.items() if item[0] not in ignoreKeys]
     
 def removeFromList(l0, l_ignore=['_ini', '_end']):
-    return [item for item in l0 if not any(set(l_ignore).intersection(item))]    
+    '''Removes l_ignore from l0 
+    l0, l_ignote : list/np.array'''
+    return [item for item in l0 if item not in l_ignore] #any(set(l_ignore).intersection(item))] 
+    
+def removeElementWith(l0, l_ignore=['_ini', '_end']):
+    '''Removes any element containing any intersection with l_ignore
+    l0 : list of lists, l_ignote : list/np.array'''
+    return  [item for item in l0 if not any(set(l_ignore).intersection(item))]    
 
 def returnSortingKeys(di, minCounts=None):
-    '''keys that sort a dictionary'''
+    '''keys that sort a dictionary
+        di : key --> num dictionary, eg. Counter dictionary'''
     return np.array([item[0] for item in 
             sorted(di.items(), key = lambda x:x[1], reverse=True) if item[1] > minCounts])
             
