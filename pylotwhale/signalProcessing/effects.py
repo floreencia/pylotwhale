@@ -56,7 +56,7 @@ def addWhiteNoise(y, param=1.0):
     """
     adds white noise with amplitude 'param" to y
     """
-    y_ns=np.random.random_sample(len(y))*2-1 # white noise
+    y_ns = np.random.random_sample(len(y))*2 - 1 # white noise
     return y + param*y_ns
 
     
@@ -111,12 +111,14 @@ def waveformEffectsDictionary(funName=None):
     
 def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=None):#, **kwEffect):
     '''
+    Generates an ensemble of signals from y_template 
+    using the parameters in generate_data_grid
     !!! only works for white noise addition
     Params:
     -------
-        y_template : waveform np.arrat
+        y_template : waveform (np.array)
         effect : name of the effect to use (string)
-        generate_data_grid : parameter grid for the effect
+        generate_data_grid : parameter grid for the effect (np.array)
         kwEffect : kwargs for the effect
     Returns:
     -------
@@ -134,7 +136,6 @@ def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=Non
     for i in range(len(generate_data_grid)):
         Y[i,:] = effectFun(y_template, param=generate_data_grid[i])#, **kwEffect)
     return(Y)
-        
         
 
 def generateAddEnsemble(y_template, y_add, intensity_grid=None, normalize=True):

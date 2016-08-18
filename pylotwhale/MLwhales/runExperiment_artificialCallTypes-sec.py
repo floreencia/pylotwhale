@@ -30,7 +30,7 @@ n_experiments = 20 # identical experiment repetitions
 # noise amplitude
 n_amps = 20
 a0 = 0
-a = 0.05
+a = 0.03
 amp = np.linspace(a0, a, n_amps) # paramter domain
 param_grid = np.repeat(amp, n_experiments) # reapet expriment
 metric='accuracy'
@@ -121,7 +121,8 @@ def genrateData_ensembleSettings(param):
     return(ensembleSettings)
     
 def clf_experiment(param):
-                           
+    '''(1) take a ensembe generating params (2) generate data from collection 
+    according to feExFun (3) filter instances and (4) train clf'''
     ensembleSettings = genrateData_ensembleSettings(param)
     datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
                                                 ensembleSettings=ensembleSettings)

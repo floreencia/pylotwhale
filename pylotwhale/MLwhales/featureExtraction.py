@@ -252,7 +252,7 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=Non
     
 def wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun=None, wavPreprocesingT=None,
                                ensembleSettings=None):
-    datO = myML.dataXy_names() 
+    datO = myML.dataXy_names() # inicialise data object
     for wavF, annF in wavAnnColl[:]:
         datO_new = wavAnn2sectionsXy_ensemble( wavF, annF, featExtFun=featExtFun, 
                                                    wavPreprocesingT=wavPreprocesingT,
