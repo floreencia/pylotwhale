@@ -21,7 +21,6 @@ from sklearn.pipeline import Pipeline
 from sklearn import svm
 import time
 
-
 #######################   SETTINGS   ######################################
 
 ###### Iter parameters
@@ -39,7 +38,7 @@ preproStr="n_idExperiments{}-n_trainSamples{}_in_{}_{}".format(n_experiments,
                                                  n_artificial_samples, a0, a)
 
 ##### out files
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
+oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments/trashtest', parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -76,8 +75,9 @@ clfStr = 'cv{}'.format(cv)
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=0) )])
 gamma_range = [ 0.01, 0.1, 1.0, 10.0, 100.0]
 pen_range = [ 1.0, 10.0, 100.0]
-clf_param_grid = [ {'clf__C': pen_range, 'clf__gamma': gamma_range, 'clf__kernel': ['rbf']}]
-gs_settings=dict(estimator=pipe_svc,
+clf_param_grid = [ {'clf__C': pen_range, 'clf__gamma': gamma_range, 
+                    'clf__kernel': ['rbf']}]
+gs_settings = dict(estimator=pipe_svc,
                   param_grid=clf_param_grid,
                   scoring=metric,
                   cv=cv,

@@ -73,7 +73,7 @@ class annotationsValidity():
 ### plot
 
 
-def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, 
+def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, dpi=None,
                          labelsHeight=10, cmapName='seismic', lw = 1, cmapIm=None, **kwargs): 
     '''
     plots the spectrogram with it's annotations
@@ -82,6 +82,8 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
         wavAnnCollection  : collection of paths to wavs and annotations files
         outDir : dir where the plots will be saved
         labelHeight : dictionary with the names of the labels and the height
+        dpi : size of the image
+        lw : line width for the annotated section
     '''
     ## wav file
     try:
@@ -115,23 +117,25 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None,
         
     #if callAsTitle: ax.set_title('{}'.format(fp.parseHeikesNameConv(wavFi)['call']))    
     outPl = os.path.join( outDir, os.path.basename(wavFi).replace('wav', 'png'))
-    plt.savefig(outPl)
+    plt.savefig(outPl, dpi=dpi)
     del fig, ax
     
     
 def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True, 
-                                     figsize=None, **kwargs):
+                                     figsize=None, dpi=None,
+                                     lw=1, **kwargs):
     '''
     plots the spectros with it's annotations calling plotAnnotatedSpectro
     Parameters
     ----------    
-    wavAnnCollection  : collection of paths to wavs and annotations files
-    outDir : dir where the plots will be saved
+        wavAnnCollection  : collection of paths to wavs and annotations files
+        outDir : dir where the plots will be saved
+        dpi : size of the image
+        lw : line width for the annotated section
     '''
     for wF, annF in wavAnnCollection:
         plotAnnotatedSpectro(wF, annF, outDir, callAsTitle=callAsTitle, 
-                             figsize=figsize, **kwargs)
-
+                             figsize=figsize, dpi=dpi, **kwargs)
 
 
 

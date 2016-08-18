@@ -28,7 +28,6 @@ def uniqueItemIndexes(mylist):
         #"unique items list")
         return(range(len(mylist))) # return all indexes
         
-    
 def filterListForUniqueItems(myList):
     uIdx = uniqueItemIndexes(myList)
     return [myList[item] for item in uIdx]

@@ -53,11 +53,11 @@ def removeElementWith(l0, l_ignore=['_ini', '_end']):
     l0 : list of lists, l_ignote : list/np.array'''
     return  [item for item in l0 if not any(set(l_ignore).intersection(item))]    
 
-def returnSortingKeys(di, minCounts=None):
+def returnSortingKeys(di, minCounts=None, reverse=True):
     '''keys that sort a dictionary
         di : key --> num dictionary, eg. Counter dictionary'''
     return np.array([item[0] for item in 
-            sorted(di.items(), key = lambda x:x[1], reverse=True) if item[1] > minCounts])
+            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] > minCounts])
             
 ### search sequence in PANDAS dataframe           
             
