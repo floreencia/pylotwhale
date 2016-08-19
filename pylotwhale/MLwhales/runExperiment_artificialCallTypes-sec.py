@@ -25,12 +25,12 @@ import time
 
 ###### Iter parameters
 parameter = 'noiseAmplitude'
-n_artificial_samples = 10 # number of artificial samples to generate
-n_experiments = 20 # identical experiment repetitions
+n_artificial_samples = 10 # number of artificial samples to generate for each amp
+n_experiments = 10 # identical experiment repetitions
 # noise amplitude
-n_amps = 20
+n_amps = 10
 a0 = 0
-a = 0.03
+a = 0.005
 amp = np.linspace(a0, a, n_amps) # paramter domain
 param_grid = np.repeat(amp, n_experiments) # reapet expriment
 metric='accuracy'
@@ -116,13 +116,17 @@ def train_clf(X, y):
     return(clf)
     
 def genrateData_ensembleSettings(param):
+    '''defines the dictionary with the settings to generate the artificial samples
+    see eff.generateWaveformEnsemble'''
     ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
     return(ensembleSettings)
     
 def clf_experiment(param):
-    '''(1) take a ensembe generating params (2) generate data from collection 
-    according to feExFun (3) filter instances and (4) train clf'''
+    '''Train clf : (1) take params, "the ensemble generating params", 
+    (2) generate data from collection according to feExFun, 
+    (3) filter instances and (4) train clf'''
+    # (1)
     ensembleSettings = genrateData_ensembleSettings(param)
     datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
                                                 ensembleSettings=ensembleSettings)
@@ -192,7 +196,7 @@ def run_iter_clf_experiment(param_grid,
            
     scores_file, X, y = print_score_params
     XyDict, accumFile = print_predictions_params
-    scoresDict=None
+    scoresDict = None
     
     for param in param_grid:
         print("param", param)

@@ -205,18 +205,18 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocesingT=Non
 
     ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
     
-    Parameters
+    Parameters:
     ----------
-    < wavFi : path to wave file
-    < featExtFun :  feature extraction function (callable)
-                    or a dictionary with the feature extraction settings
-                    featureExtrationParams = dict(zip(i, i))
-    < wavPreprocesingT : callable
-    < ensembleSettings : dictionary with the instructions for ensemeble generation
+        < wavFi : path to wave file
+        < featExtFun :  feature extraction function (callable)
+                        or a dictionary with the feature extraction settings
+                        featureExtrationParams = dict(zip(i, i))
+        < wavPreprocesingT : callable
+        < ensembleSettings : dictionary with the instructions for ensemeble generation
 
-    Return
+    Return:
     ------    
-    > datXy_names : data object
+        > datXy_names : data object
     """
 
     ### check feature extraction function
