@@ -6,7 +6,6 @@ Created on Fri Aug 19 18:41:23 2016
 @author: florencia
 """
 
-
 from __future__ import print_function, division
 import numpy as np
 import os
@@ -38,8 +37,9 @@ def genrateData_ensembleSettings(param):
     return(ensembleSettings)
     
 def clf_experiment(param):
-    '''(1) take params, the ensemble generating params, (2) generate data from collection 
-    according to feExFun (3) filter instances and (4) train clf'''
+    '''train clf : (1) take params, the ensemble generating params, 
+    (2) generate data from collection according to feExFun,
+    (3) filter instances and (4) train clf'''
     ensembleSettings = genrateData_ensembleSettings(param)
     datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
                                                 ensembleSettings=ensembleSettings)
