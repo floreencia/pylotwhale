@@ -21,9 +21,8 @@ from sklearn import svm
 import time
 
 
-
-def train_clf(X, y):
-    gs = grid_search.GridSearchCV(**gs_settings)
+def train_clf(X, y, clf_settings):
+    gs = grid_search.GridSearchCV(**clf_settings)
     gs.fit(X, y)
     clf = gs.best_estimator_
     del gs
@@ -36,23 +35,47 @@ def genrateData_ensembleSettings(param):
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
     return(ensembleSettings)
     
-def clf_experiment(param):
+def featureExtractionInstructions2Xy(wavAnnColl, lt, featExtFun=None, labelSet=None,
+                                     **feExParamDict):
+    '''All instructions for feature extraction
+    Params:
+    -------
+        wavAnnColl : 
+        lt : label transformer
+        featExtFun : feature extraction function
+        labelSet : list with the subset of labels to consider
+        **feExParamDict : other kwargs for feature extraction
+            eg. dict(wavPreprocessingT=None, ensembleSettings=ensembleSettings)
+    '''
+    datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun, **feExParamDict)
+    X_train, y_train_labels = datO.filterInstances(labelSet)
+    y_train = lt.nom2num(y_train_labels)
+    return X_train, y_train
+        
+def clf_experiment(clf_settings, **feExInstructionsDict):
     '''train clf : (1) take params, the ensemble generating params, 
     (2) generate data from collection according to feExFun,
-    (3) filter instances and (4) train clf'''
-    ensembleSettings = genrateData_ensembleSettings(param)
-    datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl_tr, featExtFun=feExFun, 
-                                                ensembleSettings=ensembleSettings)
-                                                
-    X_train, y_train_labels = datO.filterInstances(callSet)
-    y_train = lt.nom2num(y_train_labels)            
-    clf = train_clf(X_train, y_train) # train           
-    return clf
+    (3) filter instances and (4) train clf
+    Parameters:
+    -----------
+        < feExInstructionsDict : dictionary with the instrucions for feature extraction 
+        eg. dict(wavAnnColl=wavAnnColl_tr, featExtFun=feExFun, labelSet,
+                 wavPreprocesingT=None, ensembleSettings=ensembleSettings)
+                 see fex.wavAnnCollection2Xy_ensemble()
+    '''
+    #print(feExInstructionsDict)
+    X_train, y_train = featureExtractionInstructions2Xy(**feExInstructionsDict)
+    clf = train_clf(X_train, y_train, clf_settings) # train    
+    return clf #X_train, y_train # clf
     
     
 class clf_experimentO():
-    def __init__(self, param):
-        self.clf = clf_experiment(param)
+    '''
+    object to run clf experiments
+    (1) train classifier and (2) administrate outcomes
+    '''
+    def __init__(self, clf_settings, **feExParamDict):
+        self.clf = clf_experiment(clf_settings, **feExParamDict)
         
     def print_scores(self, scores_file, X_test, y_test, param=None):
         scores = self.clf.score(X_test, y_test)
@@ -81,11 +104,12 @@ class clf_experimentO():
         return predictionsDict
         
             
-    def print_predictions(self, accumFile, scoresDict ):
+    def print_predictions(self, accumFile, scoresDict, lt ):
         """prints the predictions for each wav ann"""
         
         with open(accumFile, 'w') as f:
-            f.write("#{}\n".format(", ".join(["{} {}".format(call, lt.nom2num(call)) for call in callSet])))
+            f.write("#{}\n".format(", ".join(["{} {}".format(
+            call, lt.nom2num(call)) for call in lt.classes_])))
         
         with open(accumFile, 'a') as f:
             print(scoresDict.keys())
@@ -98,23 +122,34 @@ class clf_experimentO():
         
         return accumFile
         
+#def updateParam(settingsDic):
+        
     
-def run_iter_clf_experiment(param_grid, 
+def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
+                            paramKey, updateParamInDict,
                             print_score_params=(None, None, None), 
-                            print_predictions_params=(None, None)):
+                            print_predictions_params=(None, None, None)):
     """
-    print_scores_params : (X, y, out_file)
-    print_predictions_params : (XyDict, out_file)
+    Parameters:
+    ----------
+        param_grid : 
+        clf_settings : 
+        feExParamDict :
+        paramKey :
+        updateParamInDict :
+        print_scores_params : (X, y, out_file)
+        print_predictions_params : (XyDict, out_file, lt)
     """
            
     scores_file, X, y = print_score_params
-    XyDict, accumFile = print_predictions_params
-    scoresDict=None
+    XyDict, accumFile, lt = print_predictions_params
+    scoresDict = None
     
     for param in param_grid:
         print("param", param)
         
-        clfExp = clf_experimentO(param)
+        feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
+        clfExp = clf_experimentO(clf_settings, **feExParamDict)
         
         if scores_file is not None:
             clfExp.print_scores(scores_file, X, y, param)
@@ -124,6 +159,6 @@ def run_iter_clf_experiment(param_grid,
                                                       predictionsDict=scoresDict)
    
     if XyDict is not None:
-        clfExp.print_predictions( accumFile, scoresDict )
+        clfExp.print_predictions( accumFile, scoresDict, lt )
         
     return True    
