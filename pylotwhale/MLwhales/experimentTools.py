@@ -28,11 +28,16 @@ def train_clf(X, y, clf_settings):
     del gs
     return(clf)
     
-def genrateData_ensembleSettings(param):
+def genrateData_ensembleSettings(whiteNoiseAmp=0.003, n_artificial_samples = 10):
     '''defines the dictionary with the settings to generate the artificial samples
-    see eff.generateWaveformEnsemble'''
+    adding white noise. See eff.generateWaveformEnsemble
+    Parameters:
+    -----------
+        whiteNoiseAmp=0.003
+        n_artificial_samples = 10
+    '''
     ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}
-    ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
+    ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*whiteNoiseAmp
     return(ensembleSettings)
     
 def featureExtractionInstructions2Xy(wavAnnColl, lt, featExtFun=None, labelSet=None,
@@ -67,7 +72,6 @@ def clf_experiment(clf_settings, **feExInstructionsDict):
     X_train, y_train = featureExtractionInstructions2Xy(**feExInstructionsDict)
     clf = train_clf(X_train, y_train, clf_settings) # train    
     return clf #X_train, y_train # clf
-    
     
 class clf_experimentO():
     '''

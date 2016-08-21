@@ -32,9 +32,13 @@ parameter = 'noiseAmplitude'
 paramKey = 'ensembleSettings'
 # noise amplitude
 n_amps = 5
-a0 = 0
-a = 0.005
+a0 = 0.001
+a = 0.004
 amp = np.linspace(a0, a, n_amps) # paramter domain
+
+def updateParamInDict(paramDict, paramKey, param):
+    paramDict[paramKey] = exT.genrateData_ensembleSettings(whiteNoiseAmp=param) #
+    return paramDict
 
 ####### FIX SETTINGS
 ## experiment repetitions
@@ -128,9 +132,6 @@ def genrateData_ensembleSettings(param):
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
     return(ensembleSettings)
 
-def updateParamInDict(paramDict, paramKey, param):
-    paramDict[paramKey]=genrateData_ensembleSettings(param)
-    return paramDict
 
 ###################  TASK  ####################
 
