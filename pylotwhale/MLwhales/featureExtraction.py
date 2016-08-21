@@ -474,7 +474,7 @@ class wavFeatureExtraction():
         #print(di)
         featStr = di['featExtrFun']+'-'
         di.pop('featExtrFun')
-        featStr += '-'.join([str(c)+str(v) for (c,v) in di.items()])
+        featStr += '-'.join([str(c) + str(v) for (c, v) in di.items() ])
         return featStr
     
     def featExtrFun(self):

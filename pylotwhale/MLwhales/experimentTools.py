@@ -127,12 +127,27 @@ class clf_experimentO():
         return accumFile
         
 #def updateParam(settingsDic):
+
+def updateParamTestSet(paramDict, paramKey, param, wavAnnColl_te, lt, output_type='dict'):
+    print("\n", paramKey, "\n", paramDict['featExtractionInstructions'])
+    paramDict['featExtractionInstructions'][paramKey] = param # update featExFun
+    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, featExtFun=paramDict)
+    if output_type =='dict':
+        return XyDict_test
+    if output_type == 'Xy':
+        XyO_test = fex.XyDict2XyO(XyDict_test)
+        X_test, y_test_labels = XyO_test.filterInstances(callSet)
+        lt = myML.labelTransformer(y_test_labels)
+        y_test = lt.nom2num(y_test_labels)        
+        return X_test, y_test
         
     
 def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
                             paramKey, updateParamInDict,
-                            print_score_params=(None, None, None), 
-                            print_predictions_params=(None, None, None)):
+                            wavAnnColl_te, lt, 
+                            updateTestSet = lambda x : x,
+                            scores_file=None, 
+                            accum_file=None):
     """
     Parameters:
     ----------
@@ -141,28 +156,39 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
         feExParamDict :
         paramKey :
         updateParamInDict :
-        print_scores_params : (X, y, out_file)
-        print_predictions_params : (XyDict, out_file, lt)
+        wavAnnColl_te :
+        lt :
+        scores_file : 
+        accum_file : 
     """
-           
-    scores_file, X, y = print_score_params
-    XyDict, accumFile, lt = print_predictions_params
+    
+    #TEST DATA
+    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, feExParamDict['featExtractionInstructions'])
+    XyO_test = fex.XyDict2XyO(XyDict_test)
+    X_test, y_test_labels = XyO_test.filterInstances(lt.classes_)
+    y_test = lt.nom2num(y_test_labels)
+   
     scoresDict = None
     
     for param in param_grid:
         
         feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
         clfExp = clf_experimentO(clf_settings, **feExParamDict)
-        #print("param", param, '\n\n', feExParamDict)
+        #print("param", param, '\n\n', feExParamDict['featExtFun'])
+        
+        XyDict_test = updateTestSet(feExParamDict, paramKey, param, 
+                                        wavAnnColl_te, lt, output_type='dict')
+        X_test, y_test = updateTestSet(feExParamDict, paramKey, param, 
+                                        wavAnnColl_te, lt, output_type='Xy')
         
         if scores_file is not None:
-            clfExp.print_scores(scores_file, X, y, param)
+            clfExp.print_scores(scores_file, X_test, y_test, param)
             
-        if XyDict is not None:
-            scoresDict = clfExp.accumPredictions(XyDict, param, 
+        if XyDict_test is not None:
+            scoresDict = clfExp.accumPredictions(XyDict_test, param, 
                                                       predictionsDict=scoresDict)
    
-    if XyDict is not None:
-        clfExp.print_predictions( accumFile, scoresDict, lt )
+    if XyDict_test is not None:
+        clfExp.print_predictions( accum_file, scoresDict, lt )
         
     return True    

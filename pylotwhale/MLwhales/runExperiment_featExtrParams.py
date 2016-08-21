@@ -28,19 +28,26 @@ import time
 #######################   SETTINGS   ######################################
 
 ####### Iter parameters
-parameter = 'noiseAmplitude'
-paramKey = 'ensembleSettings'
+parameter = 'Nslices'
+paramKey = 'Nslices'
 # noise amplitude
-n_amps = 10
-a0 = 0.001
-a = 0.005
-amp = np.linspace(a0, a, n_amps) # paramter domain np.arange(5,a)#
+Nslices = 10
+#n_amps = 10
+#a0 = 0.001
+#a = 0.005
+amp = np.arange(3,8) #np.linspace(a0, a, n_amps) # paramter domain np.arange(5,a)#
 
 def updateParamInDict(paramDict, paramKey, param):
-    paramDict[paramKey] = exT.genrateData_ensembleSettings(whiteNoiseAmp=param) #
+    print('IN DICT\n', paramDict['featExtractionInstructions'])
+    paramDict['featExtractionInstructions'][paramKey] = param #
+    print(paramDict['featExtractionInstructions'])
+
     return paramDict
 
-preproStr="{}_{}_{}".format(parameter, a0, a)
+preproStr="{}_{}".format(parameter, Nslices)
+
+
+updateTestSet = exT.updateParamTestSet#lambda x : x # do nothing
 
 ####### FIX SETTINGS
 ## experiment repetitions
@@ -106,12 +113,6 @@ collFi_test = '/home/florencia/whales/MLwhales/callClassification/data/collectio
 ## collections
 wavAnnColl_tr = fex.readCols(collFi_train, (0,1))
 wavAnnColl_te = fex.readCols(collFi_test, (0,1))
-## test data
-XyDict_test=fex.wavAnnCollection2XyDict(wavAnnColl_te, feExFun)
-XyO_test = fex.XyDict2XyO(XyDict_test)
-X_test, y_test_labels = XyO_test.filterInstances(callSet)
-lt = myML.labelTransformer(y_test_labels)
-y_test = lt.nom2num(y_test_labels)
 
 #### Settings strings
 preproStr+="-NidExperiments{}".format(n_experiments)
@@ -121,13 +122,11 @@ settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 #ensembleSettings = exT.genrateData_ensembleSettings(param)
 
 feExParamDict = {'wavAnnColl' : wavAnnColl_tr, 'lt' : lt,
-                 'featExtFun' : feExFun, 
+                 'featExtractionInstructions' : featConstD, 
                  'labelSet' : callSet, 
                  'wavPreprocessingT' : None,
                  'ensembleSettings' : exT.genrateData_ensembleSettings()
                  }#, 'ensembleSettings' : ensembleSettings}
-
-
 
 ###################  TASK  ####################
 
@@ -137,14 +136,15 @@ with open(out_file_scores, 'w') as f:
             time.strftime("%Y.%m.%d\t\t%H:%M:%S"), 
             collFi_train, collFi_test, settingsStr, parameter, metric))
 
-
 print('--------\nSETTINGS\n--------\n:', out_file_scores)#,
       #np.shape(X_test), np.shape(y_test),'\n',param_grid, '\n', feExParamDict)
       
 exT.run_iter_clf_experiment(param_grid, gs_settings, feExParamDict, 
-                            paramKey, updateParamInDict,                            
-                            print_score_params=(out_file_scores, X_test, y_test),
-                            print_predictions_params=(XyDict_test, out_file_votes, lt))
+                            paramKey, updateParamInDict,           
+                            wavAnnColl_te, lt,
+                            updateTestSet = updateTestSet,
+                            scores_file = out_file_scores, 
+                            accum_file = out_file_votes)
 
 
    
