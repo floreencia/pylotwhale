@@ -28,22 +28,25 @@ import time
 #######################   SETTINGS   ######################################
 
 ####### Iter parameters
+parameter = 'NArtificialSamples'
+paramKey = 'ensembleSettings'
 
-parameter = 'Nceps'
-paramKey = 'Nceps'
-N0 = 12
-Ndelta = 1
-N = 30
-amp = np.arange(N0, N, Ndelta) # np.linspace(a0, a, n_amps) 
+a = 12
+print("\n\nTEST", amp)
+
+amp = np.arange(5, a) # less than 5 doesn’t work with CV=10
+print("TEST", amp)
 
 def updateParamInDict(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param 
+    paramDict[paramKey] = exT.genrateData_ensembleSettings(n_artificial_samples = param) 
     return paramDict
 
-updateTestSet = exT.updateParamTestSet
+updateTestSet = lambda x : x # do nothing
 
-preproStr="{}_{}".format(parameter, '{}-{}'.format(N0,N))
+preproStr="{}_{}".format(parameter, a)
 
+oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/'
+                    'data/experiments/spec/', parameter)
 
 ##############################
 ####### FIX SETTINGS  ########
@@ -62,21 +65,20 @@ wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=l
 
 ## features dictionary
 featConstD = {}
-NFFTpow = 10; featConstD["NFFTpow"] = NFFTpow
+NFFTpow = 9; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"]= overlap
-Nslices = 8; featConstD["Nslices"]= Nslices
+Nslices = 7; featConstD["Nslices"]= Nslices
 normalize = True; featConstD["normalize"]= normalize
-#featExtract='spectral'; featConstD["featExtrFun"]= featExtract
+featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 #n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
-Nceps=20; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+#Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
 ## feature extraction object
 feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
 feature_str = feExOb.feature_str
-#feExFun=feExOb.featExtrFun()
 
 ##### clf
 metric='accuracy'
-cv = 10
+cv = 2
 clfStr = 'cv{}'.format(cv)
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=0) )])
 gamma_range = [ 0.01, 0.1, 1.0, 10.0, 100.0]
@@ -95,7 +97,6 @@ callSet=['126i', '130', '127', '129', '128i', '131i', '093ii']
 lt = myML.labelTransformer(callSet)
 
 ##### Out files
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
 try:
     os.makedirs(oDir)
 except OSError:

@@ -177,10 +177,12 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
         clfExp = clf_experimentO(clf_settings, **feExParamDict)
         #print("param", param, '\n\n', feExParamDict['featExtFun'])
         
+        '''# uncomment when changing features   
         XyDict_test = updateTestSet(feExParamDict, paramKey, param, 
                                         wavAnnColl_te, lt, output_type='dict')
         X_test, y_test = updateTestSet(feExParamDict, paramKey, param, 
                                         wavAnnColl_te, lt, output_type='Xy')
+        '''
         
         if scores_file is not None:
             clfExp.print_scores(scores_file, X_test, y_test, param)

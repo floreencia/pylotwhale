@@ -607,22 +607,22 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True):
 
     '''
-    cepstral Feature Matrix and the delta orders horizontalyappended
-    Parameters
+    cepstral feature matrix and the delta orders horizontaly appended
+    Parameters:
     ------------
-    < waveform : numpy array
-    < sRate : samplig rate
-    < NFFTpow : exponent of the fft window lenght in base 2
-    < overlap : [0,1)
-    < Nceps : number of cepstral coefficients
-    < logSc : retunrn features in logarithmic scale
-    < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
+        < waveform : numpy array
+        < sRate : samplig rate
+        < NFFTpow : exponent of the fft window lenght in base 2
+        < overlap : [0,1)
+        < Nceps : number of cepstral coefficients
+        < logSc : retunrn features in logarithmic scale
+        < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
     Returns
     -------
-    > M : cepstral feature matrix ( m_instances x n_features )
-    > featureNames : list
-    > tf : final time [s]
-    > paramStr : settings string
+        > M : cepstral feature matrix ( m_instances x n_features )
+        > featureNames : list
+        > tf : final time [s]
+        > paramStr : settings string
     '''
     ## settings																
     NFFT = 2**int(NFFTpow)
