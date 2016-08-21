@@ -468,13 +468,14 @@ class wavFeatureExtraction():
     """
     def __init__(self, feature_extr_di):
         self.newFeatExtrDi( feature_extr_di )
+        #self.feature_str = set_featureExtStr
                
     def set_featureExtStr(self, di):
         '''defines a string with the feature extraction settings'''
-        #print(di)
-        featStr = di['featExtrFun']+'-'
-        di.pop('featExtrFun')
-        featStr += '-'.join([str(c) + str(v) for (c, v) in di.items() ])
+        #print("TEST", di)
+        #featStr = di['featExtrFun']+'-'
+        #di.pop('featExtrFun')
+        featStr = '-'.join([str(c) + str(v) for (c, v) in di.items() ])
         return featStr
     
     def featExtrFun(self):

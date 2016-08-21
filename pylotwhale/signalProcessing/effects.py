@@ -40,7 +40,6 @@ matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
 #####           waveform manipulations                #####
 ###########################################################
 
-
     
 #### WAVEFORM MANIPULATIONS    
     

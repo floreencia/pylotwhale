@@ -129,14 +129,14 @@ class clf_experimentO():
 #def updateParam(settingsDic):
 
 def updateParamTestSet(paramDict, paramKey, param, wavAnnColl_te, lt, output_type='dict'):
-    print("\n", paramKey, "\n", paramDict['featExtractionInstructions'])
-    paramDict['featExtractionInstructions'][paramKey] = param # update featExFun
-    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, featExtFun=paramDict)
+    paramDict['featExtFun'][paramKey] = param # update featExFun
+    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, featExtFun=paramDict['featExtFun'])
+
     if output_type =='dict':
         return XyDict_test
     if output_type == 'Xy':
         XyO_test = fex.XyDict2XyO(XyDict_test)
-        X_test, y_test_labels = XyO_test.filterInstances(callSet)
+        X_test, y_test_labels = XyO_test.filterInstances(lt.classes_)
         lt = myML.labelTransformer(y_test_labels)
         y_test = lt.nom2num(y_test_labels)        
         return X_test, y_test
@@ -163,7 +163,8 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
     """
     
     #TEST DATA
-    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, feExParamDict['featExtractionInstructions'])
+    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, 
+                                              feExParamDict['featExtFun'])
     XyO_test = fex.XyDict2XyO(XyDict_test)
     X_test, y_test_labels = XyO_test.filterInstances(lt.classes_)
     y_test = lt.nom2num(y_test_labels)

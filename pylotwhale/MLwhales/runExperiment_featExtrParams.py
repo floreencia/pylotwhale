@@ -28,28 +28,25 @@ import time
 #######################   SETTINGS   ######################################
 
 ####### Iter parameters
-parameter = 'Nslices'
-paramKey = 'Nslices'
-# noise amplitude
-Nslices = 10
-#n_amps = 10
-#a0 = 0.001
-#a = 0.005
-amp = np.arange(3,8) #np.linspace(a0, a, n_amps) # paramter domain np.arange(5,a)#
+
+parameter = 'Nceps'
+paramKey = 'Nceps'
+N0 = 12
+Ndelta = 1
+N = 30
+amp = np.arange(N0, N, Ndelta) # np.linspace(a0, a, n_amps) 
 
 def updateParamInDict(paramDict, paramKey, param):
-    print('IN DICT\n', paramDict['featExtractionInstructions'])
-    paramDict['featExtractionInstructions'][paramKey] = param #
-    print(paramDict['featExtractionInstructions'])
-
+    paramDict['featExtFun'][paramKey] = param 
     return paramDict
 
-preproStr="{}_{}".format(parameter, Nslices)
+updateTestSet = exT.updateParamTestSet
+
+preproStr="{}_{}".format(parameter, '{}-{}'.format(N0,N))
 
 
-updateTestSet = exT.updateParamTestSet#lambda x : x # do nothing
-
-####### FIX SETTINGS
+##############################
+####### FIX SETTINGS  ########
 ## experiment repetitions
 # when random numbers are involved, repeat the experiment to get the stats
 n_experiments = 10 # identical experiment repetitions
@@ -75,7 +72,7 @@ Nceps=20; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featEx
 ## feature extraction object
 feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
 feature_str = feExOb.feature_str
-feExFun=feExOb.featExtrFun()
+#feExFun=feExOb.featExtrFun()
 
 ##### clf
 metric='accuracy'
@@ -98,7 +95,7 @@ callSet=['126i', '130', '127', '129', '128i', '131i', '093ii']
 lt = myML.labelTransformer(callSet)
 
 ##### Out files
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments/trashtest', parameter)
+oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -122,9 +119,9 @@ settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 #ensembleSettings = exT.genrateData_ensembleSettings(param)
 
 feExParamDict = {'wavAnnColl' : wavAnnColl_tr, 'lt' : lt,
-                 'featExtractionInstructions' : featConstD, 
+                 'featExtFun' : featConstD, 
                  'labelSet' : callSet, 
-                 'wavPreprocessingT' : None,
+                 #'wavPreprocessingT' : None,
                  'ensembleSettings' : exT.genrateData_ensembleSettings()
                  }#, 'ensembleSettings' : ensembleSettings}
 
