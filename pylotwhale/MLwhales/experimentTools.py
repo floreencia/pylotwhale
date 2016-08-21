@@ -28,12 +28,12 @@ def train_clf(X, y, clf_settings):
     del gs
     return(clf)
     
-def genrateData_ensembleSettings(whiteNoiseAmp=0.003, n_artificial_samples = 10):
+def genrateData_ensembleSettings(whiteNoiseAmp=0.0023, n_artificial_samples = 10):
     '''defines the dictionary with the settings to generate the artificial samples
     adding white noise. See eff.generateWaveformEnsemble
     Parameters:
     -----------
-        whiteNoiseAmp=0.003
+        whiteNoiseAmp=0.0023
         n_artificial_samples = 10
     '''
     ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}

@@ -31,9 +31,9 @@ import time
 parameter = 'noiseAmplitude'
 paramKey = 'ensembleSettings'
 # noise amplitude
-n_amps = 5
+n_amps = 10
 a0 = 0.001
-a = 0.004
+a = 0.003
 amp = np.linspace(a0, a, n_amps) # paramter domain
 
 def updateParamInDict(paramDict, paramKey, param):
@@ -46,7 +46,7 @@ def updateParamInDict(paramDict, paramKey, param):
 n_experiments = 10 # identical experiment repetitions
 param_grid = np.repeat(amp, n_experiments) # repeat experiment
 
-n_artificial_samples = 10 # number of artificial samples to generate for each amp
+#n_artificial_samples = 10 # number of artificial samples to generate for each amp
 
 #### Feature extraction 
 ## preprocessing
@@ -89,7 +89,7 @@ callSet=['126i', '130', '127', '129', '128i', '131i', '093ii']
 lt = myML.labelTransformer(callSet)
 
 ##### Out files
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments/trashtest', parameter)
+oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -112,8 +112,7 @@ lt = myML.labelTransformer(y_test_labels)
 y_test = lt.nom2num(y_test_labels)
 
 #### Settings strings
-preproStr="n_idExperiments{}-n_trainSamples{}_in_{}_{}".format(n_experiments,
-                                                 n_artificial_samples, a0, a)
+preproStr="NidExperiments{}_{}_{}_{}".format(n_experiments, parameter, a0, a)
 settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 
 ######### Functions #######
@@ -124,13 +123,6 @@ feExParamDict = {'wavAnnColl' : wavAnnColl_tr, 'lt' : lt,
                  'labelSet' : callSet, 
                  'wavPreprocessingT' : None}#, 'ensembleSettings' : ensembleSettings}
 
-
-def genrateData_ensembleSettings(param):
-    '''defines the dictionary with the settings to generate the artificial samples
-    see eff.generateWaveformEnsemble'''
-    ensembleSettings = {"effectName" : 'addWhiteNoise'}#, "param_grid" : np.ones(10)}
-    ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*param
-    return(ensembleSettings)
 
 
 ###################  TASK  ####################
