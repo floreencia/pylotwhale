@@ -28,7 +28,7 @@ def train_clf(X, y, clf_settings):
     del gs
     return(clf)
     
-def genrateData_ensembleSettings(whiteNoiseAmp=0.0023, n_artificial_samples = 10):
+def genrateData_ensembleSettings(whiteNoiseAmp=0.0025, n_artificial_samples = 5):
     '''defines the dictionary with the settings to generate the artificial samples
     adding white noise. See eff.generateWaveformEnsemble
     Parameters:
@@ -150,10 +150,10 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
     scoresDict = None
     
     for param in param_grid:
-        print("param", param)
         
         feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
         clfExp = clf_experimentO(clf_settings, **feExParamDict)
+        #print("param", param, '\n\n', feExParamDict)
         
         if scores_file is not None:
             clfExp.print_scores(scores_file, X, y, param)

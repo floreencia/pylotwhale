@@ -33,12 +33,14 @@ paramKey = 'ensembleSettings'
 # noise amplitude
 n_amps = 10
 a0 = 0.001
-a = 0.003
-amp = np.linspace(a0, a, n_amps) # paramter domain
+a = 0.005
+amp = np.linspace(a0, a, n_amps) # paramter domain np.arange(5,a)#
 
 def updateParamInDict(paramDict, paramKey, param):
     paramDict[paramKey] = exT.genrateData_ensembleSettings(whiteNoiseAmp=param) #
     return paramDict
+
+preproStr="{}_{}_{}".format(parameter, a0, a)
 
 ####### FIX SETTINGS
 ## experiment repetitions
@@ -89,7 +91,7 @@ callSet=['126i', '130', '127', '129', '128i', '131i', '093ii']
 lt = myML.labelTransformer(callSet)
 
 ##### Out files
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments', parameter)
+oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/experiments/trashtest', parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -112,7 +114,7 @@ lt = myML.labelTransformer(y_test_labels)
 y_test = lt.nom2num(y_test_labels)
 
 #### Settings strings
-preproStr="NidExperiments{}_{}_{}_{}".format(n_experiments, parameter, a0, a)
+preproStr+="-NidExperiments{}".format(n_experiments)
 settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 
 ######### Functions #######
@@ -121,7 +123,9 @@ settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
 feExParamDict = {'wavAnnColl' : wavAnnColl_tr, 'lt' : lt,
                  'featExtFun' : feExFun, 
                  'labelSet' : callSet, 
-                 'wavPreprocessingT' : None}#, 'ensembleSettings' : ensembleSettings}
+                 'wavPreprocessingT' : None,
+                 'ensembleSettings' : exT.genrateData_ensembleSettings()
+                 }#, 'ensembleSettings' : ensembleSettings}
 
 
 
@@ -134,7 +138,9 @@ with open(out_file_scores, 'w') as f:
             collFi_train, collFi_test, settingsStr, parameter, metric))
 
 
-print(out_file_scores, np.shape(X_test), np.shape(y_test))
+print('--------\nSETTINGS\n--------\n:', out_file_scores)#,
+      #np.shape(X_test), np.shape(y_test),'\n',param_grid, '\n', feExParamDict)
+      
 exT.run_iter_clf_experiment(param_grid, gs_settings, feExParamDict, 
                             paramKey, updateParamInDict,                            
                             print_score_params=(out_file_scores, X_test, y_test),
