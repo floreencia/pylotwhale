@@ -221,7 +221,7 @@ class file2annotationsDF(annotationsDF):
 #### sequences
 
 
-def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict'):
+def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict', time_param_dtype = float):
     '''
     returns the sequences of <l>, chains of elements separated by the interval Dt
     Parameters:
@@ -235,30 +235,32 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict'):
     creates a list with the sequences (lists)
     '''
     if isinstance(l, str):
-        fun = lambda x : x
+        fun = lambda x: x
     else:
-        fun = lambda x : tuple(x)
+        fun = lambda x: tuple(x)
  
     if Dt is None: Dt = (None, 0.5)
 
     ict = df[time_param].values
-    seqsLi = []
-    subLi = [fun(df[l].iloc[0])]  # inicialise w/ first element
 
-    for i in range(len(ict))[:]:
+    if np.isnan(ict[-1]):  # ict end with nan
+        endix = None
+    elif isinstance(ict[-1], time_param_dtype): # ends with float?
+        endix = -1
+    else:
+        assert False, 'wrong dtype'
+  
+    seqsLi = []  # inicialise list of sequences
+    subLi = [fun(df[l].iloc[0])]  # inicialise sequence w/ first element
+    
+    for i in range(len(ict))[:endix]:
         if Dt[0] <= ict[i] <= Dt[1]:  # is part of the sequence?
-            try:
-                subLi.append(df[l].iloc[i+1])
-            except IndexError:  # some seqeunces end with NaN other with an ict
-                pass
+            subLi.append(df[l].iloc[i+1])
         elif ict[i] >= Dt[1]:  # nope, then start a new sequence
             seqsLi.append(subLi) # save the one we had
-            try:  # some seqeunces end with NaN other with an ict
-                subLi = [fun(df[l].iloc[i+1])]  # start we sequence
-            except IndexError:
-                pass
-        
-    seqsLi.append(subLi)
+            subLi = [fun(df[l].iloc[i+1])] #start new squence
+
+    seqsLi.append(subLi)  # append last sequence
     
     return seqsLi    
     
