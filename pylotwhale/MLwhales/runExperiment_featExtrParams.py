@@ -6,7 +6,7 @@ Created on Fri Nov 27 18:05:03 2015
 #!/usr/bin/python
 @author: florencia
 
-Runs call classification experiments generating artificial data and trying 
+Runs call classification experiments generating artificial data and trying
 different parameters
 """
 
@@ -32,28 +32,27 @@ parameter = 'NArtificialSamples'
 paramKey = 'ensembleSettings'
 
 a = 12
-print("\n\nTEST", amp)
-
-amp = np.arange(5, a) # less than 5 doesn’t work with CV=10
-print("TEST", amp)
+amp = np.arange(2, a)  # less than 5 doesn't work with CV=10
 
 def updateParamInDict(paramDict, paramKey, param):
-    paramDict[paramKey] = exT.genrateData_ensembleSettings(n_artificial_samples = param) 
+
+    paramDict[paramKey] = exT.genrateData_ensembleSettings(
+                                                n_artificial_samples=param)
     return paramDict
 
-updateTestSet = lambda x : x # do nothing
+updateTestSet = lambda x: x  # do nothing
 
-preproStr="{}_{}".format(parameter, a)
+preproStr = "{}_{}".format(parameter, a)
 
 oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/'
-                    'data/experiments/spec/', parameter)
+                    'data/trashtest/', parameter)
 
 ##############################
 ####### FIX SETTINGS  ########
 ## experiment repetitions
 # when random numbers are involved, repeat the experiment to get the stats
-n_experiments = 10 # identical experiment repetitions
-param_grid = np.repeat(amp, n_experiments) # repeat experiment
+n_experiments = 10  # identical experiment repetitions
+param_grid = np.repeat(amp, n_experiments)  # repeat experiment
 
 #n_artificial_samples = 10 # number of artificial samples to generate for each amp
 
@@ -69,16 +68,16 @@ NFFTpow = 9; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"]= overlap
 Nslices = 7; featConstD["Nslices"]= Nslices
 normalize = True; featConstD["normalize"]= normalize
-featExtract='spectral'; featConstD["featExtrFun"]= featExtract
+#featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 #n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
-#Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
 ## feature extraction object
 feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
 feature_str = feExOb.feature_str
 
 ##### clf
 metric='accuracy'
-cv = 2
+cv = 4
 clfStr = 'cv{}'.format(cv)
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=0) )])
 gamma_range = [ 0.01, 0.1, 1.0, 10.0, 100.0]

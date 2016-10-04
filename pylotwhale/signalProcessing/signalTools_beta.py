@@ -7,8 +7,8 @@ import functools
 #import sys
 
 ### Audio feature modules
-import librosa as lf # Librosa for audio
-import features as psf # Librosa for audio
+import librosa as lf  # Librosa for audio
+import features as psf  # Librosa for audio
 ## Ploting defaults
 #import seaborn # And seaborn to make it look nice
 #seaborn.set(style='ticks')
@@ -27,7 +27,7 @@ import scipy.signal as sig
 
 import pylotwhale.utils.annotationTools as annT
 matplotlib.rcdefaults()
-matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
+matplotlib.rcParams.update({'savefig.bbox': 'tight'})
 
 '''
 #sys.path.append(os.path.abspath(os.path.expanduser('../orchive/')))
@@ -57,7 +57,8 @@ import annotationTools as annT
 ###########################################################
 
 
-def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', label='label'):
+def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', 
+                 label='label'):
     '''
     read annotated sections from a waveform
     Parameters:
@@ -86,7 +87,7 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', label='la
         t0 = annDi[t0Label]
         tf = annDi[tfLabel]
         l = annDi[label]
-        item = { label : l, 'waveform' : getWavSec(waveform, fs, t0, tf) }
+        item = {label: l, 'waveform' : getWavSec(waveform, fs, t0, tf)}
         sectionsLi.append(item)
 
     return(sectionsLi, fs)
@@ -118,7 +119,7 @@ def flatPartition(nSlices, vec_size):
         vec_size : size of the vector to slice
     '''
     idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
-    return np.array([int(item) for item  in idx])
+    return np.array([int(item) for item in idx])
     
 #### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py

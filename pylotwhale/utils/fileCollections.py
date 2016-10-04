@@ -8,50 +8,76 @@ import os
 import glob
 import warnings
 
+
+#### File loading functions
+
+
+def get_path(fiPath):  # checks if file exists
+    return os.path.isfile(fiPath)
+
+
+def concatFile_intoList(*path2files):  # load text files and concat lines into list
+    lines = []
+    for fi in path2files:
+        with open(fi, 'r') as f:
+            lines.extend(f.read().strip().splitlines())
+    return lines
+
+### Check for duplicates
+
+
 def areListItemsUnique(mylist):
     '''checks for duplcated items in a list'''
     uniqueLi = list(set(mylist))
     if len(mylist) == len(uniqueLi):
         return True
     else:
-        return False    
+        return False
+
 
 def uniqueItemIndexes(mylist):
-    '''returns the indexes of the set of elements in the list (mulist), 
+    '''returns the indexes of the set of elements in the list (mulist),
     i.e. excluding duplicates'''
     uniqueLi = list(set(mylist))
     if len(mylist) != len(uniqueLi):
         warnings.warn("WARNING! Duplicated items")
         #warnings.warn("Duplicated items")
         return sorted([mylist.index(item) for item in uniqueLi])
-    else: # no dup indexes
+    else:  # no dup indexes
         #"unique items list")
-        return(range(len(mylist))) # return all indexes
-        
+        return(range(len(mylist)))  # return all indexes
+
+
 def filterListForUniqueItems(myList):
     uIdx = uniqueItemIndexes(myList)
     return [myList[item] for item in uIdx]
-   
-    
-### collection creating    
-    
-def annotationsDir2wavAnnCollection(annDir, wavDir='default', outCollFile='default',
+
+
+### collection creating
+
+
+def annotationsDir2wavAnnCollection(annDir, wavDir='default',
+                                    outCollFile='default',
+                                    str0='.txt', strRep='.wav'):
+    '''
+    reads the annotation files (*.txt) in annDir,
+    searches their corresponding waves in
+    wavDir and saves a collection <outCollFile> of annotated wavs
+    '''
+    if wavDir == 'default':
+        wavDir = os.path.join(annDir, '..')
+    if outCollFile == 'default':
+        outCollFile = os.path.join(annDir, '..', 'collection.txt')
+
+    annotationsFiList = glob.glob(os.path.join(annDir, '*.txt'))  # enlist all the annotations
+    return annotationsList2wavAnnCollection(annotationsFiList, wavDir,
+                                            outCollFile, str0=str0, strRep=strRep)
+
+
+def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
                                      str0='.txt', strRep='.wav'):
     '''
-    reads the annotation files (*.txt) in annDir, 
-    searches their corresponding waves in
-    wavDir and saves a collection <outCollFile> of annotated wavs  
-    '''    
-    if wavDir == 'default': wavDir = os.path.join( annDir, '..')
-    if outCollFile == 'default': outCollFile = os.path.join( annDir, '..', 'collection.txt')
-    annotationsFiList = glob.glob( os.path.join(annDir, '*.txt') )  # enlist all the annotations
-    return annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
-                                     str0=str0, strRep=strRep )
-    
-def annotationsList2wavAnnCollection( annotationsFiList, wavDir, outCollFile,
-                                     str0='.txt', strRep='.wav' ):
-    '''
-    searches the wave files in the dir <wavDir> 
+    searches the wave files in the dir <wavDir>
     from each annotationFile in annotationsFiList
     and saves a collection <outCollFile> of annotated wavs
     Parameters

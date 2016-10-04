@@ -5,7 +5,7 @@ Created on Sun Nov 15 13:55:12 2015
 @author: florencia
 """
 
-from __future__ import print_function, division # py3 compatibility
+from __future__ import print_function, division  # py3 compatibility
 import numpy as np
 #from pandas import read_csv
 import sys
@@ -21,14 +21,14 @@ import pylotwhale.utils.whaleFileProcessing as fp
 
 
 def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
-                    featExtFun=None):
+                                  featExtFun=None):
     """
     Computes and saves the features of a collection of annotated wavs.
     The features are saved in the outDir and alongside an index file is created with
     the paths to the features and the labels.
-    
+
     ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
-    
+
     Parameters
     ----------
     < collectionList : list of tuples with the wav - annotation files
@@ -41,18 +41,18 @@ def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
     < indexFile :  file ith the paths to the featues and the labels
 
     Return
-    ------    
+    ------
     > indexFile :  a file with the paths to the features and their labels
     """
-    ### out dir    
-    if not os.path.isdir(outDir): 
+    ### out dir
+    if not os.path.isdir(outDir):
         #os.remove( outDir ) # delet if already exists
-        os.mkdir( outDir )
-    ## index file 
-    if indexFile == 'default' :
-        indexFile = os.path.join(outDir, 'indexFile.txt')    
-    if os.path.isfile(indexFile): 
-        os.remove( indexFile ) # delet if already exists
+        os.mkdir(outDir)
+    ## index file
+    if indexFile == 'default':
+        indexFile = os.path.join(outDir, 'indexFile.txt')
+    if os.path.isfile(indexFile):
+        os.remove(indexFile)  # delet if already exists
 
     ### feature extraction settings
     if not callable(featExtFun): # dictionary or None (defaul parameters)
