@@ -235,22 +235,28 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict'):
     creates a list with the sequences (lists)
     '''
     if isinstance(l, str):
-        fun = lambda x : x 
+        fun = lambda x : x
     else:
-        fun = lambda x : tuple(x)    
-        
+        fun = lambda x : tuple(x)
+ 
     if Dt is None: Dt = (None, 0.5)
 
     ict = df[time_param].values
     seqsLi = []
-    subLi = [fun(df[l].iloc[0])]
+    subLi = [fun(df[l].iloc[0])]  # inicialise w/ first element
 
     for i in range(len(ict))[:]:
-        if Dt[0] <= ict[i] <= Dt[1]: # is part of the sequence?
-            subLi.append(fun(df[l].iloc[i+1]))
-        elif ict[i] >= Dt[1]: # nope, then start a new sequence
-            seqsLi.append(subLi)
-            subLi = [fun(df[l].iloc[i+1])]
+        if Dt[0] <= ict[i] <= Dt[1]:  # is part of the sequence?
+            try:
+                subLi.append(df[l].iloc[i+1])
+            except IndexError:  # some seqeunces end with NaN other with an ict
+                pass
+        elif ict[i] >= Dt[1]:  # nope, then start a new sequence
+            seqsLi.append(subLi) # save the one we had
+            try:  # some seqeunces end with NaN other with an ict
+                subLi = [fun(df[l].iloc[i+1])]  # start we sequence
+            except IndexError:
+                pass
         
     seqsLi.append(subLi)
     
