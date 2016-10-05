@@ -7,6 +7,7 @@ from __future__ import print_function
 import os
 import glob
 import warnings
+from collections import Counter
 
 
 #### File loading functions
@@ -27,15 +28,23 @@ def concatFile_intoList(*path2files):  # load text files and concat lines into l
 
 
 def areListItemsUnique(mylist):
-    '''checks for duplcated items in a list'''
-    uniqueLi = list(set(mylist))
-    if len(mylist) == len(uniqueLi):
+    '''checks for duplcated items in a list, if False,
+    elements and their indexes are printed'''
+    uniqueItems = set(mylist)
+    uniqueLi = list(uniqueItems)
+    if len(mylist) == len(uniqueLi):  # no duplicates
         return True
-    else:
+    else:  # contains duplicates
+        li_counts = Counter(mylist)
+        collStr = ''
+        for i in range(len(mylist)):
+            if li_counts[mylist[i]] > 1:
+                collStr += "\n {}.   >>  {}".format(i, mylist[i])
+        print(collStr)
         return False
 
 
-def uniqueItemIndexes(mylist):
+def getUniqueItemIndexes(mylist):
     '''returns the indexes of the set of elements in the list (mulist),
     i.e. excluding duplicates'''
     uniqueLi = list(set(mylist))
@@ -49,7 +58,7 @@ def uniqueItemIndexes(mylist):
 
 
 def filterListForUniqueItems(myList):
-    uIdx = uniqueItemIndexes(myList)
+    uIdx = getUniqueItemIndexes(myList)
     return [myList[item] for item in uIdx]
 
 

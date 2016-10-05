@@ -20,3 +20,8 @@ def test_get_path():
 def test_concatFile_intoList():
     return 2*len(fcll.concatFile_intoList(teFi)) == len(fcll.concatFile_intoList(teFi, teFi))
        
+def test_areListItemsUnique():
+    x = ['a', 'b', 'c', 'd', 'e', 'b', 'f', 'e']
+    assert not fcll.areListItemsUnique(x)  # contains duplicated
+    assert fcll.areListItemsUnique(set(x))  # sets have unique elements
+
