@@ -1,3 +1,6 @@
+# pylotwhale
+
+scripts for anaylising bioacoustic signals
 
 train and save classifier with:
 /MLwhales/chooseFeatures.py
@@ -9,3 +12,4 @@ uses:
 * numpy 1.8.2.
 * librosa (https://github.com/bmcfee/librosa) 
 * http://python-speech-features.readthedocs.org/en/latest/
+
