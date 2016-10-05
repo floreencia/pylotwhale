@@ -16,7 +16,6 @@ from collections import Counter
 def get_path(fiPath):  # checks if file exists
     return os.path.isfile(fiPath)
 
-
 def concatFile_intoList(*path2files):  # load text files and concat lines into list
     lines = []
     for fi in path2files:
@@ -60,6 +59,17 @@ def getUniqueItemIndexes(mylist):
 def filterListForUniqueItems(myList):
     uIdx = getUniqueItemIndexes(myList)
     return [myList[item] for item in uIdx]
+
+
+def areLinesUnique(*collFiles):
+    li = concatFile_intoList(*collFiles)
+    if areListItemsUnique(li):
+        print('no duplicates')
+        return True
+    else:
+        print('contains duplicates')
+        return False
+    
 
 
 ### collection creating
