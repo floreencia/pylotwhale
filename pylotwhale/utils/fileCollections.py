@@ -38,7 +38,7 @@ def areListItemsUnique(mylist):
         collStr = ''
         for i in range(len(mylist)):
             if li_counts[mylist[i]] > 1:
-                collStr += "\n {}.   >>  {}".format(i, mylist[i])
+                collStr += "\n ---> {} {}".format(i, mylist[i])
         print(collStr)
         return False
 
