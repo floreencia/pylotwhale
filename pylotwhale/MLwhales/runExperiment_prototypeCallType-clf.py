@@ -24,6 +24,9 @@ from pylotwhale.MLwhales.configs.params_prototypeCallType import *
 
 ###################  ASSIGNMENTS  ####################
 
+#### parameter grid for the experiments
+param_grid = np.repeat(amp, n_experiments)  # repeat each experiment n_experiments times
+
 ##### LOAD COLLECTIONS
 wavAnnColl_tr = fex.readCols(collFi_train, (0, 1))
 wavAnnColl_te = fex.readCols(collFi_test, (0, 1))
@@ -36,17 +39,21 @@ except OSError:
 out_file_scores = os.path.join(oDir, "scores.txt")
 out_file_votes = os.path.join(oDir, "votes.txt")
 
+## ensemble
 ## feature extraction object
 feExOb = fex.wavFeatureExtractionSplit(featConstD)  # feature extraction settings
-feature_str = feExOb.feature_str
+featureStr = feExOb.feature_str
 
 #### classes maping
 lt = myML.labelTransformer(callSet)
 
-##### CLF
+#### Settings str
+ensembleStr = "-".join(['{}{}'.format(ky, vl) for ky, vl in ensembleSettingsD.items()])
 preproStr += "-NidExperiments{}".format(n_experiments)
 clfStr = 'cv{}'.format(cv)
-settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr)
+settingsStr = "{}-{}-{}".format(preproStr, ensembleStr, featureStr, clfStr)
+
+##### CLF
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=0))])
 gamma_range = [0.01, 0.1, 1.0, 10.0, 100.0]
 pen_range = [1.0, 10.0, 100.0]
@@ -65,9 +72,9 @@ gs = grid_search.GridSearchCV(**gs_settings)
 
 feExParamDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
                  'featExtFun': featConstD,
-                 'labelSet': callSet,
+                 'labelSet': callSet,  # depreciated !!!
                  #'wavPreprocessingT' : None,
-                 'ensembleSettings': exT.genrateData_ensembleSettings()
+                 'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
                  }  # , 'ensembleSettings' : ensembleSettings}
 
 ###################  TASK  ####################

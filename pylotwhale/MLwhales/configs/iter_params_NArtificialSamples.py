@@ -12,19 +12,19 @@ import os
 import pylotwhale.MLwhales.experimentTools as exT
 
 ####### Iter parameters
-parameter = 'NArtificialSamples'
+parameter = 'NArtificialSamples' # any name does to job
 paramKey = 'ensembleSettings'
 
 a = 10
-amp = np.arange(6, a)  # less than 5 doesn't work with CV=10
+amp = np.arange(4, a)  # less than 5 doesn't work with CV=10
 
 def updateParamInDict(paramDict, paramKey, param):
 
-    paramDict[paramKey] = exT.genrateData_ensembleSettings(
+    paramDict[paramKey] = exT.generateData_ensembleSettings(
                                                 n_artificial_samples=param)
     return paramDict
 
-updateTestSet = lambda x: x  # do nothing
+updateTestSet = False
 
 preproStr = "{}_{}".format(parameter, a)
 

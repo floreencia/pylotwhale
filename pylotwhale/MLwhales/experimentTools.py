@@ -28,7 +28,7 @@ def train_clf(X, y, clf_settings):
     del gs
     return(clf)
 
-def genrateData_ensembleSettings(whiteNoiseAmp=0.0025, n_artificial_samples=5):
+def generateData_ensembleSettings(whiteNoiseAmp=0.0025, n_artificial_samples=5):
     '''defines the dictionary with the settings to generate the artificial samples
     adding white noise. See eff.generateWaveformEnsemble
     Parameters:
@@ -145,21 +145,44 @@ def updateParamTestSet(paramDict, paramKey, param, wavAnnColl_te, lt, output_typ
 def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
                             paramKey, updateParamInDict,
                             wavAnnColl_te, lt,
-                            updateTestSet=lambda x: x,
+                            updateTestSet=True,
                             scores_file=None,
                             accum_file=None):
     """
+    Run a clf experiments for different parameters (param_grid)
     Parameters:
     ----------
-        param_grid : 
-        clf_settings : 
-        feExParamDict :
-        paramKey :
-        updateParamInDict :
-        wavAnnColl_te :
-        lt :
-        scores_file : 
-        accum_file : 
+    param_grid : array_like
+        Experiment parameters.
+        Often repeated according to n_experiments
+    clf_settings : dictionary
+           clf settings
+    feExParamDict : dictionary
+        Instructions for the extraction of features and ensemble generation.
+            Used user over the train set and sometimes also over the test set.
+            wavAnnColl : collection of annotated wavs
+            lt : label transformer
+            featExtFun : feature extraction instructions callable or dicT
+            labelSet : set of clf-labels
+            ensembleSettings :  instructions for the generation of a sound ensemble (dict)
+    paramKey : str
+        Argument of the param dictionary, used to update parameter of the experiment,
+        which can be a feature name (ceps), NFFT or the instructions for the ensemble
+        generation. See updateParamInDict() and feExParamDict.
+    updateParamInDict : callable
+        Instructions for updating the experimental parameter. 
+        Often specified by feExParamDict.
+    wavAnnColl_te : list,
+        test collection
+    lt : label transformer
+    updateTestSet : bool
+        True if feture extraction changes over the experiment
+        False, otherwise, i.e. no need to update feature representation if the test set
+    scores_file : str
+        output file for saving clf scores
+    accum_file : str
+        output file for saving predictions
+
     """
 
     #TEST DATA
@@ -176,13 +199,14 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
         feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
         clfExp = clf_experimentO(clf_settings, **feExParamDict)
         #print("param", param, '\n\n', feExParamDict['featExtFun'])
-
-        '''# uncomment when changing features
-        XyDict_test = updateTestSet(feExParamDict, paramKey, param,
-                                        wavAnnColl_te, lt, output_type='dict')
-        X_test, y_test = updateTestSet(feExParamDict, paramKey, param,
-                                        wavAnnColl_te, lt, output_type='Xy')
-        '''
+        
+        if updateTestSet: # True when changing feature extraction instructions
+            XyDict_test = updateParamTestSet(feExParamDict, paramKey, param,
+                                             wavAnnColl_te, lt,
+                                             output_type='dict')
+            X_test, y_test = updateParamTestSet(feExParamDict, paramKey, param,
+                                                wavAnnColl_te, lt,
+                                                output_type='Xy')
 
         if scores_file is not None:
             clfExp.print_scores(scores_file, X_test, y_test, param)

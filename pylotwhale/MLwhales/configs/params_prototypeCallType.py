@@ -11,16 +11,19 @@ import numpy as np
 #import os
 #import pylotwhale.MLwhales.experimentTools as exT
 from pylotwhale.MLwhales.configs.iter_params_NArtificialSamples import *
+#from pylotwhale.MLwhales.configs.iter_params_Nslices import *
 
 ##############################
 #######  SETTINGS  ########
 
-
+#### Expriment settings
 # when random numbers are involved, repeat the experiment to get the stats
-n_experiments = 10  # identical experiment repetitions
-param_grid = np.repeat(amp, n_experiments)  # repeat experiment
+n_experiments = 3  # identical experiment repetitions
 
-n_artificial_samples = 6 # number of artificial samples to generate for each amp
+#### Ensemble generation
+ensembleSettingsD = {}
+ensembleSettingsD['n_artificial_samples'] = 6 # number of artificial samples to generate for each amp
+ensembleSettingsD['whiteNoiseAmp'] = 0.0025
 
 #### Feature extraction 
 ## preprocessing
@@ -28,7 +31,7 @@ lb = 1500; hb = 24000; order = 3 # None
 wavPreprocessingFun = None  # functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
 #preproStr +=''#'bandfilter{}_{}'.format(lb, hb)
 
-## features dictionary
+#### features dictionary
 featConstD = {}
 NFFTpow = 9; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"] = overlap
@@ -40,7 +43,7 @@ Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["feat
 
 ##### clf
 metric='accuracy'
-cv = 11
+cv = 6
 
 #### Classes                
 callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
