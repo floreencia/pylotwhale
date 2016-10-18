@@ -69,7 +69,6 @@ def areLinesUnique(*collFiles):
     else:
         print('contains duplicates')
         return False
-    
 
 
 ### collection creating
@@ -113,7 +112,9 @@ def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
             #print(wavFileName)
             wavFiPath = findFilePathInDir(wavFileName, wavDir)
             if wavFiPath:
-                g.write("{}\t{}\n".format( wavFiPath, annFi) )     
+                g.write("{}\t{}\n".format( wavFiPath, annFi) )
+            else:
+                print(wavFileName, "not found")
     return outCollFile
     
 
