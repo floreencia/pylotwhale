@@ -11,6 +11,9 @@ different parameters
 """
 
 import os
+import argparse
+#import sys
+import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn import svm
 from sklearn import grid_search
@@ -18,20 +21,42 @@ import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.MLwhales.experimentTools as exT
 import time
-
+### load parameters
 from pylotwhale.MLwhales.configs.params_prototypeCallType import *
+from pylotwhale.MLwhales.configs.iter_params import experimentsControlParams
 
+
+parser = argparse.ArgumentParser(description='Runs controled experiment.')
+parser.add_argument("-cnv", "--controlVariable", type=str,
+                    help="name of the experiment controled variable, "
+                         "eg: NFFT, NArtificialSamples,"
+                         "etc. See iter_params.py.",
+                    default="Nslices")
+
+controlVariable = parser.parse_args().controlVariable
+print("Control variable: ", controlVariable)
 
 ###################  ASSIGNMENTS  ####################
 
+#### Control parameters
+controlParamO = experimentsControlParams(controlVariable)
+## variables
+parameter = controlParamO.parameter
+paramKey = controlParamO.paramKey
+controlParams = controlParamO.controlParams
+updateParamInDict = controlParamO.updateParamInDict
+updateTestSet = controlParamO.updateTestSet
+preproStr = controlParamO.settingsStr
+
 #### parameter grid for the experiments
-param_grid = np.repeat(controlParam, n_experiments)  # repeat each experiment n_experiments times
+param_grid = np.repeat(controlParams, n_experiments)  # repeat each experiment n_experiments times
 
 ##### LOAD COLLECTIONS
 wavAnnColl_tr = fex.readCols(collFi_train, (0, 1))
 wavAnnColl_te = fex.readCols(collFi_test, (0, 1))
 
 ##### OUTPUT FILES
+oDir = os.path.join(oDir, parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -51,7 +76,7 @@ lt = myML.labelTransformer(callSet)
 ensembleStr = "-".join(['{}{}'.format(ky, vl) for ky, vl in ensembleSettingsD.items()])
 preproStr += "-NidExperiments{}".format(n_experiments)
 clfStr = 'cv{}'.format(cv)
-settingsStr = "{}-{}-{}".format(preproStr, ensembleStr, featureStr, clfStr)
+settingsStr = "{}-{}-{}-{}".format(preproStr, ensembleStr, featureStr, clfStr)
 
 ##### CLF
 pipe_svc = Pipeline([('clf', svm.SVC(random_state=0))])

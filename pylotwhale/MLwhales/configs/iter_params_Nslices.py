@@ -16,7 +16,7 @@ import pylotwhale.MLwhales.experimentTools as exT
 parameter = 'Nslices'
 paramKey = 'Nslices'
 Nslices = 10
-amp = np.arange(1,12) # np.linspace(a0, a, n_amps) 
+controlParams = np.arange(1,12) # np.linspace(a0, a, n_amps) 
 
 def updateParamInDict(paramDict, paramKey, param):
     paramDict['featExtFun'][paramKey] = param 

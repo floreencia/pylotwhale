@@ -1,22 +1,32 @@
 #!/usr/bin/env python
 
 # -*- coding: utf-8 -*-
+
 """
-Created on Fri Nov 27 18:05:03 2015
-#!/usr/bin/python
+SETTINGS
+========
+
+Parameters to be used in classification experiment:
+
+runExperiment_prototypeCallType-clf.py
+
 @author: florencia
 """
-#####
-import numpy as np 
+
+#import numpy as np 
 #import os
 #import pylotwhale.MLwhales.experimentTools as exT
-from pylotwhale.MLwhales.configs.iter_params_NArtificialSamples import *
-#from pylotwhale.MLwhales.configs.iter_params_Nslices import *
+#from pylotwhale.MLwhales.configs.iter_params_NArtificialSamples import *
+from pylotwhale.MLwhales.configs.iter_params_Nslices import *
+#from pylotwhale.MLwhales.configs.iter_params import experimentsControlParams
 
 ##############################
-#######  SETTINGS  ########
+########   SETTINGS   ########
+##############################
 
-#### Expriment settings
+
+
+#### Experiment settings
 # when random numbers are involved, repeat the experiment to get the stats
 n_experiments = 3  # identical experiment repetitions
 
@@ -53,8 +63,8 @@ callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
 collFi_train = '/home/florencia/whales/data/Vocal-repertoire-catalogue-Pilot-whales-Norway/flo/wavs/wavFiles-wavAnnCollection-prototypes.txt'
 collFi_test = '/home/florencia/whales/MLwhales/callClassification/data/collections/grB-balanced-14-13-Filecollection.txt'
 ## OUTPUT -> DIR
-oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/'
-                    'data/trashtest/', parameter)
+oDir = '/home/florencia/whales/MLwhales/callClassification/data/trashtest-control/'
+#oDir = os.path.join('/home/florencia/whales/MLwhales/callClassification/data/trashtest/', parameter)
 
 
 
