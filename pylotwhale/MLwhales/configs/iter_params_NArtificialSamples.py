@@ -16,7 +16,7 @@ parameter = 'NArtificialSamples' # any name does to job
 paramKey = 'ensembleSettings'
 
 a = 10
-amp = np.arange(4, a)  # less than 5 doesn't work with CV=10
+controlParam = np.arange(4, a)  # less than 5 doesn't work with CV=10
 
 def updateParamInDict(paramDict, paramKey, param):
 

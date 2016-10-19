@@ -25,7 +25,7 @@ from pylotwhale.MLwhales.configs.params_prototypeCallType import *
 ###################  ASSIGNMENTS  ####################
 
 #### parameter grid for the experiments
-param_grid = np.repeat(amp, n_experiments)  # repeat each experiment n_experiments times
+param_grid = np.repeat(controlParam, n_experiments)  # repeat each experiment n_experiments times
 
 ##### LOAD COLLECTIONS
 wavAnnColl_tr = fex.readCols(collFi_train, (0, 1))
