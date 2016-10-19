@@ -1,1 +1,3 @@
 *.pyc
+*~
+pylotwhale/MLwhales/configs/config.cfg
