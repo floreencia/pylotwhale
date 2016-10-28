@@ -8,8 +8,6 @@ Created on Fri Nov 27 18:05:03 2015
 """
 #####
 import numpy as np
-import os
-import sys
 import pylotwhale.MLwhales.experimentTools as exT
 
 ### Control parameter mappint to settings object
@@ -20,13 +18,12 @@ def experimentsControlParams(iterParam):
     setting up the experiment variables
     """
     controlParamsDict = {"Nslices" : NslicesO,
-                         "NFFT": None,
                          "overlap": overlapO,
                          "NArtificialSamples": ArtificialSamplesO,
                          "noiseAmplitude": noiseAmplitudeO,
                          "Nceps": NcepsO,
                          "NFFT": NFFTO,
-                         
+                         "Nmels" : NmelsO
                          }
     assert iterParam in controlParamsDict.keys(), '{} is not a valid'
     'control parameter\nValid: {}'.format(iterParam, ', '.join(controlParamsDict.keys()))
@@ -66,7 +63,6 @@ parameter="Nslices"
 Nsl0 = 1
 Nsl = 12
 controlParam = np.arange(Nsl0, Nsl)
-
 
 def updateParamInDict_Nslices(paramDict, paramKey, param):
     paramDict['featExtFun'][paramKey] = param
@@ -117,7 +113,7 @@ overlapO = controlVariable(parameterName=parameter,
                            updateTestSet=True,
                            updateParamInDict=updateParamInDict_over,
                            settingsStr="{}_{}".format(
-                                       parameter, '{}-{}'.format(N0, N))
+                                       parameter, '{}_{}'.format(N0, N))
                            )
 
 #### noiseAmplitude
@@ -125,7 +121,7 @@ parameter = 'noiseAmplitude'
 # noise amplitude
 n_amps = 10
 a0 = 0.001
-a = 0.005
+a = 0.2 # 0.005 for ceps
 amps = np.linspace(a0, a, n_amps)  # paramter domain np.arange(5,a)#
 
 
@@ -140,6 +136,9 @@ noiseAmplitudeO = controlVariable(parameterName=parameter,
                                   updateParamInDict=updateParamInDict_noise,
                                   settingsStr="{}_{}_{}".format(parameter, a0, a)
                                   )
+
+
+
 
 ##### Nceps
 parameter = 'Nceps'
@@ -157,58 +156,54 @@ NcepsO = controlVariable(parameterName=parameter,
                          controlParams=np.arange(N0, N, Ndelta),
                          updateTestSet=True,
                          updateParamInDict=updateParamInDict_Nceps,
-                         settingsStr="{}_{}".format(parameter, '{}-{}'.format(N0,N))
+                         settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
                          )
 
 ##### NFFTpow
 parameter = 'NFFTpow'
-N0 = 4
+N0 = 5
 Ndelta = 1
 N = 12
-NFFTs = np.arange(N0, N, Ndelta) # np.linspace(a0, a, n_amps) 
+NFFTs = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps) 
 
 
 def updateParamInDict_NFFT(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param 
+    paramDict['featExtFun'][paramKey] = param
     return paramDict
 
 NFFTO = controlVariable(parameterName=parameter,
-                         paramKey=parameter,
-                         controlParams=NFFTs,
-                         updateTestSet=True,
-                         updateParamInDict=updateParamInDict_NFFT,
-                         settingsStr="{}_{}".format(parameter, '{}-{}'.format(N0,N))
-                         )
+                        paramKey=parameter,
+                        controlParams=NFFTs,
+                        updateTestSet=True,
+                        updateParamInDict=updateParamInDict_NFFT,
+                        settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
+                        )
+
+##### N mels
+parameter = 'n_mels'
+N0 = 2
+Ndelta = 1
+N = 7
+Nmels = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps) 
 
 
-
-
-
-
-
-
-'''
-
-sys.exit()
-
-controlParam = np.arange(1, Nslices) # np.linspace(a0, a, n_amps) 
-
-def updateParamInDict(paramDict, paramKey, param):
+def updateParamInDict_Nmels(paramDict, paramKey, param):
     paramDict['featExtFun'][paramKey] = param 
     return paramDict
 
-updateTestSet = True # feture extraction changes
+NmelsO = controlVariable(parameterName=parameter,
+                         paramKey=parameter,
+                         controlParams=Nmels,
+                         updateTestSet=True,
+                         updateParamInDict=updateParamInDict_NFFT,
+                         settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
+                         )
+                         
+                         
+##### N mels
+#parameter = 'Nceps'
+#NcepsO = NmelsO
+#NcepsO.NmelsO.paramKey
 
 
-iterParamsDict = {
-    'Nslices' : {parameter : 'Nslices', 
-                 paramKey : 'Nslices',
-                 Nslices : 10,
-                 updateTestSet : True,
-                 preproStr="{}_{}".format(parameter, Nslices)
-
-                 
-        }
-
-'''
-
+                        

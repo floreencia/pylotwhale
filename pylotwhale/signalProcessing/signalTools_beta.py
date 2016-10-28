@@ -605,7 +605,7 @@ def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True)
                 logSc=logSc, order=0)
 
 def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
-                order=1, logSc=True):
+                order=1, logSc=True):#, n_mels=n_mels):
 
     '''
     cepstral feature matrix and the delta orders horizontaly appended
@@ -615,7 +615,8 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
         < sRate : samplig rate
         < NFFTpow : exponent of the fft window lenght in base 2
         < overlap : [0,1)
-        < Nceps : number of cepstral coefficients
+        < Nceps : int,
+            number of cepstral coefficients (n_mfcc) melspectral filters
         < logSc : retunrn features in logarithmic scale
         < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
     Returns
@@ -628,11 +629,12 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
     ## settings																
     NFFT = 2**int(NFFTpow)
     overlap = float(overlap)
-    hopSz = int(NFFT*(1 - overlap) )
-    Nceps = int(Nceps)			
+    hopSz = int(NFFT*(1 - overlap))
+    Nceps = int(Nceps)
     paramStr = '-Nceps%d'%(Nceps)
     ## CEPSTROGRAM
-    M0 = lf.feature.mfcc(waveform, sr=sRate, n_mfcc=Nceps, n_fft=NFFT, hop_length=hopSz)#, hop_length=hopSz)
+    M0 = lf.feature.mfcc(waveform, sr=sRate, n_mels=n_mels, n_mfcc=Nceps, 
+                         n_fft=NFFT, hop_length=hopSz)#, hop_length=hopSz)
     m = np.shape(M0)[1]
     M=np.zeros((Nceps*(order+1), m))
     M[:Nceps, :] = M0
@@ -680,20 +682,20 @@ def melSpecDRep(waveform, sRate, NFFTpow=10, overlap=0.5, n_mels=2**4,
 
     ## CEPSTROGRAM
     Mc = lf.feature.melspectrogram(waveform, sr=sRate, n_mels=n_mels,
-                       n_fft=NFFT, hop_length=hopSz)
+                                   n_fft=NFFT, hop_length=hopSz)
     Mc_log = np.log(Mc)
     M = Mc.copy()
     if logSc: M = np.log(M)
     n = np.shape(M)[0]
     featureNames = ['melSpec'+str(cc) for cc in range(n)]
     ## deltas
-    for dO in np.arange(1,order+1):
+    for dO in np.arange(1, order + 1):
         #print(dO)
         M = np.vstack((M, delta(Mc_log, order=dO)))
         featureNames += ['delta%s'%dO+'melSpec'+str(cc) for cc in range(n)]
         paramStr += '-delta%s'%dO
 
-    M=M.T
+    M = M.T
     tf = 1.*len(waveform) / sRate
 
     return M, featureNames, tf, paramStr
@@ -835,6 +837,7 @@ def butter_bandpass_filter(waveform, fs, lowcut, highcut, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
     y = sig.lfilter(b, a, waveform)
     return y
+
 
 def bandDecomposition(x, fs, intervals=None,
                       filFun = butter_bandpass_filter, order=3, Nbins=4):

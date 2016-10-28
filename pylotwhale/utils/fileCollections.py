@@ -108,17 +108,17 @@ def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
     '''
     with open(outCollFile, 'w') as g:
         for annFi in annotationsFiList:
-            wavFileName = os.path.basename(annFi).replace( str0, strRep)
+            wavFileName = os.path.basename(annFi).replace(str0, strRep)
             #print(wavFileName)
             wavFiPath = findFilePathInDir(wavFileName, wavDir)
             if wavFiPath:
-                g.write("{}\t{}\n".format( wavFiPath, annFi) )
+                g.write("{}\t{}\n".format(wavFiPath, annFi))
             else:
                 print(wavFileName, "not found")
     return outCollFile
-    
 
-def findFilePathInDir(guessFile, searchDir):   
+
+def findFilePathInDir(guessFile, searchDir):
     '''
     looks for the path of a file, assuming this is in searchDir
     '''

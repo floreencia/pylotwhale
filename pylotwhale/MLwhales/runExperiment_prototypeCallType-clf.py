@@ -9,10 +9,10 @@ Created on Fri Nov 27 18:05:03 2015
 Runs call classification experiments generating artificial data and trying
 different parameters
 """
-
+from __future__ import print_function
 import os
 import argparse
-#import sys
+import sys
 import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn import svm
@@ -47,7 +47,8 @@ controlParams = controlParamO.controlParams
 updateParamInDict = controlParamO.updateParamInDict
 updateTestSet = controlParamO.updateTestSet
 preproStr = controlParamO.settingsStr
-
+print(parameter, paramKey)
+#sys.exit()
 #### parameter grid for the experiments
 param_grid = np.repeat(controlParams, n_experiments)  # repeat each experiment n_experiments times
 

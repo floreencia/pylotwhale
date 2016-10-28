@@ -14,53 +14,55 @@ import matplotlib.colors as colors
 from matplotlib import ticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-
 import scipy
 import pylab
 import scipy.cluster.hierarchy as sch
 
 
-def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None, 
-                   key_labels=None, figsize=None, outFigName=None, cmap = plt.cm.Accent_r):
+def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
+                   key_labels=None, figsize=None, outFigName=None,
+                   cmap=plt.cm.Accent_r):
     '''
     plot freq_arr stacked
     Parameters:
     -----------
-        freq_arr : array (n_plots, n_items)
-        freq_arr_names : tick names
-        ylabel : labels in the y axis
-        xlabel : labels in the x axis
-        key_labels : 
-        figsize  tuple
-        outFigName string
-        cmap : color map callable
+    freq_arr : array (n_plots, n_items)
+    freq_arr_names : tick names
+    ylabel : labels in the y axis
+    xlabel : labels in the x axis
+    key_labels :
+    figsize  tuple
+    outFigName string
+    cmap : color map callable
     '''
-    
-    freq_arr=np.array(freq_arr)
+
+    freq_arr = np.array(freq_arr)
     n_plots, n_items = np.shape(freq_arr)
-    
-    if key_labels is None: key_labels = [None]*n_plots
-    if freq_arr_names is None : freq_arr_names = np.arange(n_items)
+
+    if key_labels is None:
+        key_labels = [None]*n_plots
+    if freq_arr_names is None:
+        freq_arr_names = np.arange(n_items)
     assert n_items == len(freq_arr_names)
-    
-    color=iter(cmap(np.linspace(0,1,n_plots)))
+
+    color = iter(cmap(np.linspace(0, 1, n_plots)))
 
     ind = np.arange(np.shape(freq_arr)[1])
     arr0 = np.zeros(n_items)
     fig, ax = plt.subplots(figsize=figsize)
     for i in range(len(freq_arr)):
         arr = freq_arr[i]
-        ax.bar( ind, arr, bottom=arr0, 
+        ax.bar(ind, arr, bottom=arr0,
                color=next(color), label=key_labels[i])
         arr0 += arr
         
     plt.legend()
-    ax.set_xticks(np.arange(n_items)+0.4)   
+    ax.set_xticks(np.arange(n_items)+0.4)
     ax.set_xticklabels(freq_arr_names)
     if xlabel: ax.set_xlabel(xlabel)
     if ylabel : ax.set_ylabel(ylabel)
     if outFigName:fig.savefig(outFigName)
-        
+
     return fig, ax     
     
     
@@ -145,14 +147,14 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
     im = ax.imshow(A, interpolation = 'nearest', cmap = cmap, origin='bottom')
                    # extent = [0, len(xTickL),0,len(yTickL)], origin='bottom')
-    
-    ax.set_yticks( np.arange( len(yTickL ) ))# + 0.5 ) #flo -> +0.1)
-    ax.set_yticklabels( yTickL ) 
-    ax.set_xticks( np.arange(len(xTickL)))# + 0.5 ) 
-    ax.set_xticklabels( xTickL, rotation=90 ) 
+
+    ax.set_yticks(np.arange(len(yTickL)))  # + 0.5 ) #flo -> +0.1)
+    ax.set_yticklabels(yTickL)
+    ax.set_xticks(np.arange(len(xTickL)))  # + 0.5 )
+    ax.set_xticklabels(xTickL, rotation=90)
     if plTitle: ax.set_title(plTitle)
-    if xLabel : ax.set_xlabel(xLabel)
-    if yLabel : ax.set_ylabel(yLabel)
+    if xLabel: ax.set_xlabel(xLabel)
+    if yLabel: ax.set_ylabel(yLabel)
     #COLOR BAR
     if isinstance(cbarLim, tuple): im.set_clim(cbarLim) # cmap lims
 
@@ -164,16 +166,14 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
         if isinstance(cbarTicks, list): cbar.set_ticks(cbarTicks)
         if isinstance(cbarTickLabels, list): cbar.set_ticklabels(cbarTickLabels)  
 
-        
-    if outFig: 
-        fig.savefig(outFig, bbox_inches = 'tight')
+    if outFig:
+        fig.savefig(outFig, bbox_inches='tight')
         #print len(i2c), "\nout:%s"%outFig
-    
+
     return fig, ax
 
+
 ### Clustering plots
-
-
 
 def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
                          NcbarTicks=4, cbarAxis=None):

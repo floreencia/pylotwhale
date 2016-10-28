@@ -19,7 +19,7 @@ def parseHeikesNameConv(fileN):
     Parameters
     ----------
     fileN : string with a file name using Heike's convension
-        e.g. ...NPW-033-J-B-090713_f50-8_00_01_52...    
+        e.g. ...NPW-033-J-B-090713_f50-8_00_01_52...
     Returns
     ------->
     di : dictionary with the info encoded in the file name
