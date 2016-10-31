@@ -240,6 +240,8 @@ def plXy(X, y, y_ix_names=None, figsize=None, outFig='', plTitle='',
     if outFig: 
         #fig.tight_layout()        
         fig.savefig(outFig, bbox_inches='tight')
+        
+    return fig
 
 
     
