@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name='pylotwhale',
       version='1.0',
-      description='bioacoustics related scripsts',
+      description='bioacoustics related scripts',
       author='Florencia Noriega',
       author_email='flo@nld.ds.mpg.de',
       packages=['pylotwhale',

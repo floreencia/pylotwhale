@@ -6,7 +6,7 @@ import functools
 #import pylab as pl
 #import sys
 
-### Audio feature modules
+# Audio feature modules
 import librosa as lf  # Librosa for audio
 import features as psf  # Librosa for audio
 ## Ploting defaults
@@ -29,25 +29,8 @@ import pylotwhale.utils.annotationTools as annT
 matplotlib.rcdefaults()
 matplotlib.rcParams.update({'savefig.bbox': 'tight'})
 
-'''
-#sys.path.append(os.path.abspath(os.path.expanduser('../orchive/')))
-#p=os.path.join( os.path.abspath(os.path.expanduser( os.path.dirname(os.path.dirname(__file__)))) , 'utils')
-#print(p)
-p=os.path.join(  '/home/florencia/whales/scripts', 'utils')
-sys.path.append(p)
-import annotationTools as annT
-
-## Restore ploting defaults --librosa patch
-#, "figure.dpi" : 40 })
-#from features import mfcc
-#from features import logfbank
-#from librosa.feature import melspectrogram, chroma_cqt# Librosa for audio
-
-#sys.path.append('/home/florencia/whales/scripts/orchive/')
-#import MLtools_beta as myML
-'''
-
 """
+    Tools for manipulating audio signals
     Module for the preprocessing of features
     florencia @ 06.09.14
 """
@@ -55,7 +38,7 @@ import annotationTools as annT
 ###########################################################
 #####           waveform manipulations                #####
 ###########################################################
-
+"""
 
 def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', 
                  label='label'):
@@ -120,14 +103,16 @@ def flatPartition(nSlices, vec_size):
     '''
     idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
     return np.array([int(item) for item in idx])
+ '''
+ 
+"""    
     
 #### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py
 def normalizeWF(waveform):
     return 1.0*waveform/np.max(np.abs(waveform))
     
-    
-"""    
+
 def tileTillN(arr, N, n0=0):
     '''returns an arrray of size N (>0) from tiling of arr. n0 is the starting index'''
     #np.tile(arr, int(n/len(arr))+1)[:n]
@@ -208,7 +193,7 @@ def freqshift(data, Fs, fshift=100):
     y = np.roll(x.real,nbins) + 1j*np.roll(x.imag,nbins)
     z = np.fft.irfft(y)
     return z
-"""    
+    
 
 ##### wav files
 
@@ -223,10 +208,10 @@ def write_wavfile(filename,fs,data):
 def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
                   over = 0.5, axTitle = True, fc0 = 0, fcf=120,
                   aspect = 'auto', figScale=1, spec_factor = '0.6'):
-    """
+    '''
     < files, an array with the wav file names
     * spec_factor, 0 = nothing, 1 = all
-    """
+    '''
     n = len(files[:12])
     nC, nR = fitNinSqr(n) # print "size ", nR, nC
     fig, axes  = plt.subplots(nrows=nR, ncols=nC, figsize = (int(nR)*4*figScale, int(nC)*2*figScale) )
@@ -290,10 +275,10 @@ def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):
 
 
 def fitNinSqr(N):
-    """
+    '''
     Returns the number of columns and rows to optimally plot N images 
     together, used by plotFiles
-    """
+    '''
     nC = np.ceil(np.sqrt(N))
     if nC*(nC-1)>=N:
         return int(nC), int(nC-1)
@@ -301,13 +286,13 @@ def fitNinSqr(N):
         return int(nC), int(nC)
 
 def reeScale_E(M, spec_factor = 1.0/3.0):
-    """
+    '''
     Zeroes the noise by taking only the part of the spectrum with the higest energy.
     - spec_factor \in [0,1],
     --- 0 - max cutting energy (we don't see anything)
     --- 1 - min cutting energy (returns M without doing anything )
     * M, log (spectrogram)
-    """
+    '''
 
     assert(spec_factor >= 0 and spec_factor <= 1)
     cutE = (np.min(M) - np.max(M))*spec_factor + np.max(M)
@@ -321,14 +306,14 @@ def reeScale_E(M, spec_factor = 1.0/3.0):
     return M_tr
 
 def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000):
-    """
+    '''
     selects a band on frquencies from the matrix M
     fr_0, initial frequency of the matrix
     fr_f, final frequency of the matrix, sampR/2
     cutting frequencies
     v0_cut
     vf_cut
-    """
+    '''
     ny, nx = np.shape(M)
     n0_cut = int( ny*v0_cut/( fr_f - fr_0 ) )
     nf_cut = int( ny*vf_cut/( fr_f - fr_0 ) )
@@ -336,9 +321,9 @@ def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000)
     return M[ n0_cut:nf_cut, : ]
 
 def allPositive_andNormal(M):
-    """
+    '''
     normalizes the matrices, so that all it's values lay in (0,1)
-    """
+    '''
     if np.min(M) < 0:
         M = M - np.min(M)
     M = 1.0*M/np.max(M)
@@ -356,9 +341,9 @@ def reeSize_t(M, h_size = 3938):
 
 
 def myBinarize(rawData, Nbits = 7):
-    """
+    '''
     This function binarizes a matix preserving the number of columns (time wins)
-    """
+    '''
     a = np.min(rawData)*1.0
     b = 1.0*np.max(rawData)-a
 
@@ -449,10 +434,10 @@ def flatPartition(nSlices, vec_size):
 
 
 def cbarLabels(minV, maxV):
-    """
+    '''
     give me the maximum and the minimum values of color bar and I will retun 3 label
     the lables returned are int type. ment for exponents.
-    """
+    '''
     minV = int(np.ceil(minV))
     maxV = int(np.floor(maxV))
     ml = (minV + maxV)/2
@@ -987,6 +972,8 @@ def tsBandenergy(y, fs, textureWS=0.1, textureWSsamps=0, overlap=0,
 
 ######     ANNOTATIONS     #########
 
+"""
+
 def mtl2annTu(mtlFi):
     '''
     extracts the labels from an mtl file and retun a list of
@@ -1431,5 +1418,5 @@ def mf2wavLi(mf_file):
 
     return wF_li
 
-
+"""
 

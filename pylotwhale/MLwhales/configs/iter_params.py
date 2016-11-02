@@ -164,7 +164,7 @@ parameter = 'NFFTpow'
 N0 = 5
 Ndelta = 1
 N = 12
-NFFTs = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps) 
+NFFTs = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps)
 
 
 def updateParamInDict_NFFT(paramDict, paramKey, param):

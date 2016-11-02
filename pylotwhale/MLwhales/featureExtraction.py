@@ -12,7 +12,9 @@ import sys
 import os
 import functools
 
-import pylotwhale.signalProcessing.signalTools_beta as sT
+from pylotwhale.signalProcessing.signalTools_beta import wav2waveform
+import pylotwhale.signalProcessing.audioFeatures as auf
+
 import pylotwhale.signalProcessing.effects as eff
 
 import MLtools_beta as myML
@@ -112,7 +114,7 @@ def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
     assert os.path.isfile(wavF), "%s\ndoesn't exists"%wavF
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
     ### extract features for each annotated section
-    segmentsLi, fs = sT.getAnnWavSec(wavF, annF)    
+    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)    
 
     datO = myML.dataXy_names()     
     ## for each annotation in the wavfile compute the features
@@ -231,7 +233,7 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocessingT=No
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
                 
     ### extract features for each annotated section
-    segmentsLi, fs = sT.getAnnWavSec(wavF, annF)
+    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)
     #assert sr==fs, "noise and signal waves have different sampling rates"
 
     datO = myML.dataXy_names()     
@@ -284,14 +286,14 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocessingT=N
     > datO :  a file with the paths to the features and their labels
     """   
     if isinstance(featExtFun, dict):
-        featExtFun = functools.partial(sT.waveform2featMatrix, **featExtFun)
+        featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
     if not callable(wavPreprocessingT): 
         wavPreprocessingT = lambda x, y : x
         
     datO = myML.dataXy_names() #inicialize data object    
 
     for wavF, l in wavLabelCollection:
-        waveForm, fs = sT.wav2waveform(wavF)
+        waveForm, fs = wav2waveform(wavF)
         waveForm = wavPreprocessingT(waveForm, fs)        
         M, _, _, featStr = featExtFun(waveForm, fs)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])  
@@ -326,16 +328,16 @@ def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, wavPreprocessingT=
     """   
     if isinstance(featExtFun, dict):
         #!!! featExtFun = wavFeatureExtractionWalk(featExtFun).featExtrFun()
-        featExtFun = functools.partial(sT.waveform2featMatrix, **featExtFun)
+        featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
     if not callable(wavPreprocessingT): 
         wavPreprocessingT = lambda x, y : x
         
     datO = myML.dataXy_names() #inicialize data object
 
     for wavF, annF in WavAnnCollection:
-        waveForm, fs = sT.wav2waveform(wavF)
+        waveForm, fs = wav2waveform(wavF)
         waveForm = wavPreprocessingT(waveForm, fs)
-        annotLi_t = sT.aupTxt2annTu(annF) ## in sample units
+        annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
         M0, y0_names,  _, _ =  featExtFun(waveForm, fs, annotations=annotLi_t)
         datO.addInstances(M0, y0_names) 
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
@@ -480,7 +482,7 @@ class wavFeatureExtraction():
     
     def featExtrFun(self):
         '''returns the feature extraction callable, ready to use!'''
-        return functools.partial(sT.waveform2featMatrix, **self.feature_extr_di)
+        return functools.partial(auf.waveform2featMatrix, **self.feature_extr_di)
     
     def newFeatExtrDi(self, feature_extr_di):
         '''updates the feature-extractio-dictionary and string'''
