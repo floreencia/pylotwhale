@@ -4,6 +4,7 @@ Created on Wed Nov  2 12:44:09 2016
 
 @author: florencia
 """
+from __future__ import print_function, division
 import pylotwhale.signalProcessing.signalTools_beta as sT
 import functools
 import numpy as np
@@ -73,7 +74,7 @@ def flatPartition(nSlices, vec_size):
         nSlices : number of slices
         vec_size : size of the vector to slice
     '''
-    idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
+    idx = np.linspace(0, vec_size, nSlices+1)
     return np.array([int(item) for item in idx])
 
 
@@ -164,13 +165,136 @@ def tuLi2frameAnnotations(tuLiAnn, m_instances, tf):
         targetArr[ix] = l
     return targetArr
 
+####### summarisation tools
+
+
+### normalisation tools
+
+def normalisationFun(funName=None, **kwargs):
+    '''
+    Dictionary of normalisation
+    '''
+    D = {#'welch' : welchD,
+        #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
+        'normalize': sT.spectralRep,
+        }
+
+
+def normaliseMatrix(M):
+    '''normalises an ndarray dividing by the abs max'''
+    normM = M / np.max(np.abs(M))
+    return normM
+
+
+### texturisation
+""" deprecate
+def texturizeFeatures(M, nTextWS=100, normalize=True):
+    '''
+    computes the mean and the std over the features of M over
+    a texture window of size nTextWS
+    M : feature matrix (n_instances x n_features)
+        tf : length of the recording in seconds
+    nTextWS :   int - size of the texture window in number of samples (walk)
+                array - or vector with the index values (split)
+    normalize : if True, normalizes the instances
+    ------>
+    fM : texturized feature matrix
+    t : time array
+    '''
+
+    n0_instances, n_features = np.shape(M)
+
+    if isinstance(nTextWS, int): # walk
+        ind = np.arange(0, n0_instances - nTextWS + 1, nTextWS)
+        m_instances = len(ind)
+        fM = np.zeros((m_instances, 2*n_features))
+
+        for i in np.arange(m_instances):
+            thisX = np.array(M[ind[i] : ind[i] + nTextWS, : ])
+            if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
+            fM[i,:] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
+        return fM
+
+    elif isinstance(nTextWS, np.ndarray): # spliting indexes
+
+        ind = nTextWS # slicing indexes array
+        #print(ind)
+        m_instances = len(ind) - 1 # #(instances) = #(slicing indexes) - 1
+        fM = np.zeros((m_instances, 2*nf))
+
+        if normalize : M /= np.max(np.abs(M), axis=0) # the whole matrix
+
+        for i in np.arange(m_instances):
+            thisX = np.array(M[ind[i] : ind[i+1]+1, : ])
+            
+            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
+
+        return fM
+"""
+        
+def texturiseSplitting(M, Nslices, normalise=False):
+    '''
+    Summarises features matrix M splitting into Nslices 
+    along time instances
+    M (n_time_instances x n_features)
+    Parameters
+    ---------
+    M : 2dim array
+        matrix to summarise
+    nTextWS : int,
+        size of the summarisation window
+    '''
+    mt, nf = np.shape(M)
+    assert mt >= Nslices, 'Nslices should be smaller than the number of instances'
+
+    slicingIdx = flatPartition(Nslices, mt)  # numpy array
+    m_instances = len(slicingIdx) - 1 # #(instances) = #(slicing indexes) - 1
+    fM = np.zeros((m_instances, 2*nf))
+
+    if normalise : M /= np.max(np.abs(M), axis=0) # the whole matrix
+
+    for i in np.arange(m_instances):
+        thisX = np.array(M[slicingIdx[i] : slicingIdx[i+1], : ])
+
+        fM[i,:] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
+    return fM
+
+
+def texturiseWalkig(M, nTextWS, normalise=False):
+    '''
+    Summarises features matrix M walking along time instances
+    M (n_time_instances x n_features)
+    Parameters
+    ---------
+    M : 2dim array
+        matrix to summarise
+    nTextWS : int,
+        size of the summarisation window
+    '''
+    mt, nf = np.shape(M)
+    assert mt >= nTextWS, 'texture window is larger than number of instances'
+    ind = np.arange(0, mt - nTextWS + 1, nTextWS)  # sumarisation indexes
+    m_instances = len(ind)  # number of instances of the new feature matrix
+    fM = np.zeros((m_instances, 2*nf))  # inicialise feature matrix
+
+    for i in np.arange(m_instances):
+        thisX = np.array(M[ind[i]: ind[i] + nTextWS, :]) # summarisation instance for all features
+        if normalise: # divide by the maximum
+            thisX = normaliseMatrix(thisX)  # normalize each instance
+        fM[i, :] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
+    return fM
+
+
+
 
 #### FEATURE EXTRACTION and processing #####
 
 def featureExtractionFun(funName=None):
     '''
     Dictionary of feature extracting functions
-    that return a dictionary of features
+    returns funciton of the requested requensted feature (str)
+    or the feture options
+    Parameters:    
     ------
     > feature names (if None)
     > feature function
@@ -180,14 +304,14 @@ def featureExtractionFun(funName=None):
     '''
     D = {#'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'spectral' : sT.spectralRep,
-        'spectralDelta' : functools.partial(sT.spectralDspecRep, order=1),
-        'cepstral' : sT.cepstralRep,
-        'cepsDelta' : functools.partial(sT.cepstralDcepRep, order=1), # MFCC and delta-MFCC
-        'cepsDeltaDelta' : functools.partial(sT.cepstralDcepRep, order=2),
-        'chroma' : sT.chromaRep,
-        'melspectroDelta' : sT.melSpecDRep,
-        'melspectro' : functools.partial(sT.melSpecDRep, order=0)
+        'spectral': sT.spectralRep,
+        'spectralDelta': functools.partial(sT.spectralDspecRep, order=1),
+        'cepstral': sT.cepstralRep,
+        'cepsDelta': functools.partial(sT.cepstralDcepRep, order=1), # MFCC and delta-MFCC
+        'cepsDeltaDelta': functools.partial(sT.cepstralDcepRep, order=2),
+        'chroma': sT.chromaRep,
+        'melspectroDelta': sT.melSpecDRep,
+        'melspectro': functools.partial(sT.melSpecDRep, order=0)
         }
 
     if funName == None: # retuns a list of posible feature names
@@ -269,51 +393,6 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
 
     return M, targetArr, featNames, featStr
 
-
-
-
-
-def texturizeFeatures(M, nTextWS=100, normalize=True):
-    '''
-    computes the mean and the std over the features of M over a texture window of size nTextWS
-    M : feature matrix (n_features x instances)
-    tf : length of the recording in seconds
-    nTextWS :   int - size of the texture window in number of samples (walk)
-                array - or vector with the index values (split)
-    normalize : if True, normalizes the instances
-    ------>
-    fM : texturized feature matrix
-    t : time array
-    '''
-
-    mt, nf = np.shape(M)
-
-    if isinstance(nTextWS, int): # walk
-        ind = np.arange(0, mt - nTextWS + 1, nTextWS)
-        m_instances = len(ind)
-        fM = np.zeros((m_instances, 2*nf))
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i] + nTextWS, : ])
-            if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
-            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-        return fM
-
-    elif isinstance(nTextWS, np.ndarray): # spliting indexes
-
-        ind = nTextWS # slicing indexes array
-        #print(ind)
-        m_instances = len(ind) - 1 # #(instances) = #(slicing indexes) - 1
-        fM = np.zeros((m_instances, 2*nf))
-
-        if normalize : M /= np.max(np.abs(M), axis=0) # the whole matrix
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i+1]+1, : ])
-            
-            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-
-        return fM
 
     #print(np.shape(fM))
 
