@@ -467,7 +467,7 @@ class wavFeatureExtraction():
         * settings dictionary
     """
     def __init__(self, feature_extr_di):
-        self.newFeatExtrDi( feature_extr_di )
+        self.newFeatExtrDi(feature_extr_di)
         #self.feature_str = set_featureExtStr
                
     def set_featureExtStr(self, di):
@@ -475,7 +475,7 @@ class wavFeatureExtraction():
         #print("TEST", di)
         #featStr = di['featExtrFun']+'-'
         #di.pop('featExtrFun')
-        featStr = '-'.join([str(c) + str(v) for (c, v) in di.items() ])
+        featStr = '-'.join([str(c) + str(v) for (c, v) in di.items()])
         return featStr
     
     def featExtrFun(self):
@@ -484,7 +484,7 @@ class wavFeatureExtraction():
     
     def newFeatExtrDi(self, feature_extr_di):
         '''updates the feature-extractio-dictionary and string'''
-        if isinstance(feature_extr_di, dict): 
+        if isinstance(feature_extr_di, dict):
             self.feature_extr_di = feature_extr_di
             self.feature_str = self.set_featureExtStr(dict(self.feature_extr_di))
             
@@ -495,7 +495,7 @@ class wavFeatureExtractionWalk(wavFeatureExtraction):
         if feature_extr_di is None:
             feature_extr_di = self.defaultFeatureExtractionDi()
         wavFeatureExtraction.__init__(self, feature_extr_di) #sets string and dictionary
-        self.newFeatExtrDi( feature_extr_di )
+        self.newFeatExtrDi(feature_extr_di)
         
     def defaultFeatureExtractionDi(self):
         '''default settings'''
@@ -512,8 +512,8 @@ class wavFeatureExtractionSplit(wavFeatureExtraction):
         
     def defaultFeatureExtractionDi(self):
         '''default settings'''
-        feExDict = {'featExtrFun' : 'melspectro', 'Nslices' : 10, 'n_mels' : 2**4 }
-        return feExDict            
+        feExDict = {'featExtrFun' : 'melspectro', 'Nslices' : 10, 'n_mels' : 2**4}
+        return feExDict     
             
             
             

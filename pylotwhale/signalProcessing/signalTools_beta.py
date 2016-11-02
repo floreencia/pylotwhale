@@ -584,9 +584,11 @@ def saveSpecgram(wav_fileN, powerOfWinLen=12, overlap=0.9, freqFrac=1.0,
 #####                 cepstrograms                    #####
 ###########################################################
 
-def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True):
+def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128):
     '''
     Extracts the spectral features from a waveform
+    Parameters:
+    ----------
     < waveform : numpy array
     < sRate : samplig rate
     < NFFTpow : exponent of the fft window lenght in base 2
@@ -602,10 +604,10 @@ def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True)
     ## settings																
 
     return cepstralDcepRep(waveform, sRate, NFFTpow=NFFTpow, overlap=overlap, Nceps=Nceps,
-                logSc=logSc, order=0)
+                logSc=logSc, order=0, n_mels=n_mels)
 
 def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
-                order=1, logSc=True):#, n_mels=n_mels):
+                order=1, logSc=True, n_mels=128):
 
     '''
     cepstral feature matrix and the delta orders horizontaly appended
@@ -619,7 +621,7 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
             number of cepstral coefficients (n_mfcc) melspectral filters
         < logSc : retunrn features in logarithmic scale
         < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
-    Returns
+    Returns:
     -------
         > M : cepstral feature matrix ( m_instances x n_features )
         > featureNames : list
@@ -1121,7 +1123,7 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
         --->>> No explicit texturiztion <<<--- (see waveform2featMatrix)
 
     Params
-    -----------------
+    ------
     < waveform :  waveform array
     < fs :  sampling rate of the waveform
     < annotations : list with the time stamp, label pairs. The stamp must have
@@ -1131,7 +1133,7 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
                         {cepstralFeatures, logfbankFeatures }
     < **featArgs : arguments for estimating the features (see featExtract)
     Return
-    -------->
+    ------
     > M : feature matrix ( n (features) x m (insatances) )
     > targetArr : target vector
     > featNames : array with the names of the features
