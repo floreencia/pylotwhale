@@ -110,7 +110,7 @@ def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
 
     ### check feature extraction function
     if not callable(featExtFun): # dictionary or None (defaul parameters)
-        featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
     ### check existance of provided files    
     assert os.path.isfile(wavF), "%s\ndoesn't exists"%wavF
     assert os.path.isfile(annF), "%s\ndoesn't exists"%annF
@@ -178,7 +178,7 @@ def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
     """
     ### check feature extraction function
     if not callable(featExtFun): # dictionary or None (defaul parameters)
-        featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
 
     XyDict = {}
 
@@ -224,9 +224,9 @@ def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocessingT=No
 
     ### check feature extraction function
     if not callable(featExtFun): # dictionary or None (defaul parameters)
-        featExtFun = wavFeatureExtractionSplit(featExtFun).featExtrFun() # default
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
     if not callable(wavPreprocessingT): 
-        wavPreprocessingT = lambda x, y : x
+        wavPreprocessingT = lambda x, y: x
     if ensembleSettings is None:
         ensembleSettings = dict(effectName='addWhiteNoise', generate_data_grid=np.ones(1) )
     ### check existance of provided files    

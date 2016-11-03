@@ -14,13 +14,16 @@ import os
 import argparse
 import sys
 import numpy as np
+import time
+import pdb
+
 from sklearn.pipeline import Pipeline
 from sklearn import svm
 from sklearn import grid_search
+
 import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.MLwhales.experimentTools as exT
-import time
 ### load parameters
 from pylotwhale.MLwhales.configs.params_prototypeCallType import *
 from pylotwhale.MLwhales.configs.iter_params import experimentsControlParams
@@ -103,6 +106,7 @@ feExParamDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
                  'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
                  }  # , 'ensembleSettings' : ensembleSettings}
 
+print("TEST", feExParamDict)
 ###################  TASK  ####################
 
 ## print experiment settings header

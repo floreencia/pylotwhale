@@ -7,10 +7,11 @@ Created on Fri Nov 27 18:05:03 2015
 @author: florencia
 """
 #####
+from __future__ import print_function, division
 import numpy as np
 import pylotwhale.MLwhales.experimentTools as exT
 
-### Control parameter mappint to settings object
+### Control parameter mapping to settings object
 def experimentsControlParams(iterParam):
     """
     Sets up the variables for a parameter controled experiment
@@ -65,7 +66,8 @@ Nsl = 12
 controlParam = np.arange(Nsl0, Nsl)
 
 def updateParamInDict_Nslices(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param
+    paramDict['featExtFun']['summariseDict'][paramKey] = param
+    print('\n\nTEST\n\n', paramDict, "\n\n", paramKey)
     return paramDict
 
 NslicesO = controlVariable(parameterName=parameter,
@@ -161,9 +163,9 @@ NcepsO = controlVariable(parameterName=parameter,
 
 ##### NFFTpow
 parameter = 'NFFTpow'
-N0 = 5
+N0 = 8
 Ndelta = 1
-N = 12
+N = 10
 NFFTs = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps)
 
 

@@ -128,16 +128,31 @@ class clf_experimentO():
 
 #def updateParam(settingsDic):
 
-def updateParamTestSet(paramDict, paramKey, param, wavAnnColl_te, lt, output_type='dict'):
-    paramDict['featExtFun'][paramKey] = param # update featExFun
-    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te, featExtFun=paramDict['featExtFun'])
+def updateParamTestSet(wavAnnColl_te, lt, featExtFun,
+                       output_type='dict'):
+    '''
+    recomputes features of the test set
+    Parameters:
+    ----------
+    wavAnnColl_te : collection of annotated wavs
+    lt : label transformer
+    featExtFun : callable
+        extracts audio features for clf from wave file
+    output_type : str,
+        dict (for keeping track of the files) ot Xy (computing  scores)
+    Returns:
+    <test_set_features> : as a dict, ar as X, y nparray pair
+    '''
+    #paramDict['featExtFun'][paramKey] = param # update featExFun
+    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te,
+                                              featExtFun=featExtFun)
 
     if output_type =='dict':
         return XyDict_test
     if output_type == 'Xy':
         XyO_test = fex.XyDict2XyO(XyDict_test)
         X_test, y_test_labels = XyO_test.filterInstances(lt.classes_)
-        lt = myML.labelTransformer(y_test_labels)
+        #lt = myML.labelTransformer(y_test_labels)
         y_test = lt.nom2num(y_test_labels)
         return X_test, y_test
 
@@ -199,13 +214,13 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
         feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
         clfExp = clf_experimentO(clf_settings, **feExParamDict)
         #print("param", param, '\n\n', feExParamDict['featExtFun'])
-        
-        if updateTestSet: # True when changing feature extraction instructions
-            XyDict_test = updateParamTestSet(feExParamDict, paramKey, param,
-                                             wavAnnColl_te, lt,
+
+        if updateTestSet:  # True when changing feature extraction instructions
+            XyDict_test = updateParamTestSet(wavAnnColl_te, lt,
+                                             featExtFun=feExParamDict['featExtFun'],
                                              output_type='dict')
-            X_test, y_test = updateParamTestSet(feExParamDict, paramKey, param,
-                                                wavAnnColl_te, lt,
+            X_test, y_test = updateParamTestSet(wavAnnColl_te, lt,
+                                             featExtFun=feExParamDict['featExtFun'],
                                                 output_type='Xy')
 
         if scores_file is not None:

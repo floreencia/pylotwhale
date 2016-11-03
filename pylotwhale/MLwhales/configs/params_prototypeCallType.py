@@ -35,10 +35,12 @@ wavPreprocessingFun = None  # functools.partial(sT.butter_bandpass_filter, lowcu
 
 #### features dictionary
 featConstD = {}
+summDict = {'summarisation': 'splitting', 'Nslices':5, 'normalise':True}
+featConstD['summariseDict'] = summDict
 NFFTpow = 7; featConstD["NFFTpow"] = NFFTpow
 overlap = 0.5; featConstD["overlap"] = overlap
-Nslices = 4; featConstD["Nslices"] = Nslices
-normalize = True; featConstD["normalize"] = normalize
+#Nslices = 4; featConstD["Nslices"] = Nslices
+#normalize = True; featConstD["normalize"] = normalize
 featExtract='spectral'; featConstD["featExtrFun"]= featExtract
 #n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
 #Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
@@ -55,7 +57,7 @@ callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
 collFi_train = '/home/florencia/whales/data/Vocal-repertoire-catalogue-Pilot-whales-Norway/flo/wavs/wavFiles-wavAnnCollection-prototypes.txt'
 collFi_test = '/home/florencia/whales/MLwhales/callClassification/data/collections/grB-balanced-14-13-Filecollection.txt'
 ## OUTPUT -> DIR
-oDir = '/home/florencia/whales/MLwhales/callClassification/data/experiments/spec'
+oDir = '/home/florencia/whales/MLwhales/callClassification/data/experiments/trashtest/'
 
 
 

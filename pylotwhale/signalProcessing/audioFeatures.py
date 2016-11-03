@@ -6,6 +6,8 @@ Created on Wed Nov  2 12:44:09 2016
 """
 from __future__ import print_function, division
 import pylotwhale.signalProcessing.signalTools_beta as sT
+import pylotwhale.utils.annotationTools as annT
+
 import functools
 import numpy as np
 
@@ -238,7 +240,8 @@ def texturiseSplitting(M, Nslices, normalise=False):
         size of the summarisation window
     '''
     mt, nf = np.shape(M)
-    assert mt >= Nslices, 'Nslices should be smaller than the number of instances'
+    assert mt >= Nslices, 'Nslices ({}) should be smaller than the number \
+                            of instances({})'.format(Nslices, mt)
 
     slicingIdx = flatPartition(Nslices, mt)  # numpy array
     m_instances = len(slicingIdx) - 1 # #(instances) = #(slicing indexes) - 1

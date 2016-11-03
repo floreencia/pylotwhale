@@ -156,7 +156,7 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     '''
     if shift_grid is None:
         shift_grid = np.linspace(-2, 2, 5)
-     
+
     #print(len(intensity_grid), len(y_template))
     Y = np.zeros((len(shift_grid), len(y_template)))
     for i in range(len(shift_grid)):
