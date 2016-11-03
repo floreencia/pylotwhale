@@ -13,6 +13,15 @@ Various handy functions (sorting, spliting, searching) for working with data
 import numpy as np
 from collections import Counter
 
+def stringiseDict(di, distr): 
+    '''converts a dictionary into string, supports dictionaries as values'''
+    for ky, val in di.items():
+        if isinstance(val, dict):
+            distr += stringiseDict(val, distr)
+        else:
+            distr += '-{}_{}'.format(ky, val)            
+    return distr
+
 def dictOfGroupedDataFrames(df0, groupingKey='tape'):
     '''groups a dataframe according to groupingKey and returns a dictionary of data frames'''
     df = {}

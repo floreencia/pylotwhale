@@ -20,6 +20,7 @@ import pylotwhale.signalProcessing.effects as eff
 import MLtools_beta as myML
 
 import pylotwhale.utils.whaleFileProcessing as fp
+from pylotwhale.utils.dataTools import stringiseDict
 
 
 def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
@@ -477,7 +478,7 @@ class wavFeatureExtraction():
         #print("TEST", di)
         #featStr = di['featExtrFun']+'-'
         #di.pop('featExtrFun')
-        featStr = '-'.join([str(c) + str(v) for (c, v) in di.items()])
+        featStr = stringiseDict(di, '')
         return featStr
     
     def featExtrFun(self):
