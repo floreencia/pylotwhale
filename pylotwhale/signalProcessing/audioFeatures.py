@@ -185,52 +185,45 @@ def normaliseMatrix(M):
     normM = M / np.max(np.abs(M))
     return normM
 
+###### texturise festures
 
-### texturisation
-""" deprecate
-def texturizeFeatures(M, nTextWS=100, normalize=True):
+def summarisationFun(funName=None):
     '''
-    computes the mean and the std over the features of M over
-    a texture window of size nTextWS
-    M : feature matrix (n_instances x n_features)
-        tf : length of the recording in seconds
-    nTextWS :   int - size of the texture window in number of samples (walk)
-                array - or vector with the index values (split)
-    normalize : if True, normalizes the instances
-    ------>
-    fM : texturized feature matrix
-    t : time array
+    Dictionary of summarisations (=texturisations)
+    returns of the requested summarisation function
+    Parameters:    
+    ------
+    > feature names (if None)
+    > feature function
+        this functions take the waveform and return an instancited feature matrix
+        m (instances) - rows
+        n (features) - columns
     '''
+    D = {#'welch' : welchD,
+        #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
+        'splitting': texturiseSplitting,
+        'walking':  texturiseWalking,
+        }
 
-    n0_instances, n_features = np.shape(M)
+    if funName == None: # retuns a list of posible feature names
+        return D.keys()
+    else:
+        return D[funName]
+        
+def summariseMatrixFromSummDict(M, summariseDict):
+    '''
+    Summarises M (n0_instances x n_features) according to the
+    instructions in summariseDict. Eg:
+    summariseDict = 
+    {'summarisation': 'walking', 'n_textWS':10, 'normalise':False}
+    {'summarisation': 'walking', 'textWS': 0.2, 'normalise':False}
+    {'summarisation': 'splitting', 'Nslices':10, 'normalise':False}
+    '''
+    fun = summarisationFun(summariseDict['summarisation'])
+    settingsDir = dict(summariseDict) # create new dict for the settings
+    del(settingsDir['summarisation'])  # remove summarisation
+    return fun(M, **settingsDir)
 
-    if isinstance(nTextWS, int): # walk
-        ind = np.arange(0, n0_instances - nTextWS + 1, nTextWS)
-        m_instances = len(ind)
-        fM = np.zeros((m_instances, 2*n_features))
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i] + nTextWS, : ])
-            if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
-            fM[i,:] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-        return fM
-
-    elif isinstance(nTextWS, np.ndarray): # spliting indexes
-
-        ind = nTextWS # slicing indexes array
-        #print(ind)
-        m_instances = len(ind) - 1 # #(instances) = #(slicing indexes) - 1
-        fM = np.zeros((m_instances, 2*nf))
-
-        if normalize : M /= np.max(np.abs(M), axis=0) # the whole matrix
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i+1]+1, : ])
-            
-            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-
-        return fM
-"""
         
 def texturiseSplitting(M, Nslices, normalise=False):
     '''
@@ -260,7 +253,7 @@ def texturiseSplitting(M, Nslices, normalise=False):
     return fM
 
 
-def texturiseWalkig(M, nTextWS, normalise=False):
+def texturiseWalking(M, n_textWS, normalise=False):
     '''
     Summarises features matrix M walking along time instances
     M (n_time_instances x n_features)
@@ -272,13 +265,13 @@ def texturiseWalkig(M, nTextWS, normalise=False):
         size of the summarisation window
     '''
     mt, nf = np.shape(M)
-    assert mt >= nTextWS, 'texture window is larger than number of instances'
-    ind = np.arange(0, mt - nTextWS + 1, nTextWS)  # sumarisation indexes
+    assert mt >= n_textWS, 'texture window is larger than number of instances'
+    ind = np.arange(0, mt - n_textWS + 1, n_textWS)  # sumarisation indexes
     m_instances = len(ind)  # number of instances of the new feature matrix
     fM = np.zeros((m_instances, 2*nf))  # inicialise feature matrix
 
     for i in np.arange(m_instances):
-        thisX = np.array(M[ind[i]: ind[i] + nTextWS, :]) # summarisation instance for all features
+        thisX = np.array(M[ind[i]: ind[i] + n_textWS, :]) # summarisation instance for all features
         if normalise: # divide by the maximum
             thisX = normaliseMatrix(thisX)  # normalize each instance
         fM[i, :] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
@@ -400,9 +393,8 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
     #t = np.linspace(0, tf, n)
 
 
-
-def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
-                        annotations=None, nTextWS=False,
+def waveform2featMatrix(waveform, fs, summariseDict,
+                        annotations=None,
                         featExtrFun='cepsDelta', **featExArgs):
     '''
     1. extract audio features
@@ -411,12 +403,17 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
     3. handle annotations
     Parameters
     ----------<
-    < waveform :  waveform array
-    < fs :  sampling rate of the waveform
-    < textWS : size of the texture window
+    waveform :  waveform array
+    fs :  sampling rate of the waveform
+        summariseDict : dict,
+        instructions for summarising features
+        eg. {'summarisation' : 'walking', textWS : 0.2, normalise=True}
+            {'summarisation' : 'walking', n_textWS : 4, normalise=False}
+            {'summarisation' : 'splitting', textWS : 5}
+    textWS : size of the texture window
         nTextWs is assigned here from this value.
         instead on can set Nslices
-    < annotations : list with the time stamp, label pairs. The stamp can be in
+    annotations : list with the time stamp, label pairs. The stamp can be in
                 samples or time units, and this indicates the first sample with the
                 given label (stamp, label) list
     < featExtrFun : feature extraction function or name (see FeatureExtractionFun)
@@ -431,34 +428,19 @@ def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
     > featNames : feature names
     > featStr : string with feature extraction settings
     '''
-    ## feature extraction
+    ## audio feature extraction
     if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
     M0, featNames0, tf, featStr  = featExtrFun(waveform, fs, **featExArgs)
     m0 = np.shape(M0)[0] ## number of frames
 
-    ## set the textWS
-    if Nslices is False and nTextWS is False: ### WALKING - texture window size given
-        nTextWS_0 = 1.0*m0*float(textWS)/tf
-        nTextWS = int(nTextWS_0) ###
-        assert nTextWS >= 1, 'the texture window is too small {:.2f}'.format(nTextWS_0)
-        slicingIdx = nTextWS # integer
-    elif isinstance(Nslices, int) : # SPLITTING - slice the featMtx into Nslices!
-        slicingIdx = flatPartition(Nslices+1, m0) # numpy array
-        #print("TEST",slicingIdx)
-        assert slicingIdx[-1] > 1, 'the texture window is too small %d'%slicingIdx[-1]
-        textWS = slicingIdx[1] - slicingIdx[0]
-        nTextWS = int(1.0*m0*float(textWS)/tf) ###
-    elif isinstance(nTextWS, int): # walk!, number of frames given
-        slicingIdx = nTextWS # integer
-        textWS = 1.0*nTextWS*tf/m0
-    else:
-        assert False, 'you must give a valid summarization parameter'
+    ## summarisation of features
+    M = summariseMatrixFromSummDict(M0, summariseDict=summariseDict)
+    summStr = '-'.join(['{}_{}'.format(ky, val) for ky, val in summariseDict.items()])
 
-    featStr+='-txWin%dms%d'%(textWS*1000, nTextWS)
-    if normalize: featStr+='-TxWinNormalized'
+    #featStr ='-txWin%dms%d'%(textWS*1000, nTextWS) + summStr
 
     ## texturize features
-    M = texturizeFeatures(M0, nTextWS=slicingIdx, normalize=normalize)
+    #M = texturizeFeatures(M0, nTextWS=slicingIdx, normalize=normalize)
     featNames = [str(fn) + 'mu' for fn in featNames0] + [str(fn) + 'std' for fn in featNames0]
     m_instances, n_features = np.shape(M)
 
