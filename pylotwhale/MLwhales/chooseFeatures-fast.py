@@ -34,20 +34,16 @@ from sklearn.externals import joblib
 
 
 ##### SETTINGS
-## preprocessing
-lb = 1500; hb = 24000; order = 3 # None
-wavPreprocessingFun = None#functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
-preproStr = ''#'bandfilter{}_{}'.format(lb, hb)
-## features dictionary
-featConstD={}
-NFFTpow=10; featConstD["NFFTpow"] = NFFTpow
-overlap=0.5; featConstD["overlap"]= overlap
-n_mels=128; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
-textWS=0.05 ; featConstD["textWS"]= textWS
-#Nceps=30; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
-#featExtract='spectral'; featConstD["featExtrFun"]= featExtract
-feExOb = fex.wavFeatureExtractionSplit(featConstD) # feature extraction settings
-featExtFun = feExOb.featExtrFun() #functools.partial(sT.waveform2featMatrix, **featConstD)
+featConstD = {}
+summDict = {'summarisation': 'walking', 'n_textWS':5, 'normalise':False}
+featConstD['summariseDict'] = summDict
+NFFTpow = 9; featConstD["NFFTpow"] = NFFTpow
+overlap = 0.5; featConstD["overlap"] = overlap
+#Nslices = 4; featConstD["Nslices"] = Nslices
+#normalize = True; featConstD["normalize"] = normalize
+featExtract='spectral'; featConstD["featExtrFun"]= featExtract
+feExOb = fex.wavFeatureExtraction(featConstD)  # feature extraction settings
+
 print("Feature extraction settings", featConstD)
 ## clf
 cv = 10
@@ -72,7 +68,7 @@ feExOb = fex.wavFeatureExtraction(featConstD) # feature extraction settings
 feature_str = feExOb.feature_str
 feExFun=feExOb.featExtrFun()
 
-settingsStr = "{}-{}-{}".format(preproStr, feature_str, clfStr )
+settingsStr = "{}-{}".format( feature_str, clfStr )
 
 #### FUNCTIONS
 
@@ -85,7 +81,7 @@ WavAnnCollection = fex.readCols(collFile, colIndexes = (0,1))
 print("collection:", len(WavAnnCollection), WavAnnCollection[-1])
 
 ## extract features - train and test collections
-trainDat = fex.wavAnnCollection2datXy(WavAnnCollection, feExFun, wavPreprocesingT=wavPreprocessingFun)
+trainDat = fex.wavAnnCollection2datXy(WavAnnCollection, feExFun) #, wavPreprocesingT=wavPreprocessingFun)
 
 ## y_names train and test data
 X, y_names = trainDat.filterInstances(labs) # train
