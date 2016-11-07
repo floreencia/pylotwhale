@@ -15,6 +15,8 @@ import pandas as pd
 import os
 import sys
 
+import pylotwhale.signalProcessing.audioFeatures as auf
+
 import pylotwhale.signalProcessing.signalTools_beta as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
 import featureExtraction as fex #pylotwhale.MLwhales.
@@ -610,7 +612,7 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, of):
         waveForm, fs = sT.wav2waveform(wavF)
 
         annF_bN = os.path.basename(annF)
-        annotLi_t = sT.aupTxt2annTu(annF) ## in sample units
+        annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
 
         M0, y0_names, featN, fExStr =  feExFun(waveForm, fs, annotations=annotLi_t)
         datO = dataXy_names(M0, y0_names)
