@@ -109,7 +109,7 @@ def flatPartition(nSlices, vec_size):
     
 #### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py
-def normalizeWF(waveform):
+def normalizeWF(waveform ):
     return 1.0*waveform/np.max(np.abs(waveform))
     
 
@@ -230,12 +230,12 @@ def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
     if title : fig.suptitle(title)
     if outFig : fig.savefig(outFig, bbox_inches='tight')
 
-def wav2waveform(wavF, normalize=True):
+def wav2waveform(wavF, normalize=False):
     '''reads wave file and returns (waveform, sr)'''
-    return _wav2waveform(wavF, normalize=True)
+    return _wav2waveform(wavF, normalize=normalize)
 
 
-def _wav2waveform(wavF, normalize=True):
+def _wav2waveform(wavF, normalize=False):
     "read wavfile and return sRate, waveform"
     try:
         sRate, waveform = wavfile.read(wavF)

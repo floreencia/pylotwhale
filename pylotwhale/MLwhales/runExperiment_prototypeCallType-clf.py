@@ -73,7 +73,7 @@ out_file_votes = os.path.join(oDir, "votes.txt")
 feExOb = fex.wavFeatureExtractionSplit(featConstD)  # feature extraction settings
 featureStr = feExOb.feature_str
 
-#### classes maping
+#### classes mapping
 lt = myML.labelTransformer(callSet)
 
 #### Settings str
