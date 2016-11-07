@@ -600,7 +600,7 @@ def _bestCVScoresfromGridSearch(gs):
     return np.mean(cv_max ), np.std(cv_max )
 
 
-def printScoresFromCollection(feExFun, clf, lt, collFi, of):
+def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
     """
     clf : classifier
     le : label encoder (object)
@@ -620,7 +620,8 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, of):
         a = lt.nom2num(a_names)
         
         scsO = clfScoresO(clf, A, a)
-        of.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
+        with open(fileName, 'a') as f:
+            f.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
         
 
 def clfGeneralizability(clf_list, wavAnnCollection, featExtFun, labelEncoder, labelSet=None):

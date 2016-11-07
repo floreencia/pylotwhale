@@ -15,9 +15,9 @@ from collections import Counter
 
 def stringiseDict(di, distr): 
     '''converts a dictionary into string, supports dictionaries as values'''
-    for ky, val in di.items():
+    for ky, val in di.items(): # for each element in the dictionary
         if isinstance(val, dict):
-            distr += stringiseDict(val, distr)
+            distr += '-'+stringiseDict(val, ky)
         else:
             distr += '-{}_{}'.format(ky, val)            
     return distr

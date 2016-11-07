@@ -21,7 +21,7 @@ import pylotwhale.MLwhales.MLtools_beta as myML
 
 ### PREDICT WAV SECTIONS (SOUND TYPE)
 
-def predictSoundSections(wavF, clf, lt, feExFun, 
+def predictSoundSections(wavF, clf, lt, feExFun,
                          outF='default', annSections='default'):
     '''
     predicts and generates the annotations of the given wavF
@@ -36,8 +36,8 @@ def predictSoundSections(wavF, clf, lt, feExFun,
     '''
     if outF =='default':
         bN = os.path.basename(wavF)
-        outF = os.path.join(outDir , bN.replace('.wav', '-predictions.txt'))
-    if annSections == 'default': 
+        outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
+    if annSections == 'default':
             annSections = ['c']
 
     waveForm, fs = sT.wav2waveform(wavF)
