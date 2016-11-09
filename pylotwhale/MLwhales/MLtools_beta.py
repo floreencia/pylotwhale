@@ -572,6 +572,7 @@ class labelTransformer():
 
 ###### save model
 
+
 def saveModel(clf, outModelName, fileModelName_fN=None):
     '''saves clf model and appends model_name in a register file
     Parameters:
@@ -579,7 +580,7 @@ def saveModel(clf, outModelName, fileModelName_fN=None):
         clf : estimator
         outModelName : string with settings of the model- features, clf, etc
         fileModelName_f : name of the file where the clf-models are being filed'''
-    try: 
+    try:
         shutil.rmtree(outModelName)
     except OSError:
         pass
