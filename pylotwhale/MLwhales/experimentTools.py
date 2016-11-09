@@ -15,14 +15,15 @@ import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.MLwhales.MLtools_beta as myML
 
 from sklearn.utils import shuffle
-from sklearn import grid_search
+#from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn import svm
 import time
 
 
 def train_clf(X, y, clf_settings):
-    gs = grid_search.GridSearchCV(**clf_settings)
+    gs = GridSearchCV(**clf_settings)
     gs.fit(X, y)
     clf = gs.best_estimator_
     del gs

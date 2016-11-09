@@ -17,6 +17,8 @@ import pylotwhale.signalProcessing.audioFeatures as auf
 
 import pylotwhale.signalProcessing.effects as eff
 
+#import pylotwhale.MLwhales.MLtools_beta as myML
+#import pylotwhale.MLwhales.MLtools_beta as myML
 import MLtools_beta as myML
 
 import pylotwhale.utils.whaleFileProcessing as fp
@@ -268,10 +270,10 @@ def wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun=None, wavPreprocessingT=
 def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocessingT=None):
     """
     returns the data object of a collection of annotated wavs.
-            
+
         ( •_•)O*¯`·. call type (classification) .·´¯`°Q(•_• )
 
-    
+
     Parameters
     ----------
     < wavLabelCollection : list of tuples with the wav - annotation files
@@ -283,7 +285,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocessingT=N
                             eg. filter
 
     Return
-    ------    
+    ------
     > datO :  a file with the paths to the features and their labels
     """   
     if isinstance(featExtFun, dict):

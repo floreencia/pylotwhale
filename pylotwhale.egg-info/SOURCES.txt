@@ -17,6 +17,7 @@ pylotwhale/MLwhales/predictionTools.py
 pylotwhale/MLwhales/runExperiment_artificialCallTypes-sec.py
 pylotwhale/MLwhales/runExperiment_artificialCallTypes.py
 pylotwhale/MLwhales/runExperiment_prototypeCallType-clf.py
+pylotwhale/MLwhales/runExperiment_soundDetector-clf.py
 pylotwhale/NLP/__init__.py
 pylotwhale/NLP/analyseAnnotations-shuffle.py
 pylotwhale/NLP/analyseAnnotations.py
@@ -33,6 +34,8 @@ pylotwhale/NLP/ngramO_beta.py
 pylotwhale/NLP/sequencesO_beta.py
 pylotwhale/NLP/statMechT_beta.py
 pylotwhale/signalProcessing/__init__.py
+pylotwhale/signalProcessing/audioFeatures.py
+pylotwhale/signalProcessing/audioFeaturespy.py
 pylotwhale/signalProcessing/effects.py
 pylotwhale/signalProcessing/myCepstrogram-guakamole.py
 pylotwhale/signalProcessing/myCepstrogram.py

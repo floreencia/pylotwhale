@@ -317,7 +317,7 @@ def featureExtractionFun(funName=None):
 
 
 def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
-                          featExtrFun = sT.cepstralFeatures, **featExArgs):
+                          featExtrFun = sT.cepstralRep, **featExArgs):
     '''
     Combines feature extraction with annotations
         --->>> No explicit texturiztion <<<--- (see waveform2featMatrix)

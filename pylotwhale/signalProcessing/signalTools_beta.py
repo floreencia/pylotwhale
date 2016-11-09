@@ -8,7 +8,7 @@ import functools
 
 # Audio feature modules
 import librosa as lf  # Librosa for audio
-import features as psf  # Librosa for audio
+#import features as psf  # Librosa for audio
 ## Ploting defaults
 #import seaborn # And seaborn to make it look nice
 #seaborn.set(style='ticks')
@@ -697,7 +697,7 @@ def wav2deltaCepsRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
     paramStr = 'delta%s-'%order+paramStr0
     return dM, featureNames, tf, paramStr
 
-
+"""
 def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 numcep=13, NFilt=26, NFFT=512, lFreq=0, hFreq=None,
                 preemph=0.97, ceplifter=22):
@@ -726,6 +726,7 @@ def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
     #if logSpec : specM = np.log(specM)
 
     return cepsM, featNames, tf
+ """
 
 def logfbankFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 NFilt=26, NFFT=512, lFreq=0, hFreq=None,

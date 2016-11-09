@@ -16,16 +16,17 @@ import os
 import sys
 
 import pylotwhale.signalProcessing.audioFeatures as auf
-
 import pylotwhale.signalProcessing.signalTools_beta as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
-import featureExtraction as fex #pylotwhale.MLwhales.
 
+import featureExtraction as fex
+import shutil
 
 #from sklearn.utils import shuffle
 from sklearn import preprocessing
 from sklearn.externals import joblib
-from sklearn.learning_curve import learning_curve
+#from sklearn.learning_curve import learning_curve
+from sklearn.model_selection import learning_curve
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
 
 
@@ -35,7 +36,7 @@ from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_sc
 #import ast
 
 #import sequencesO_beta as seqs
-sys.path.append('/home/florencia/whales/scripts/')
+sys.path.append('/home/florencia/whales/sipts/')
 #import matrixTools as mt 
 
 """
@@ -569,6 +570,62 @@ class labelTransformer():
 
 
 
+###### save model
+
+def saveModel(clf, outModelName, fileModelName_fN=None):
+    '''saves clf model and appends model_name in a register file
+    Parameters:
+    -----------
+        clf : estimator
+        outModelName : string with settings of the model- features, clf, etc
+        fileModelName_f : name of the file where the clf-models are being filed'''
+    try: 
+        shutil.rmtree(outModelName)
+    except OSError:
+        pass
+    os.mkdir(outModelName)
+    outModelName+='/model.pkl'
+    joblib.dump(clf, outModelName)
+    if fileModelName_fN:
+        with open(fileModelName_fN, 'a') as out_file:
+            out_file.write("{}\n".format(outModelName))
+            print(outModelName)    
+            out_file.write("###---------   {}   ---------###\n".format(time.strftime("%H:%M:%S"))) 
+    return outModelName
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #################################################################################
 ########################   CLASSIFIER EVALUATION    #############################
 #################################################################################    
@@ -757,7 +814,7 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     outFig : name where to save fig
     '''
     # myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
-    font = {'size' : fontSz}; matplotlib.rc('font', **font)
+    #font = {'size' : fontSz}; matplotlib.rc('font', **font)
         
     fig, ax = plt.subplots(figsize=figsize)#(5, 5))
     ax.imshow(cM, cmap=plt.cm.Blues, alpha=alpha, interpolation='nearest')
@@ -768,7 +825,8 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     if display_nums:
         for i in range(r):
             for j in range(c):
-                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center')
+                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center', 
+                        fontsize=fontSz )
     
     ## ticks labels
     ax.set_xticks(range(c))        
@@ -784,19 +842,21 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     
 ### learnig curve
 
-def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1, outFig='',
+def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1, 
+                    scoring=None,
+                    outFig='',
                     y_min = 0.8, y_max = 1.1, figsize=None):
                         
-    '''plots the learning curve using learning_curve
+    '''plots the learning curve using sklearn's learning_curve
     Retunrs:
     train_sizes, train_scores, test_scores
     '''
     
-    if samples_arr is None: samples_arr=np.linspace(0.1, 1.0, 10)
+    if samples_arr is None: samples_arr=np.linspace(0.1, 1.0, 5)
     
     train_sizes, train_scores, test_scores =\
-                learning_curve(estimator=clf, 
-                X=X, 
+                learning_curve(estimator=clf,
+                X=X,
                 y=y, 
                 train_sizes=samples_arr, 
                 cv=cv,
@@ -832,7 +892,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1, outFig='',
     plt.grid()
     plt.xlabel('Number of training samples')
     plt.ylabel('Accuracy')
-    plt.legend(loc='lower right')
+    plt.legend(loc='center left')
     plt.ylim([y_min, 1.0])
     plt.tight_layout()
     if outFig: fig.savefig(outFig, dpi=300)            
