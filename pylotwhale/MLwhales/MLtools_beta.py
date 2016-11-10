@@ -1,35 +1,34 @@
 #!/usr/mprg/bin/python
 
 from __future__ import print_function
-import numpy as np
-import scipy.io.arff as arff
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib.ticker import NullFormatter
-
-from collections import Counter
-#from mpl_toolkits.axes_grid1 import ImageGrid
-from subprocess import call
-import pandas as pd
-
 import os
 import sys
-
-import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.signalProcessing.signalTools_beta as sT
-#import pylotwhale.utils.whaleFileProcessing as fp
-
-import featureExtraction as fex
+import warnings
+warnings.simplefilter('always', DeprecationWarning)
+from collections import Counter
 import shutil
 
-#from sklearn.utils import shuffle
 from sklearn import preprocessing
 from sklearn.externals import joblib
 #from sklearn.learning_curve import learning_curve
 from sklearn.model_selection import learning_curve
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
 
+import numpy as np
+import scipy.io.arff as arff
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.ticker import NullFormatter
+from subprocess import call
+import pandas as pd
 
+import pylotwhale.signalProcessing.audioFeatures as auf
+import pylotwhale.signalProcessing.signalTools_beta as sT
+#import pylotwhale.utils.whaleFileProcessing as fp
+
+import featureExtraction as fex
+
+#from sklearn.utils import shuffle
 #import time 
 #import itertools as it
 #import os
@@ -44,6 +43,8 @@ sys.path.append('/home/florencia/whales/sipts/')
     florencia @ 16.05.15
 
 """
+
+DEPRECATION_MSG = ("use MLEvalTools")
 
 #################################################################################
 ##############################    FEATURES    ##################################
@@ -626,12 +627,17 @@ def saveModel(clf, outModelName, fileModelName_fN=None):
 
 
 
-
+########## --> MLEvalTools
 #################################################################################
 ########################   CLASSIFIER EVALUATION    #############################
 #################################################################################    
 
 ### Evaluate a list of classifiers over a collection   
+
+def fun():
+    '''print deprecation warning'''
+    # warnings.warn(DEPRECATION_MSG, DeprecationWarning)
+    return warnings.warn(DEPRECATION_MSG, DeprecationWarning)
 
 
 def bestCVScoresfromGridSearch(gs):
@@ -642,14 +648,17 @@ def bestCVScoresfromGridSearch(gs):
     Retunrs: (mu, std) of the bets scores
     --------
     '''
+    #warnings.warn(DEPRECATION_MSG, DeprecationWarning)
+
     mu, std = _bestCVScoresfromGridSearch(gs)
     assert mu - gs.best_score_ < 0.01, "retrived value doesn't match best score {} =/={}".format(mu, gs.best_score_)
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     return mu, std
     
   
     
-def _bestCVScoresfromGridSearch(gs):
-    mu_max=0
+def _bestCVScoresfromGridSearch(gs, mu_max=0):
+    
     for pars, mu, cv_scrs in gs.grid_scores_[:]:
         if mu > mu_max:
             mu_max = mu
@@ -665,6 +674,7 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
     collfi : annotated wav collection (*.txt)
     of : out file (*.txt)
     """
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
     for wavF, annF in coll[:]:
         waveForm, fs = sT.wav2waveform(wavF)
@@ -684,6 +694,7 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
 
 def clfGeneralizability(clf_list, wavAnnCollection, featExtFun, labelEncoder, labelSet=None):
     '''estimates the score of a list of classifiers, one score for each wav file'''
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)    
     clf_scores = [] #np.zeros(len(clf_list))
     for clf in clf_list: 
         acc, pre, rec, f1, size = coll_clf_scores(clf, wavAnnCollection, featExtFun, labelEncoder=labelEncoder, labelSet=labelSet)
@@ -703,6 +714,7 @@ def coll_clf_scores(clf, wavAnnCollection, featExtFun, labelTransformer, labelSe
     < labelEncoder : label encoder of the features
     < labelSet : list of labels to consider, if None => all labels are kept
     '''
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     n = len(wavAnnCollection)
     acc = np.zeros(n)
     pre = np.zeros(n)
@@ -744,6 +756,7 @@ def clfScores(clf, X, y):
     P : presicion [array]
     F1 : [array]
     '''
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     y_pred = clf.predict(X)
     s = np.sum(y == y_pred)/(1.*len(y)) #clf.score(X, y)
     cM = confusion_matrix(y, y_pred, labels=clf.classes_)
@@ -766,6 +779,7 @@ def printClfScores( fileN, clf, X, y, l0):
     -------
     S : accuracy
     '''
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     S, P, R, F1 = clfScores(clf, X, y)
     if fileN:
         with open(fileN, 'a') as f:
@@ -787,6 +801,7 @@ def printIterClfScores( fileN, clf, X, y, c0, comments=None, commtLi='#'):
     < comments :  comment string
     < coomtLi :  symbol at the start of a comment line
     '''
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     ## write comments
     if isinstance(comments, str):
         comments = '#' + comments.replace('\n', '\n' + commtLi) # add '#' at the biging of the lines
@@ -816,7 +831,7 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     '''
     # myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
     #font = {'size' : fontSz}; matplotlib.rc('font', **font)
-        
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning) 
     fig, ax = plt.subplots(figsize=figsize)#(5, 5))
     ax.imshow(cM, cmap=plt.cm.Blues, alpha=alpha, interpolation='nearest')
     
@@ -852,7 +867,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
     Retunrs:
     train_sizes, train_scores, test_scores
     '''
-    
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     if samples_arr is None: samples_arr=np.linspace(0.1, 1.0, 5)
     
     train_sizes, train_scores, test_scores =\
@@ -901,6 +916,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
 
 
 class clfScoresO():
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     def __init__(self, clf, X, y):
         self.clf = clf
         self.X = X
@@ -960,7 +976,7 @@ class dataObj:
     annotated, tells if the data set should be trated as an annotated (True)
         containing the ground truth or not (False)
     """
-
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     def __init__( self, X, attrNames, target=None, std_features=False, datStr=''):       
         #print("TEST", arffFile)
         
@@ -1034,6 +1050,7 @@ class dataObj:
 
     
 class arff2dataFrame(dataObj):
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     """
     loads an arff file into a pandasDataFrame
     > the data matrix  ( #instnces X #features )
@@ -1070,6 +1087,7 @@ class arff2dataFrame(dataObj):
             
         
 class readAudioArff(arff2dataFrame):
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     
     def __init__(self, arffFile, annotated=True, std_features=False):
         self.arffFi = arffFile
@@ -1094,6 +1112,7 @@ class readAudioArff(arff2dataFrame):
                 
             
 class whaleSoundDetector():
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     """
     bounds feature matrix, targets with other common preprocessing 
     functionalities
@@ -1264,6 +1283,7 @@ class whaleSoundDetector():
         
 
 def gridSearch_clfStr(best_params):
+    warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     s=''
     for a, b in best_params.items():
         s += str(a)+str(b)+'-'
