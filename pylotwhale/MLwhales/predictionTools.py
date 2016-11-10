@@ -44,15 +44,16 @@ def predictSoundSections(wavF, clf, lt, feExFun,
         outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
 
     waveForm, fs = sT.wav2waveform(wavF)
-    return predictSectionsFromWaveform(waveform, fs, clf, lt, feExFun,
+    return predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
                                        outF=outF, annSections=annSections)
 
 
-def predictSectionsFromWaveform(waveform, fs, clf, lt, feExFun, outF,
+def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, outF,
                                 annSections='default'):
 
     """
-    predicts and generates the annotations of a given waveform
+    predicts the sections of a waveform and generates annotations
+    walking along a waveform 
     Parameters:
     -----------
     waveform : ndarray
@@ -76,6 +77,83 @@ def predictSectionsFromWaveform(waveform, fs, clf, lt, feExFun, outF,
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
     return outF
+
+
+def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outFi, 
+                    readSections='default', keepSections='default', dt=0):
+    """Generate annotations using the WSD2
+    reads the predicted sections from WSD1 to predicts
+    the finer structure of the calls
+    with clf trained with a smaller nTextWS
+    Parameters
+    ----------
+    wavF: str
+        wavefile name
+    feExFun: callable
+        feature extraction function
+    lt: LabelEncoder
+        label transformation object
+    WSD2_clf: estimator
+        model for estimating predictions
+    outFi: str
+        name of the output annotations
+    readSections: list like object
+        array with the ann sections from WSD1 we want to reinterpret, default = ['c']
+    keepSections: list like object
+        array with the ann sections we want to print
+    dt: float
+        time buffer for reading arund the desired annotation section
+    """
+
+    waveform, fs = sT.wav2waveform(wavF)  # load waveform
+    A = anns2array(annF)  # load annotations
+    for t0i, t0f, l0 in A[:]:  # for each ann section
+        if l0 in annSection:  # if section of interest (c)
+            thisWaveform = auf.getWavSec(waveform, fs, t0i - dt, t0f + dt)
+            ## predict annotations
+            T, L = pT.predictAnnotations(thisWaveform, fs, feExFun, lt,
+                                         WSD2_clf,
+                                         annSections=keepSections)
+            with open(outFi, 'a') as f:  # new annotations
+                newT = T + t0i - dt  # relative to the orginal ann sections
+                for i in np.arange(len(L)):  # print new annotations
+                    f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(newT[i, 0],
+                            newT[i, 1], L[i]))
+    return outF
+    
+    
+def predictAnnotations(waveform, fs, feExFun, lt, clf, annSections='default'):
+
+    """
+    predicts annotation sections of a waveform
+    walking along a waveform 
+    Parameters:
+    -----------
+    waveform : ndarray
+        sound waveform
+    clf : estimator
+        classifier object
+    lt : label transformer object
+    feExFun : callable
+        feature extraction
+    annSections : array
+        sections to print, default = ['c']
+    Returns
+    -------
+    T: ndarray (#annotations, 2)
+        initial and final time of the annotation sections
+    labels: ndarray (#anns, )
+        labels of the annotation sections
+    """
+
+    if annSections == 'default':
+        annSections = ['c']
+
+    tf = 1.0*len(waveform)/fs    
+    M0, _, featN, fExStr =  feExFun(waveform, fs)#, annotations=annotLi_t)
+    y_pred = clf.predict(M0)
+    T, labels = annT.predictions2annotations(lt.num2nom(y_pred), tf)
+    return T, labels     
 
 
 ### PREDICT THE LABELS OF THE ANNOTATED SECTION IN A WAV FILE  (CALL TYPE)

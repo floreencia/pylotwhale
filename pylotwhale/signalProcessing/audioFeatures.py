@@ -19,7 +19,8 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
                  label='label'):
     '''
     read annotated sections from a waveform
-    Parameters:
+    
+    Parameters
     ----------
     wavFi : wav file name
     annFi : annotations file (*.txt)
@@ -51,18 +52,19 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
     return(sectionsLi, fs)
 
 def getWavSec(waveform, fs, t0, tf):
-    '''
-    get wav section
-    Parameters:
-    ----------<
-        waveform : waveform
-        fs : sampling rate
-        t0 : initial time
-        tf : final time
+    """get waveform section
+    
+    Parameters
+    ----------
+    waveform: waveform
+    fs: sampling rate
+    t0: initial time
+    tf : final time
     Returns:
-    ------->
-        waveform segment
-    '''
+    -------
+    waveform : ndarray
+        segment
+    """
     n0 = int(np.floor(fs * float(t0)))
     nf = int(np.ceil(fs * float(tf)))
     return(waveform[n0:nf])
@@ -71,8 +73,8 @@ def getWavSec(waveform, fs, t0, tf):
 def flatPartition(nSlices, vec_size):
     '''
     returns the indexes that slice an array of size vec_size into nSlices
-    Parameters:
-    ---------->
+    Parameters
+    ----------
         nSlices : number of slices
         vec_size : size of the vector to slice
     '''

@@ -5,7 +5,7 @@ from __future__ import print_function
 import numpy as np
 import re
 import os
-import scikits.audiolab as au
+#import scikits.audiolab as au
 #import warnings
 
 
@@ -14,6 +14,10 @@ tools for the preparation of annotated files
 """
     
 #### AUP annotations <---> mtl (marsyas) annotations
+    
+def anns2array(annF):
+    '''loads annotations file into ndarray'''
+    return np.genfromtxt(annF, dtype=None)
     
 def parseAupFile(inFilename, sep='.'):
     """ 
@@ -178,23 +182,23 @@ def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
 #### back to time stamps -- audio frame analyser (walking)
 
 def getSections(y, tf=None):
-    '''
+    """
     takes labels (numeric) vector and returns a dictionary of the sections
     if tf is given the sections will have time units otherwise they'll have
     sample units
     Parameters
     ----------
-    < y : labels (np.array)
-    < tf : time at y[-1]
+    y: labels (np.array)
+    tf: time at y[-1]
     Returns
-    -----------
-    > sections dictionary in analiysed fft-samples
+    -------
+    > sections dictionary in analysed fft-samples
         (s0, sf) : label
         
     ASSUMPTIONS:
         - no time overlapping regions in the annotations
         
-    '''
+    """
     scaleFac = 1.*tf/len(y) if tf else 1
     
     sectionsDict = {}
@@ -209,22 +213,54 @@ def getSections(y, tf=None):
     if s0+1 <= len(y)-1: 
         sectionsDict[(s0*scaleFac, len(y)*scaleFac)] = y[s0+1]
     return(sectionsDict)
+    
+def annDi2annArrays(sectionsD):
+    """reformats the ourput of setSections into T array with the times and L
+    array with the labels"""
+    times = sorted(sectionsD.keys(), key = lambda x: x[0]) # sort annotations
+    T = np.zeros((len(times), 2))
+    labels = np.empty(len(times), dtype=str)
+    for i, t in enumerate(times):
+        T[i, :] = t
+        labels[i] = sectionsD[t]
+    return T, labels
+        
+def predictions2annotations(y, tf=None):
+    """interprets predictions as annotations: 
+    Parameters
+    ----------
+    y: ndarray
+        predictions
+    tf: final time of the wavform to wich this predictions belong to
+    Returns
+    -------
+    T: ndarray (n, 2)
+        times
+    L: ndarray (n,)
+        labels
+    """
+    sectionsD = getSections(y, tf)
+    return annDi2annArrays(sectionsD)
 
 
-def predictions2txt(y, outTxt, tf, sections='default'):
+def predictions2txt(y, outTxt, tf, sections):
     '''
     transforms the predicted labels y into a txt annotation file
-    that can be read by audacity.
-    < y : predicted samples
-    < outTxt : output file name
-    < sR : samplingr rate of the wave file corresponding to the annotation
-    < ws : size of the fft-analysis window
-    < sections : an array with the sections (num) we are interested
-        'default', means section '1'
-    > txtFile : audacity annotations file
+    that can be read by audacity or other audio software.
+   
+    Parameters
+    ----------
+    y: predicted samples
+    outTxt: output file name
+    tf: float
+        final time
+    sections: list 
+        sections (num) we are interested
+    Returns
+    -------
+    txtFile: str
+        name of the output file with the annotations
     '''
-    
-    if sections == 'default': sections = [1] # only call, not background
         
     sectionsD = getSections(y, tf)  ## find sections
     ky = sorted(sectionsD.keys(), key = lambda x: x[0]) ## sort the stamps
