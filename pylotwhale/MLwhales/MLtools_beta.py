@@ -4,7 +4,6 @@ from __future__ import print_function
 import os
 import sys
 import warnings
-warnings.simplefilter('always', DeprecationWarning)
 from collections import Counter
 import shutil
 
@@ -44,6 +43,7 @@ sys.path.append('/home/florencia/whales/sipts/')
 
 """
 
+warnings.simplefilter('always', DeprecationWarning)
 DEPRECATION_MSG = ("use MLEvalTools")
 
 #################################################################################
@@ -570,29 +570,31 @@ class labelTransformer():
         return dict(zip(self.nom2num(y_namesSet), y_namesSet))
 
 
-
 ###### save model
-
 
 def saveModel(clf, outModelName, fileModelName_fN=None):
     '''saves clf model and appends model_name in a register file
     Parameters:
     -----------
-        clf : estimator
-        outModelName : string with settings of the model- features, clf, etc
-        fileModelName_f : name of the file where the clf-models are being filed'''
+    clf : estimator
+        classifier we want to save as pkl for later predictions
+    outModelName : string
+        settings of the model- features, clf, etc
+    fileModelName_f : string
+        name of the file where the clf-models are being filed'''
     try:
         shutil.rmtree(outModelName)
     except OSError:
         pass
     os.mkdir(outModelName)
-    outModelName+='/model.pkl'
+    outModelName += '/model.pkl'
     joblib.dump(clf, outModelName)
     if fileModelName_fN:
         with open(fileModelName_fN, 'a') as out_file:
             out_file.write("{}\n".format(outModelName))
-            print(outModelName)    
-            out_file.write("###---------   {}   ---------###\n".format(time.strftime("%H:%M:%S"))) 
+            print(outModelName)
+            out_file.write("###---------   {}"
+                           "---------###\n".format(time.strftime("%H:%M:%S")))
     return outModelName
 
 

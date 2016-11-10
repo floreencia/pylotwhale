@@ -1,33 +1,27 @@
 #!/usr/bin/python
 
 from __future__ import print_function, division
-import numpy as np
 import functools
-#import pylab as pl
-#import sys
 
-# Audio feature modules
-import librosa as lf  # Librosa for audio
-#import features as psf  # Librosa for audio
-## Ploting defaults
-#import seaborn # And seaborn to make it look nice
-#seaborn.set(style='ticks')
-
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
-import pandas as pd
-#import random
-#import ast
-from scipy.io import wavfile
-#import scikits.audiolab as al
 import sys
 import os.path
 import scipy.signal as sig
 
-import pylotwhale.utils.annotationTools as annT
-matplotlib.rcdefaults()
-matplotlib.rcParams.update({'savefig.bbox': 'tight'})
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.mlab as mlab
+import pandas as pd
+from sklearn.preprocessing import scale
+
+from scipy.io import wavfile
+import librosa as lf  # Librosa for audio
+
+#import scikits.audiolab as al
+
+
+#matplotlib.rcdefaults()
+#matplotlib.rcParams.update({'savefig.bbox': 'tight'})
 
 """
     Tools for manipulating audio signals
@@ -109,28 +103,34 @@ def flatPartition(nSlices, vec_size):
     
 #### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py
+    
+def scale(y):
+    """standarizes array"""
+    return scale(y)
+    
+    
 def normalizeWF(waveform ):
     return 1.0*waveform/np.max(np.abs(waveform))
     
 
 def tileTillN(arr, N, n0=0):
-    '''returns an arrray of size N (>0) from tiling of arr. n0 is the starting index'''
+    """returns an arrray of size N (>0) from tiling of arr. n0 is the starting index"""
     #np.tile(arr, int(n/len(arr))+1)[:n]
     return arr[np.array([i for i in np.arange(n0, N + n0)%len(arr)])]
     
 def addToSignal(y1, y2, noiseIndex):
-    '''
+    """
     adds y2 (noise) to the primary signal y1. Returns the sum, keeping the size of y1
-    '''
+    """
     return y1 + tileTillN(y2, len(y1), noiseIndex)    
     
 def generateAddEnsemble(y_template, y_add , intensity_grid=None):
-    '''
+    """
     generate an ensemble of y_template-singnals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
-    '''
+    """
     if intensity_grid is None:
         intensity_grid = np.linspace(0.1, 10, 10)
      
@@ -145,7 +145,7 @@ def generateAddEnsemble(y_template, y_add , intensity_grid=None):
     return Y    
     
 def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
-    '''
+    """
     generate an ensemble of y_template-singnals shifting the pitch of the original signal
     normalizes both signals and adds different amplitudes of y_add to y_template
     Parameters:
@@ -153,7 +153,7 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
         shift_grid : 12 steps per octave
     Returns:
         Y : a matrix, with the sum of y_template and y_add in each row
-    '''
+    """
     if shift_grid is None:
         shift_grid = np.linspace(-2, 2, 5)
 
@@ -166,12 +166,12 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     return Y    
     
 def generateTimeStreachEnsemble(y_template, streach_grid=None):
-    '''
+    """
     generate an ensemble of y_template-singnals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
-    '''
+    """
     if streach_grid is None:
         streach_grid = np.linspace(0.8, 1.2, 5)
      
@@ -183,8 +183,8 @@ def generateTimeStreachEnsemble(y_template, streach_grid=None):
     return Y 
 
 def freqshift(data, Fs, fshift=100):
-    '''Frequency shift the signal by constant
-    '''
+    """Frequency shift the signal by constant
+    """
     x = np.fft.rfft(data)
     T = len(data)/float(Fs)
     df = 1.0/T
@@ -208,10 +208,10 @@ def write_wavfile(filename,fs,data):
 def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
                   over = 0.5, axTitle = True, fc0 = 0, fcf=120,
                   aspect = 'auto', figScale=1, spec_factor = '0.6'):
-    '''
+    """
     < files, an array with the wav file names
     * spec_factor, 0 = nothing, 1 = all
-    '''
+    """
     n = len(files[:12])
     nC, nR = fitNinSqr(n) # print "size ", nR, nC
     fig, axes  = plt.subplots(nrows=nR, ncols=nC, figsize = (int(nR)*4*figScale, int(nC)*2*figScale) )
@@ -231,7 +231,7 @@ def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
     if outFig : fig.savefig(outFig, bbox_inches='tight')
 
 def wav2waveform(wavF, normalize=False):
-    '''reads wave file and returns (waveform, sr)'''
+    """reads wave file and returns (waveform, sr)"""
     return _wav2waveform(wavF, normalize=normalize)
 
 
@@ -275,10 +275,10 @@ def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):
 
 
 def fitNinSqr(N):
-    '''
+    """
     Returns the number of columns and rows to optimally plot N images 
     together, used by plotFiles
-    '''
+    """
     nC = np.ceil(np.sqrt(N))
     if nC*(nC-1)>=N:
         return int(nC), int(nC-1)
@@ -286,13 +286,13 @@ def fitNinSqr(N):
         return int(nC), int(nC)
 
 def reeScale_E(M, spec_factor = 1.0/3.0):
-    '''
+    """
     Zeroes the noise by taking only the part of the spectrum with the higest energy.
     - spec_factor \in [0,1],
     --- 0 - max cutting energy (we don't see anything)
     --- 1 - min cutting energy (returns M without doing anything )
     * M, log (spectrogram)
-    '''
+    """
 
     assert(spec_factor >= 0 and spec_factor <= 1)
     cutE = (np.min(M) - np.max(M))*spec_factor + np.max(M)
@@ -306,14 +306,14 @@ def reeScale_E(M, spec_factor = 1.0/3.0):
     return M_tr
 
 def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000):
-    '''
+    """
     selects a band on frquencies from the matrix M
     fr_0, initial frequency of the matrix
     fr_f, final frequency of the matrix, sampR/2
     cutting frequencies
     v0_cut
     vf_cut
-    '''
+    """
     ny, nx = np.shape(M)
     n0_cut = int( ny*v0_cut/( fr_f - fr_0 ) )
     nf_cut = int( ny*vf_cut/( fr_f - fr_0 ) )
@@ -321,9 +321,9 @@ def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000)
     return M[ n0_cut:nf_cut, : ]
 
 def allPositive_andNormal(M):
-    '''
+    """
     normalizes the matrices, so that all it's values lay in (0,1)
-    '''
+    """
     if np.min(M) < 0:
         M = M - np.min(M)
     M = 1.0*M/np.max(M)
@@ -341,9 +341,9 @@ def reeSize_t(M, h_size = 3938):
 
 
 def myBinarize(rawData, Nbits = 7):
-    '''
+    """
     This function binarizes a matix preserving the number of columns (time wins)
-    '''
+    """
     a = np.min(rawData)*1.0
     b = 1.0*np.max(rawData)-a
 
@@ -412,13 +412,13 @@ def plspectro(waveform, sRate, outF='', N = 2**9, v0_cut = 1000,
 
 
 def flatPartition(nSlices, vec_size):
-    '''
+    """
     returns the indexes that slice an array of size vec_size into nSlices
     Parameters
     ----------
     nSlices : number of slices
     vec_size : size of the vector to slice
-    '''
+    """
     idx = np.linspace(0, np.arange(vec_size)[-1], nSlices)
     return np.array([int(item) for item  in idx])
 
@@ -434,10 +434,10 @@ def flatPartition(nSlices, vec_size):
 
 
 def cbarLabels(minV, maxV):
-    '''
+    """
     give me the maximum and the minimum values of color bar and I will retun 3 label
     the lables returned are int type. ment for exponents.
-    '''
+    """
     minV = int(np.ceil(minV))
     maxV = int(np.floor(maxV))
     ml = (minV + maxV)/2
@@ -449,7 +449,7 @@ def cbarLabels(minV, maxV):
     return (ll, ml, ul)
 
 def specgramWav(wav_fileN, NFFTpow=12, overlap=0.5, saveData=False): #, max_freq = 8000):
-    '''
+    """
     this function creates spectrograms form a wav file
     wav_fileN = name of the wavfile we want to plot
     max_freq = the maximum frequency we want to display [KHz]
@@ -458,7 +458,7 @@ def specgramWav(wav_fileN, NFFTpow=12, overlap=0.5, saveData=False): #, max_freq
     > tf, final time
     > ff, largest frequency
     > paramStr :  string with the used parameters
-    '''
+    """
     # read wav file
     sRate, waveform = wavfile.read(wav_fileN)
     paramStr = 'NFFT%d-OV%d'%(2**NFFTpow, overlap*100)
@@ -466,7 +466,7 @@ def specgramWav(wav_fileN, NFFTpow=12, overlap=0.5, saveData=False): #, max_freq
 
 def spectralRep(waveform, sRate, NFFTpow=9, overlap=0.5,
                 winN='hanning', outF=None, logSpec=True):
-    '''
+    """
     Extracts the power spectral features from a waveform
     < waveform :  numpy array
     < sRate : samplig rate
@@ -479,7 +479,7 @@ def spectralRep(waveform, sRate, NFFTpow=9, overlap=0.5,
     > s2f : names of the features. Central frequency of the bin (n,)
     > tf : final time (s2t[-1])
     > paramStr
-    '''
+    """
     # settings
     NFFT = 2**int(NFFTpow)
     overlap=float(overlap)
@@ -529,7 +529,7 @@ def spectralDspecRep(waveform, sRate, NFFTpow=9, overlap=0.5, winN='hanning',
 
 def saveSpecgram(wav_fileN, powerOfWinLen=12, overlap=0.9, freqFrac=1.0,
                  outDir='', figsize=None, cmN = 'gray_r'): #, max_freq = 8000):
-    '''
+    """
     Draw spectrogram form a wav file
     Parameters:
     -----------
@@ -540,7 +540,7 @@ def saveSpecgram(wav_fileN, powerOfWinLen=12, overlap=0.9, freqFrac=1.0,
         freqFrac = fraction of the max frequency
         outDir='' # if no output dir is given the image is stored in the same dir
                 as the wav file
-    '''
+    """
     # settings
     M, tf, ff = specgramWav(wav_fileN, powerOfWinLen=powerOfWinLen, overlap=overlap)
 
@@ -570,7 +570,7 @@ def saveSpecgram(wav_fileN, powerOfWinLen=12, overlap=0.9, freqFrac=1.0,
 ###########################################################
 
 def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128):
-    '''
+    """
     Extracts the spectral features from a waveform
     Parameters:
     ----------
@@ -585,7 +585,7 @@ def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True,
     > featureNames : names of the features. Central frequency of the bin (n,)
     > tf : final time (s2t[-1])
     > paramStr :  string with the used parameters
-    '''
+    """
     ## settings																
 
     return cepstralDcepRep(waveform, sRate, NFFTpow=NFFTpow, overlap=overlap, Nceps=Nceps,
@@ -594,7 +594,7 @@ def cepstralRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4, logSc=True,
 def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True, n_mels=128):
 
-    '''
+    """
     cepstral feature matrix and the delta orders horizontaly appended
     Parameters:
     ------------
@@ -612,7 +612,7 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
         > featureNames : list
         > tf : final time [s]
         > paramStr : settings string
-    '''
+    """
     ## settings																
     NFFT = 2**int(NFFTpow)
     overlap = float(overlap)
@@ -642,7 +642,7 @@ def cepstralDcepRep(waveform, sRate, NFFTpow=10, overlap=0.5, Nceps=2**4,
 def melSpecDRep(waveform, sRate, NFFTpow=10, overlap=0.5, n_mels=2**4,
                 order=1, logSc=True):
 
-    '''
+    """
     melspectrum Feature Matrix and the delta orders horizontaly appended
     Parameters:
     -----------
@@ -659,7 +659,7 @@ def melSpecDRep(waveform, sRate, NFFTpow=10, overlap=0.5, n_mels=2**4,
         > featureNames : list
         > tf : final time [s]
         > paramStr : settings string
-    '''
+    """
     ## settings																
     NFFT = 2**int(NFFTpow)
     overlap = float(overlap)
@@ -701,7 +701,7 @@ def wav2deltaCepsRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
 def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 numcep=13, NFilt=26, NFFT=512, lFreq=0, hFreq=None,
                 preemph=0.97, ceplifter=22):
-    '''
+    """
     Extracts the cepstral features from a waveform
     < waveform : numpy array
     < sRate : samplig rate
@@ -712,7 +712,7 @@ def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
     > specM : spectral matrix (numpy array)
     > s2f : names of the features. Central frquency of the bin
     > tf : final time (s2t[-1])
-    '''
+    """
 
     # cepstrogram
     cepsM = psf.mfcc(waveform, samplerate=sRate,
@@ -731,7 +731,7 @@ def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
 def logfbankFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 NFilt=26, NFFT=512, lFreq=0, hFreq=None,
                 preemph=0.97):
-    '''
+    """
     Extracts the spectral features from a waveform
     < waveform : numpy array
     < sRate : samplig rate
@@ -741,7 +741,7 @@ def logfbankFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
     > specM : spectral matrix (numpy array)
     > s2f : names of the features. Central frquency of the bin
     > tf : final time (s2t[-1])
-    '''
+    """
 
     # cepstrogram
     lbfM = psf.logfbank(waveform, samplerate=sRate,
@@ -762,7 +762,7 @@ def chromaRep(waveform, sRate, C=None, hop_length=512, fmin=None,
 			threshold=0.0, tuning=None, n_chroma=12, n_octaves=7,
 			window=None, bins_per_octave=None, mode='full'):
 														
-    '''
+    """
     Extracts the spectral features from a waveform
     < waveform : numpy array
     < sRate : samplig rate
@@ -775,7 +775,7 @@ def chromaRep(waveform, sRate, C=None, hop_length=512, fmin=None,
     > featureNames : names of the features. Central frequency of the bin (n,)
     > tf : final time (s2t[-1])
     > paramStr :  string with the used parameters
-    '''
+    """
     ## settings
     paramStr = 'CHROMA-Hsz%d-chroma%d-ocvates%d'%(hop_length, n_chroma, n_octaves)
     # Chromogram
@@ -799,14 +799,14 @@ def chromaRep(waveform, sRate, C=None, hop_length=512, fmin=None,
 ###########################################################
 
 def delta(M, width=9, order=1, axis=0, trim=True):
-    '''
+    """
     M :  feature matrix (m_instanes x n_features)
     axis : int [scalar]
         the axis along which to compute deltas.
         Default is 0 (rows).
     trim      : bool
         set to `True` to trim the output matrix to the original size.
-    '''
+    """
     dM = lf.feature.delta(M, width=width, order=order, axis=axis, trim=trim)
     return dM
 
@@ -829,7 +829,7 @@ def butter_bandpass_filter(waveform, fs, lowcut, highcut, order=5):
 
 def bandDecomposition(x, fs, intervals=None,
                       filFun = butter_bandpass_filter, order=3, Nbins=4):
-    '''
+    """
     band decomposition of a signal filter
 
     < x, input signal
@@ -840,7 +840,7 @@ def bandDecomposition(x, fs, intervals=None,
     < bins, used when the intervals are defined (default log)
     -->
     > yLi, dictionary of the band decomposition of x
-    '''
+    """
 
     if intervals == None:
         li = np.array([int(item) for item in np.logspace(np.log(1000), np.log(fs/2), num=Nbins, base=np.e)])
@@ -859,7 +859,7 @@ def bandDecomposition(x, fs, intervals=None,
     return(yLi)
 
 def whiten(waveForm, psd_whittener, Fs):
-    '''
+    """
     Noise whitening
     Divide by ASD in the frequency domain, and transform back.
     Parameters:
@@ -870,7 +870,7 @@ def whiten(waveForm, psd_whittener, Fs):
     Retrurns:
     --------
         whittened waveform : np.array
-    '''
+    """
     Nt = len(waveForm)
     freqs = np.fft.rfftfreq(Nt, Fs)
 
@@ -884,7 +884,7 @@ def whiten(waveForm, psd_whittener, Fs):
 ######    Spectral energy    ######
 
 def bandEnergy(y, fs, f_band=None, nps=256, overl=None):
-    '''
+    """
     sum of the power spectral density within a freq interval using
     welch's method
 
@@ -898,7 +898,7 @@ def bandEnergy(y, fs, f_band=None, nps=256, overl=None):
     > returns
     ----------
     sum (X_k), k in f_band
-    '''
+    """
 
     if f_band==None: f_band=(1000, fs/2)
 
@@ -910,7 +910,7 @@ def bandEnergy(y, fs, f_band=None, nps=256, overl=None):
     return(D)
 
 def welchD(y, fs, f_band=None, nps=256, overl=None):
-    '''
+    """
     sum of the power spectral density with in a freq interval using
     welch's method
 
@@ -924,7 +924,7 @@ def welchD(y, fs, f_band=None, nps=256, overl=None):
     > returns
     ----------
     sum (X_k), k in f_band
-    '''
+    """
 
     if f_band==None: f_band=(1000, fs/2)
 
@@ -936,7 +936,7 @@ def welchD(y, fs, f_band=None, nps=256, overl=None):
 
 def tsBandenergy(y, fs, textureWS=0.1, textureWSsamps=0, overlap=0,
                  freqBand=None, normalize=True):
-    '''
+    """
     returns  a time series with the spectral energy every textureWS (seconds)
     overlap [0,1)
     < y : signal (waveform)
@@ -948,7 +948,7 @@ def tsBandenergy(y, fs, textureWS=0.1, textureWSsamps=0, overlap=0,
     -->
     > time series of the powerspectral density
     > time interval of the texture window
-    '''
+    """
 
     ## set set (size of the texture window in samples)
     if textureWS: step = 2**np.max((2, int(np.log(fs*textureWS)/np.log(2)))) # as a power of 2

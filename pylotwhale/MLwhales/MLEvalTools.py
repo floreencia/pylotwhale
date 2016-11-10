@@ -53,7 +53,7 @@ sys.path.append('/home/florencia/whales/sipts/')
 ### Evaluate a list of classifiers over a collection   
 
 
-def gridSearchresults(gs, max_std=0.02):
+def get_gridSearchresults_str(gs, max_std=0.02):
     gsResults_str = ''
     means = gs.cv_results_['mean_test_score']
     stds = gs.cv_results_['std_test_score']
