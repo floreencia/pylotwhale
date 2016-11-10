@@ -106,7 +106,10 @@ def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
     dt: float
         time buffer for reading arund the desired annotation section
     """
-
+    try:
+        os.remove(outF)
+    except OSError:
+        pass
     waveform, fs = sT.wav2waveform(wavF)  # load waveform
     A = annT.anns2array(annWSD1)  # load annotations
     for t0i, t0f, l0 in A[:]:  # for each ann section
