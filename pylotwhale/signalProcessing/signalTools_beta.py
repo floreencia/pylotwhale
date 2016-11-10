@@ -6,13 +6,14 @@ import functools
 import sys
 import os.path
 import scipy.signal as sig
+import warnings
 
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import pandas as pd
-from sklearn.preprocessing import scale
+from sklearn.preprocessing import scale, maxabs_scale, minmax_scale
 
 from scipy.io import wavfile
 import librosa as lf  # Librosa for audio
@@ -28,6 +29,8 @@ import librosa as lf  # Librosa for audio
     Module for the preprocessing of features
     florencia @ 06.09.14
 """
+
+warnings.simplefilter('always', DeprecationWarning)
 
 ###########################################################
 #####           waveform manipulations                #####
@@ -104,12 +107,21 @@ def flatPartition(nSlices, vec_size):
 #### WAVEFORM MANIPULATIONS        
 ########### moved to effects.py
     
-def scale(y):
-    """standarizes array"""
-    return scale(y)
+def standardise(y, axis=0):
+    """standarizes array along axis
+    centers and trslades array so that mu = 0 and std = 1"""
+    return scale(y, axis=axis)
     
+def scale2range(y, feature_range=(-1, 1), axis=0):
+    """scales array to range"""
+    return minmax_scale(y, feature_range=feature_range, axis=axis)
+     
+def maxAbsScale(y, axis=0):
+    """normalises array didviding by the max abs value"""
+    return maxabs_scale(y, axis=axis)
     
 def normalizeWF(waveform ):
+    warnings.warn('use maxAbsScale', DeprecationWarning)
     return 1.0*waveform/np.max(np.abs(waveform))
     
 
@@ -697,7 +709,7 @@ def wav2deltaCepsRep(waveform, sRate, NFFTpow=9, overlap=0.5, Nceps=2**4,
     paramStr = 'delta%s-'%order+paramStr0
     return dM, featureNames, tf, paramStr
 
-"""
+'''
 def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 numcep=13, NFilt=26, NFFT=512, lFreq=0, hFreq=None,
                 preemph=0.97, ceplifter=22):
@@ -726,7 +738,7 @@ def cepstralFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
     #if logSpec : specM = np.log(specM)
 
     return cepsM, featNames, tf
- """
+ '''
 
 def logfbankFeatures(waveform, sRate, analysisWS=0.025, analysisWStep=0.01,
                 NFilt=26, NFFT=512, lFreq=0, hFreq=None,
