@@ -25,28 +25,58 @@ def predictSoundSections(wavF, clf, lt, feExFun,
                          outF='default', annSections='default'):
     '''
     predicts and generates the annotations of the given wavF
-    PARAMETERS:
+    Parameters:
     -----------
-        wavF : path to wav file
-        clf : classifier object
-        lt : label transformer object
-        feExFun : feature extraction callable
-        out : annotations out file name, default = wav base name + '-predicitons'
-        annSections : setions to print, defaulf = 'c'
+    wavF : str
+        path to wav file
+    clf : estimator
+        classifier object
+    lt : label transformer object
+    feExFun : callable
+        feature extraction
+    out : str
+        annotations out file name, default = wav base name + '-predictions'
+    annSections : array
+        sections to print, default = ['c']
     '''
-    if outF =='default':
+    if outF == 'default':
         bN = os.path.basename(wavF)
         outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
-    if annSections == 'default':
-            annSections = ['c']
 
     waveForm, fs = sT.wav2waveform(wavF)
-    tf = 1.0*len(waveForm)/fs
-        
-    M0, _, featN, fExStr =  feExFun(waveForm, fs)#, annotations=annotLi_t)
+    return predictSectionsFromWaveform(waveform, fs, clf, lt, feExFun,
+                                       outF=outF, annSections=annSections)
+
+
+def predictSectionsFromWaveform(waveform, fs, clf, lt, feExFun, outF,
+                                annSections='default'):
+
+    """
+    predicts and generates the annotations of a given waveform
+    Parameters:
+    -----------
+    waveform : ndarray
+        sound waveform
+    clf : estimator
+        classifier object
+    lt : label transformer object
+    feExFun : callable
+        feature extraction
+    out : str
+        annotations out file name, default = wav base name + '-predictions'
+    annSections : array
+        sections to print, default = ['c']
+    """
+
+    if annSections == 'default':
+        annSections = ['c']
+
+    tf = 1.0*len(waveform)/fs    
+    M0, _, featN, fExStr =  feExFun(waveform, fs)#, annotations=annotLi_t)
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
     return outF
+
 
 ### PREDICT THE LABELS OF THE ANNOTATED SECTION IN A WAV FILE  (CALL TYPE)
 
