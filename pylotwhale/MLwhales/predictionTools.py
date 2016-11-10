@@ -15,6 +15,8 @@ import featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.utils.annotationTools as annT
 import pylotwhale.MLwhales.MLtools_beta as myML
+import pylotwhale.signalProcessing.audioFeatures as auf
+
 
 
 ### split
@@ -79,7 +81,7 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, o
     return outF
 
 
-def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outFi, 
+def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
                     readSections='default', keepSections='default', dt=0):
     """Generate annotations using the WSD2
     reads the predicted sections from WSD1 to predicts
@@ -95,7 +97,7 @@ def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outFi,
         label transformation object
     WSD2_clf: estimator
         model for estimating predictions
-    outFi: str
+    outF: str
         name of the output annotations
     readSections: list like object
         array with the ann sections from WSD1 we want to reinterpret, default = ['c']
@@ -106,15 +108,15 @@ def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outFi,
     """
 
     waveform, fs = sT.wav2waveform(wavF)  # load waveform
-    A = anns2array(annF)  # load annotations
+    A = annT.anns2array(annWSD1)  # load annotations
     for t0i, t0f, l0 in A[:]:  # for each ann section
-        if l0 in annSection:  # if section of interest (c)
+        if l0 in readSections:  # if section of interest (c)
             thisWaveform = auf.getWavSec(waveform, fs, t0i - dt, t0f + dt)
             ## predict annotations
-            T, L = pT.predictAnnotations(thisWaveform, fs, feExFun, lt,
-                                         WSD2_clf,
-                                         annSections=keepSections)
-            with open(outFi, 'a') as f:  # new annotations
+            T, L = predictAnnotations(thisWaveform, fs, feExtFun, lt,
+                                      WSD2_clf,
+                                      annSections=keepSections)
+            with open(outF, 'a') as f:  # new annotations
                 newT = T + t0i - dt  # relative to the orginal ann sections
                 for i in np.arange(len(L)):  # print new annotations
                     f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(newT[i, 0],
