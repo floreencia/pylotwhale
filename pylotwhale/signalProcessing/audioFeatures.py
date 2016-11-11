@@ -413,22 +413,8 @@ def waveform2features(waveform, fs, transfsPipelinefun, annotations=None):
     ----------
     waveform :  waveform array
     fs :  sampling rate of the waveform
-        summariseDict : dict,
-        instructions for summarising features
-        eg. {'summarisation' : 'walking', textWS : 0.2, normalise=True}
-            {'summarisation' : 'walking', n_textWS : 4, normalise=False}
-            {'summarisation' : 'splitting', textWS : 5}
-    textWS : size of the texture window
-        nTextWs is assigned here from this value.
-        instead on can set Nslices
-    annotations : list with the time stamp, label pairs. The stamp can be in
-                samples or time units, and this indicates the first sample with the
-                given label (stamp, label) list
-    < featExtrFun : feature extraction function or name (see FeatureExtractionFun)
-    < **featExArgss : arguments to be used on the feature extraction
-                        e.g. - NFFT, overlap, etc.
-                            -- Nceps
-    < Nslices : sets textWS so that the waveform is sliced in Nslices equal length segments
+    transfsPipelinefun: callable
+        transformation, can be generated with TransformationsPipeline().fun()
     Returns
     --------->
     M : feature matrix ( m x n )

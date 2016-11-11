@@ -268,7 +268,7 @@ def wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun=None, wavPreprocessingT=
     return datO
 
     
-def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocessingT=None):
+def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     """
     returns the data object of a collection of annotated wavs.
 
@@ -298,8 +298,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None, wavPreprocessingT=N
 
     for wavF, l in wavLabelCollection:
         waveForm, fs = wav2waveform(wavF, normalize=False)
-        waveForm = wavPreprocessingT(waveForm, fs)        
-        M, _, _, featStr = featExtFun(waveForm, fs)
+        M = featExtFun(waveForm, fs)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])  
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
     return datO        
@@ -527,8 +526,6 @@ class TransformationsPipeline():
 
     def composeTransformation(self, fun):
         return compose2(fun, self.fun)
-
-
 
 
 class wavFeatureExtraction():
