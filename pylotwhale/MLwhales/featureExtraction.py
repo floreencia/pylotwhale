@@ -497,21 +497,22 @@ class Transformation():
         self.settingsDict = settings_di
         self.string = self.set_transformationStr(self.settingsDict, self.name)
         self.fun = self.set_transformationFun(self.name, self.settingsDict)
-               
+
     def set_transformationStr(self, di, settStr=''):
         """defines a string with transformation's intructions"""
         settStr += stringiseDict(di, '')
         return settStr
-    
-    def set_transformationFun(self, Tname, settings, transformationFun=get_transformationFun):
+
+    def set_transformationFun(self, Tname, settings,
+                              transformationFun=get_transformationFun):
         """returns the feature extraction callable, ready to use!"""
         return functools.partial(transformationFun(Tname), **settings)
 
-            
-class transformationsPipeline():
+
+class TransformationsPipeline():
     """pipeline of Transformations
     """
-    
+
     def __init__(self, transformationsList):
         self.transformationsList = transformationsList
         self.string = ''
@@ -520,19 +521,16 @@ class transformationsPipeline():
             #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
             self.string = self.appendString(step, trO)
             self.fun = self.composeTransformation(trO.fun)
-            
+
     def appendString(self, step_name, trOb):
         return self.string + "-{}-{}-{}".format(step_name, trOb.name, trOb.string)
-            
+
     def composeTransformation(self, fun):
         return compose2(fun, self.fun)
-        
 
 
 
-            
-            
-    
+
 class wavFeatureExtraction():
     """class for the extraction of wav features, statring from a dictionary of settings
     bounds:

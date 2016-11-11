@@ -6,10 +6,10 @@ import numpy as np
 import pylotwhale.signalProcessing.audioFeatures as auf
 
 
-def test_texturiseWalkig():
+def test_texturiseWalking():
 	## nTextWS=1
 	M = np.random.randint(5, 11, (20,20))
-	Mtext = auf.texturiseWalkig(M, 1, normalise=False)
+	Mtext = auf.texturiseWalking(M, 1, normalise=False)
 	np.testing.assert_array_equal( M , Mtext[:, :np.shape(M)[1]])
 
 	## nText=1, normalised
