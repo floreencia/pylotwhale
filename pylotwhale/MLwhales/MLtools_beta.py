@@ -22,7 +22,7 @@ from subprocess import call
 import pandas as pd
 
 import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.signalProcessing.signalTools_beta as sT
+import pylotwhale.signalProcessing.signalTools as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
 
 import featureExtraction as fex
