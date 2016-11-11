@@ -5,13 +5,15 @@ Created on Wed Nov  2 12:44:09 2016
 @author: florencia
 """
 from __future__ import print_function, division
-import pylotwhale.signalProcessing.signalTools_beta as sT
-import pylotwhale.utils.annotationTools as annT
-
+import warnings
 import functools
 import numpy as np
 
+import pylotwhale.signalProcessing.signalTools_beta as sT0
+import pylotwhale.signalProcessing.signalTools as sT
+import pylotwhale.utils.annotationTools as annT
 
+warnings.simplefilter('always', DeprecationWarning)
 
 ######     ANNOTATIONS     #########
 
@@ -19,7 +21,6 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
                  label='label'):
     '''
     read annotated sections from a waveform
-    
     Parameters
     ----------
     wavFi : wav file name
@@ -28,7 +29,7 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
     t0Label : name of the label for the start time (used by annT.parseAupFile)
     tfLabel : name of the label for the end time (used by annT.parseAupFile)
     label : name of the label with the annotation label (used by annT.parseAupFile)
-    Returns:
+    Returns
     -------
     sectionsLi : a list with dictionaries with the label and waveform information
         { <label>, <waveFormSection (np.array)> }
@@ -169,7 +170,6 @@ def tuLi2frameAnnotations(tuLiAnn, m_instances, tf):
         targetArr[ix] = l
     return targetArr
 
-####### summarisation tools
 
 
 ### normalisation tools
@@ -180,7 +180,7 @@ def normalisationFun(funName=None, **kwargs):
     '''
     D = {#'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'normalize': sT.spectralRep,
+        'normalize': sT0.spectralRep,
         }
 
 
@@ -189,30 +189,37 @@ def normaliseMatrix(M):
     normM = M / np.max(np.abs(M))
     return normM
 
-###### texturise festures
+
+#### FEATURE EXTRACTION and processing #####
+
+
+
+
+
+####### SUMMARISATION
+
+###### texturise features
 
 def summarisationFun(funName=None):
     '''
     Dictionary of summarisations (=texturisations)
     returns of the requested summarisation function
-    Parameters:    
-    ------
-    > feature names (if None)
-    > feature function
-        this functions take the waveform and return an instancited feature matrix
-        m (instances) - rows
-        n (features) - columns
+    Parameters
+    ----------
+    funName: str,
+        name of the summarisation function
+    Retuns: callble
     '''
     D = {#'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
         'splitting': texturiseSplitting,
-        'walking':  texturiseWalking,
+        'walking':  texturiseWalking
         }
 
-    if funName == None: # retuns a list of posible feature names
-        return D.keys()
-    else:
+    if funName in D.keys(): # retuns a list of posible feature names
         return D[funName]
+    else:
+        return D
         
 def summariseMatrixFromSummDict(M, summariseDict):
     '''
@@ -222,16 +229,19 @@ def summariseMatrixFromSummDict(M, summariseDict):
     {'summarisation': 'walking', 'n_textWS':10, 'normalise':False}
     {'summarisation': 'walking', 'textWS': 0.2, 'normalise':False}
     {'summarisation': 'splitting', 'Nslices':10, 'normalise':False}
+    Returns
+    -------
+    feature matrix, ndarray (n_summInstances, n_summFeatures)
     '''
     fun = summarisationFun(summariseDict['summarisation'])
-    settingsDir = dict(summariseDict) # create new dict for the settings
+    settingsDir = dict(summariseDict)  # create new dict for the settings
     del(settingsDir['summarisation'])  # remove summarisation
     return fun(M, **settingsDir)
 
-        
+
 def texturiseSplitting(M, Nslices, normalise=False):
     '''
-    Summarises features matrix M splitting into Nslices 
+    Summarises features matrix M splitting into Nslices
     along time instances
     M (n_time_instances x n_features)
     Parameters
@@ -300,16 +310,17 @@ def featureExtractionFun(funName=None):
         m (instances) - rows
         n (features) - columns
     '''
+    print("\n\nyou are using sT0. use sT.audioFeaturesFun")
     D = {#'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'spectral': sT.spectralRep,
-        'spectralDelta': functools.partial(sT.spectralDspecRep, order=1),
-        'cepstral': sT.cepstralRep,
-        'cepsDelta': functools.partial(sT.cepstralDcepRep, order=1), # MFCC and delta-MFCC
-        'cepsDeltaDelta': functools.partial(sT.cepstralDcepRep, order=2),
-        'chroma': sT.chromaRep,
-        'melspectroDelta': sT.melSpecDRep,
-        'melspectro': functools.partial(sT.melSpecDRep, order=0)
+        'spectral': sT0.spectralRep,
+        'spectralDelta': functools.partial(sT0.spectralDspecRep, order=1),
+        'cepstral': sT0.cepstralRep,
+        'cepsDelta': functools.partial(sT0.cepstralDcepRep, order=1), # MFCC and delta-MFCC
+        'cepsDeltaDelta': functools.partial(sT0.cepstralDcepRep, order=2),
+        'chroma': sT0.chromaRep,
+        'melspectroDelta': sT0.melSpecDRep,
+        'melspectro': functools.partial(sT0.melSpecDRep, order=0)
         }
 
     if funName == None: # retuns a list of posible feature names
@@ -319,7 +330,7 @@ def featureExtractionFun(funName=None):
 
 
 def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
-                          featExtrFun = sT.cepstralRep, **featExArgs):
+                          featExtrFun = sT0.cepstralRep, **featExArgs):
     '''
     Combines feature extraction with annotations
         --->>> No explicit texturiztion <<<--- (see waveform2featMatrix)
@@ -392,11 +403,46 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
     return M, targetArr, featNames, featStr
 
 
-    #print(np.shape(fM))
+def waveform2features(waveform, fs, transfsPipelinefun, annotations=None):
+    '''
+    1. extract audio features
+    2. texturizes them
+        (computing the mean and std over a texture window, see texturizeFeatures)
+    3. handle annotations
+    Parameters
+    ----------
+    waveform :  waveform array
+    fs :  sampling rate of the waveform
+        summariseDict : dict,
+        instructions for summarising features
+        eg. {'summarisation' : 'walking', textWS : 0.2, normalise=True}
+            {'summarisation' : 'walking', n_textWS : 4, normalise=False}
+            {'summarisation' : 'splitting', textWS : 5}
+    textWS : size of the texture window
+        nTextWs is assigned here from this value.
+        instead on can set Nslices
+    annotations : list with the time stamp, label pairs. The stamp can be in
+                samples or time units, and this indicates the first sample with the
+                given label (stamp, label) list
+    < featExtrFun : feature extraction function or name (see FeatureExtractionFun)
+    < **featExArgss : arguments to be used on the feature extraction
+                        e.g. - NFFT, overlap, etc.
+                            -- Nceps
+    < Nslices : sets textWS so that the waveform is sliced in Nslices equal length segments
+    Returns
+    --------->
+    M : feature matrix ( m x n )
+    '''
+    tf = len(waveform)/fs
+    M = transfsPipelinefun(waveform)
+    m_instances, n_features = np.shape(M)
 
+    if annotations: # generate the targets for the instances
+        targetArr = tuLi2frameAnnotations(annotations, m_instances, tf)
+    else:
+        targetArr = np.zeros(m_instances, dtype=object)
 
-    #t = np.linspace(0, tf, n)
-
+    return M
 
 def waveform2featMatrix(waveform, fs, summariseDict,
                         annotations=None,
@@ -407,7 +453,7 @@ def waveform2featMatrix(waveform, fs, summariseDict,
         (computing the mean and std over a texture window, see texturizeFeatures)
     3. handle annotations
     Parameters
-    ----------<
+    ----------
     waveform :  waveform array
     fs :  sampling rate of the waveform
         summariseDict : dict,
@@ -433,6 +479,8 @@ def waveform2featMatrix(waveform, fs, summariseDict,
     > featNames : feature names
     > featStr : string with feature extraction settings
     '''
+    warnings.warn('use waveform2features', FutureWarning)
+
     ## audio feature extraction
     if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
     M0, featNames0, tf, featStr  = featExtrFun(waveform, fs, **featExArgs)
@@ -546,6 +594,13 @@ def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0
         if annotations : targetArr.append(setLabel(ix0 + step/2, annotations))
 
     return(feat_df, targetArr)
+    
+    
+    
+    
+#### FEATURE EXTRACTION CLASSES
+
+   
 
 
 #####   FILE CONVERSIONS   #####
