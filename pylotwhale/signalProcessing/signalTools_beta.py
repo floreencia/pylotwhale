@@ -32,6 +32,35 @@ import librosa as lf  # Librosa for audio
 
 warnings.simplefilter('always', DeprecationWarning)
 
+
+def audioFeaturesFun(funName=None):
+    '''
+    Dictionary of feature extracting functions
+    returns a callable
+    ------
+    > feature names (if None)
+    > feature function
+        this functions take the waveform and return an instancited feature matrix
+        m (instances) - rows
+        n (features) - columns
+    '''
+    D = {#'welch' : welchD,
+        #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
+        'spectral' : spectralRep,
+        'spectralDelta' : functools.partial(spectralDspecRep, order=1),
+        'cepstral' : cepstralRep,
+        'cepsDelta' : functools.partial(cepstralDcepRep, order=1), # MFCC and delta-MFCC
+        'cepsDeltaDelta' : functools.partial(cepstralDcepRep, order=2),
+        'chroma' : chromaRep,
+        'melspectroDelta' : melSpecDRep,
+        'melspectro' : functools.partial(melSpecDRep, order=0)
+        }
+
+    if funName in D.keys(): # retuns a list of posible feature names
+        return D[funName]
+    else:
+        return D # returns function name of the asked feature
+
 ###########################################################
 #####           waveform manipulations                #####
 ###########################################################
