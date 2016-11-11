@@ -12,11 +12,12 @@ import sys
 import os
 import functools
 
-from pylotwhale.signalProcessing.signalTools_beta import wav2waveform
+from pylotwhale.signalProcessing.signalTools import wav2waveform, waveformPreprocessingFun, audioFeaturesFun
+
 import pylotwhale.signalProcessing.audioFeatures as auf
 
 import pylotwhale.signalProcessing.effects as eff
-
+from pylotwhale.utils.funTools import compose2
 #import pylotwhale.MLwhales.MLtools_beta as myML
 #import pylotwhale.MLwhales.MLtools_beta as myML
 import MLtools_beta as myML
@@ -462,7 +463,75 @@ def splitCollectionRandomly(collection, trainFraction = 0.75):
     m=len(collection)
     np.random.shuffle(collection)
     return collection[:int(m*trainFraction)], collection[int(m*trainFraction):]    
+
+
+#####feature extraction
+
+def get_transformationFun(funName=None):
+    '''
+    Dictionary of transformations
+    '''
+    D = {}
+    ## waveform --> waveform
+    D.update(waveformPreprocessingFun())
+    ## waveform --> audio features matrix
+    D.update(audioFeaturesFun())
+    ## audio features matrix --> summ clf features
+    D.update(auf.summarisationFun())
+
+    if funName in D.keys():
+        return D[funName]
+    else:
+        return D
+        
+
+class Transformation():
+    """creates a transformation from a settings dictionary 
+    and the name of the transformation bonding: the dictionary, a string 
+    and the callable
+    """
+    def __init__(self, transformation_name, settings_di):
+        assert transformation_name in get_transformationFun().keys(), "trans\
+        formation not recognised"
+        self.name = transformation_name
+        self.settingsDict = settings_di
+        self.string = self.set_transformationStr(self.settingsDict, self.name)
+        self.fun = self.set_transformationFun(self.name, self.settingsDict)
+               
+    def set_transformationStr(self, di, settStr=''):
+        """defines a string with transformation's intructions"""
+        settStr += stringiseDict(di, '')
+        return settStr
     
+    def set_transformationFun(self, Tname, settings, transformationFun=get_transformationFun):
+        """returns the feature extraction callable, ready to use!"""
+        return functools.partial(transformationFun(Tname), **settings)
+
+            
+class transformationsPipeline():
+    """pipeline of Transformations
+    """
+    
+    def __init__(self, transformationsList):
+        self.transformationsList = transformationsList
+        self.string = ''
+        self.fun = lambda x: x
+        for (step, trO) in self.transformationsList:
+            #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
+            self.string = self.appendString(step, trO)
+            self.fun = self.composeTransformation(trO.fun)
+            
+    def appendString(self, step_name, trOb):
+        return self.string + "-{}-{}-{}".format(step_name, trOb.name, trOb.string)
+            
+    def composeTransformation(self, fun):
+        return compose2(fun, self.fun)
+        
+
+
+
+            
+            
     
 class wavFeatureExtraction():
     """class for the extraction of wav features, statring from a dictionary of settings
