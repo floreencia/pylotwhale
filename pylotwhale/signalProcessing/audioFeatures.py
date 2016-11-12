@@ -83,6 +83,70 @@ def flatPartition(nSlices, vec_size):
     return np.array([int(item) for item in idx])
 
 
+def time2indexes(t_0, t_f, tIntervals_arr):
+    """maps time stamps to indices, to be used to convert annotations
+    into instance labels
+    Parameters
+    ----------
+    t_0: float
+         initial time stamp
+    t_f: float,
+        final time stamp
+    tIntervals_arr: ndarray (<#instances>, )
+        array with the time intervals, see annotations2instanceArray
+    Returns
+    -------
+    i_0, i_f : int
+        section indices
+    """
+    idx_arr = np.where(np.logical_and(tIntervals_arr >= t_0,
+                                      tIntervals_arr <= t_f))[0]
+    if len(idx_arr) > 0:
+        return idx_arr[0], idx_arr[-1]
+    else:
+        idx_arr = np.where(tIntervals_arr >= t_0)[0]
+        return idx_arr[0], idx_arr[0]
+
+
+def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
+    """reads annotations into m-instances labels array
+    Parameters
+    ----------
+    T: ndarray (m, 2), float
+        time intervals
+    L: ndarray (m,) str
+        labesl
+    m: int
+        number of instances
+    labelsHierarchy: list like object
+        hierarchy of the annotations in case of overlaps.
+        Only one label per instance, eg = ['c', 'w']
+    gaps: sting,
+        label for the gaps
+    Returns
+    -------
+    labels_arr: ndarray (m, )
+        array with the instance labels
+    """
+    labels_arr = np.array([gaps]*m)   # inicialise array
+    assert(len(T) == len(L)), "T and L must match in length"
+    tIntervals_arr = np.linspace(0, tf, m)
+    #assert labelsSet = set(labelsHierarchy)
+    ## overwrite sections hierarchically
+    for l in labelsHierarchy[::-1]:  # for each label
+        indices = np.where(L == l)[0]
+        for i in indices:
+            t_0, t_f = T[i, :]  # get time itervals
+            assert t_f > t_0, "time intervals should be positive"
+            i_0, i_f = time2indexes(t_0, t_f, tIntervals_arr)
+            labels_arr[i_0: i_f + 1] = l  # overwrite
+
+    return labels_arr
+
+
+
+
+
 def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
     '''
     extracts the labels from an annotations file and retuns a list filling all time gaps
@@ -115,7 +179,7 @@ def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
 
 def findLabel( stamp, stampLabelTu, i=0):
     '''
-    Returns the label asociated with the given (time)stamp
+    Returns the label associated with the given (time) stamp
     searching in the stampLabelTu
     Parameters:
     -----------
