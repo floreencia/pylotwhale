@@ -83,7 +83,7 @@ def flatPartition(nSlices, vec_size):
     return np.array([int(item) for item in idx])
 
 
-def time2indexes(t_0, t_f, tIntervals_arr):
+def time2indices(t_0, t_f, tIntervals_arr):
     """maps time stamps to indices, to be used to convert annotations
     into instance labels
     Parameters
@@ -138,7 +138,7 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
         for i in indices:
             t_0, t_f = T[i, :]  # get time itervals
             assert t_f > t_0, "time intervals should be positive"
-            i_0, i_f = time2indexes(t_0, t_f, tIntervals_arr)
+            i_0, i_f = time2indices(t_0, t_f, tIntervals_arr)
             labels_arr[i_0: i_f + 1] = l  # overwrite
 
     return labels_arr
