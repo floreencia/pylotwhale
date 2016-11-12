@@ -155,7 +155,7 @@ def predictAnnotations(waveform, fs, feExFun, lt, clf, annSections='default'):
         annSections = ['c']
 
     tf = 1.0*len(waveform)/fs    
-    M0, _, featN, fExStr =  feExFun(waveform, fs)#, annotations=annotLi_t)
+    M0 = feExFun(waveform)  #, annotations=annotLi_t)
     y_pred = clf.predict(M0)
     T, labels = annT.predictions2annotations(lt.num2nom(y_pred), tf)
     return T, labels     
