@@ -16,7 +16,7 @@ import pandas as pd
 from sklearn.preprocessing import scale, maxabs_scale, minmax_scale
 
 from scipy.io import wavfile
-import librosa as lf  # Librosa for audio
+import librosa  # Librosa for audio
 
 #import scikits.audiolab as al
 
@@ -57,6 +57,7 @@ def waveformPreprocessingFun(funName=None):
     else:
         return D
 
+
 def audioFeaturesFun(funName=None):
     '''
     Dictionary of feature extracting functions
@@ -77,7 +78,8 @@ def audioFeaturesFun(funName=None):
         'cepsDeltaDelta' : functools.partial(cepstral_nDdelta, order=2),
         'chroma' : chromogram,
         'melspectroDelta' : melSpectral_nDelta,
-        'melspectro' : functools.partial(melSpectral_nDelta, order=0)
+        'melspectro' : functools.partial(melSpectral_nDelta, order=0),
+        'rms': librosa.feature.rmse
         }
 
     if funName in D.keys(): # retuns a list of posible feature names
@@ -158,7 +160,7 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     #print(len(intensity_grid), len(y_template))
     Y = np.zeros((len(shift_grid), len(y_template)))
     for i in range(len(shift_grid)):
-        Y[i,:] = lf.effects.pitch_shift(y_template, fs, shift_grid[i])
+        Y[i,:] = librosa.effects.pitch_shift(y_template, fs, shift_grid[i])
         #y_template + intensity_grid[i]*tileTillN(y_add, len(y_template), np.random.randint(0,len(y_template)))
     
     return Y    
@@ -176,7 +178,7 @@ def generateTimeStreachEnsemble(y_template, streach_grid=None):
     #print(len(intensity_grid), len(y_template))
     Y = []#np.zeros((len(streach_grid), len(streach_grid)))
     for i in range(len(streach_grid)):
-        Y.append(lf.effects.time_stretch(y_template, streach_grid[i]))
+        Y.append(librosa.effects.time_stretch(y_template, streach_grid[i]))
     
     return Y 
 
@@ -502,7 +504,7 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
     Nceps = int(Nceps)
     paramStr = '-Nceps%d'%(Nceps)
     ## CEPSTROGRAM
-    M0 = lf.feature.mfcc(waveform, sr=sRate, n_mels=n_mels, n_mfcc=Nceps, 
+    M0 = librosa.feature.mfcc(waveform, sr=sRate, n_mels=n_mels, n_mfcc=Nceps, 
                          n_fft=NFFT, hop_length=hopSz)#, hop_length=hopSz)
     m = np.shape(M0)[1]
     M=np.zeros((Nceps*(order+1), m))
@@ -545,7 +547,7 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
     n_mels = int(n_mels)			
 
     ## CEPSTROGRAM
-    Mc = lf.feature.melspectrogram(waveform, sr=sRate, n_mels=n_mels,
+    Mc = librosa.feature.melspectrogram(waveform, sr=sRate, n_mels=n_mels,
                                    n_fft=NFFT, hop_length=hopSz)
     Mc_log = np.log(Mc)
     M = Mc.copy()
@@ -589,7 +591,7 @@ def chromogram(waveform, sRate, C=None, hop_length=512, fmin=None,
     ## settings
 								
     #y_harmonic, y_percussive = librosa.effects.hpss(y)
-    C = lf.feature.chroma_cqt(y=waveform, sr=sRate, C=C, hop_length=hop_length,
+    C = librosa.feature.chroma_cqt(y=waveform, sr=sRate, C=C, hop_length=hop_length,
 			fmin=fmin, threshold=threshold, tuning=tuning,
 			n_chroma=n_chroma, n_octaves=n_octaves, window=window,
 			bins_per_octave=bins_per_octave, mode=mode)
@@ -612,7 +614,7 @@ def delta(M, width=9, order=1, axis=0, trim=True):
     trim      : bool
         set to `True` to trim the output matrix to the original size.
     """
-    dM = lf.feature.delta(M, width=width, order=order, axis=axis, trim=trim)
+    dM = librosa.feature.delta(M, width=width, order=order, axis=axis, trim=trim)
     return dM
 
 
