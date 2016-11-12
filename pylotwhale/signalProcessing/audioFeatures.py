@@ -99,6 +99,8 @@ def time2indices(t_0, t_f, tIntervals_arr):
     i_0, i_f : int
         section indices
     """
+    assert t_0 >= tIntervals_arr[0], "time sections should be within recording time (0, tf)"
+    assert t_f <= tIntervals_arr[-1], "time sections should be within recording time (0, tf)"
     idx_arr = np.where(np.logical_and(tIntervals_arr >= t_0,
                                       tIntervals_arr <= t_f))[0]
     if len(idx_arr) > 0:
@@ -130,11 +132,13 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     """
     labels_arr = np.array([gaps]*m)   # inicialise array
     assert(len(T) == len(L)), "T and L must match in length"
+    assert isinstance( T, np.ndarray), "must be an ndarray"
+    assert isinstance( L, np.ndarray), "must be an ndarray"
+
     tIntervals_arr = np.linspace(0, tf, m)
     #assert labelsSet = set(labelsHierarchy)
     ## overwrite sections hierarchically
     for l in labelsHierarchy[::-1]:  # for each label
-        print(l)
         indices = np.where(L == l)[0]
         for i in indices:
             t_0, t_f = T[i, :]  # get time itervals
