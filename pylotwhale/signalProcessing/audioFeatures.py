@@ -134,6 +134,7 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     #assert labelsSet = set(labelsHierarchy)
     ## overwrite sections hierarchically
     for l in labelsHierarchy[::-1]:  # for each label
+        print(l)
         indices = np.where(L == l)[0]
         for i in indices:
             t_0, t_f = T[i, :]  # get time itervals

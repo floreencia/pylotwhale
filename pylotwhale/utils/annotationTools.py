@@ -21,12 +21,12 @@ def anns2array(annF):
     
 def loadAnnLabels(fi, cols=(2,)):
     """Loads labels from annotations file (3rd column)"""
-    return np.loadtxt(fi, dtype=str, usecols=cols)
+    return np.loadtxt(fi, dtype=str, usecols=cols, ndmin=1)
     
     
 def anns2TLndarrays(fi):
     """like anns2arraybut returns 2 ndarrays T (n, 2) and L (n,)"""
-    T = np.loadtxt(fi, usecols=(0,1))
+    T = np.loadtxt(fi, usecols=(0,1), ndmin=2)
     L = loadAnnLabels(fi)
     return T, L
     
