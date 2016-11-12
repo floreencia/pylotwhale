@@ -305,7 +305,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     
 ### whale sound detector
     
-def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, wavPreprocessingT=None):
+def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None):
     """
     !!!! split it into wavAnn2datXy + a for loop that does it for the whole collection
     !!!! see wavAnn2secionsXy and wavAnnCollection2sectionsXy
@@ -332,17 +332,16 @@ def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, wavPreprocessingT=
     if isinstance(featExtFun, dict):
         #!!! featExtFun = wavFeatureExtractionWalk(featExtFun).featExtrFun()
         featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
-    if not callable(wavPreprocessingT): 
-        wavPreprocessingT = lambda x, y : x
-        
+
     datO = myML.dataXy_names() #inicialize data object
 
     for wavF, annF in WavAnnCollection:
         waveForm, fs = wav2waveform(wavF, normalize=False)
-        waveForm = wavPreprocessingT(waveForm, fs)
+        tf = len(waveForm)/fs
+        M =  featExtFun(waveForm)
         annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
-        M0, y0_names,  _, _ =  featExtFun(waveForm, fs, annotations=annotLi_t)
-        datO.addInstances(M0, y0_names) 
+        y0_names = auf.tuLi2frameAnnotations(annotLi_t, np.shape(M)[0], tf)
+        datO.addInstances(M, y0_names) 
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
 
     return datO
@@ -522,7 +521,7 @@ class TransformationsPipeline():
             self.fun = self.composeTransformation(trO.fun)
 
     def appendString(self, step_name, trOb):
-        return self.string + "-{}-{}-{}".format(step_name, trOb.name, trOb.string)
+        return self.string + "-{}-{}".format(step_name, trOb.string)
 
     def composeTransformation(self, fun):
         return compose2(fun, self.fun)
