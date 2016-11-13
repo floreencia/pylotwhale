@@ -1,6 +1,6 @@
 #!/usr/mprg/bin/python
 
-from __future__ import print_function
+from __future__ import print_function, division
 import numpy as np
 import scipy.io.arff as arff
 import matplotlib
@@ -18,6 +18,8 @@ import sys
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools_beta as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
+import pylotwhale.MLwhales.MLtools_beta as myML
+
 
 import featureExtraction as fex
 
@@ -87,7 +89,7 @@ def _bestCVScoresfromGridSearch(gs):
     return np.mean(cv_max ), np.std(cv_max )
 
 
-def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
+def printScoresFromCollection(feExFun, clf, lt, collFi, fileName, labelsHierarchy):
     """
     clf : classifier
     le : label encoder (object)
@@ -97,18 +99,22 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
     for wavF, annF in coll[:]:
         waveForm, fs = sT.wav2waveform(wavF)
+        tf = len(waveForm)/fs
 
         annF_bN = os.path.basename(annF)
         annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
 
-        M0, y0_names, featN, fExStr =  feExFun(waveForm, fs, annotations=annotLi_t)
-        datO = dataXy_names(M0, y0_names)
+        M0 = feExFun(waveForm)
+        m = len(M0)
+        y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
+        datO = myML.dataXy_names(M0, y0_names)
         A, a_names = datO.filterInstances(lt.classes_)
         a = lt.nom2num(a_names)
         
         scsO = clfScoresO(clf, A, a)
         with open(fileName, 'a') as f:
             f.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
+
         
 
 def clfGeneralizability(clf_list, wavAnnCollection, featExtFun, labelEncoder, labelSet=None):

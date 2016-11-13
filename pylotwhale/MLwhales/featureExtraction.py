@@ -15,6 +15,7 @@ import functools
 from pylotwhale.signalProcessing.signalTools import wav2waveform, waveformPreprocessingFun, audioFeaturesFun
 
 import pylotwhale.signalProcessing.audioFeatures as auf
+import pylotwhale.utils.annotationTools as annT
 
 import pylotwhale.signalProcessing.effects as eff
 from pylotwhale.utils.funTools import compose2
@@ -305,7 +306,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     
 ### whale sound detector
     
-def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None):
+def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, labelsHierarchy='default'):
     """
     !!!! split it into wavAnn2datXy + a for loop that does it for the whole collection
     !!!! see wavAnn2secionsXy and wavAnnCollection2sectionsXy
@@ -329,28 +330,27 @@ def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None):
     ------    
     > datO :  a file with the paths to the features and their labels
     """   
-    if isinstance(featExtFun, dict):
+    if labelsHierarchy == 'default':
+        labelsHierarchy = ['c']
         #!!! featExtFun = wavFeatureExtractionWalk(featExtFun).featExtrFun()
-        featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
+        #featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
 
     datO = myML.dataXy_names() #inicialize data object
 
     for wavF, annF in WavAnnCollection:
         waveForm, fs = wav2waveform(wavF, normalize=False)
         tf = len(waveForm)/fs
-        M =  featExtFun(waveForm)
-        annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
-        y0_names = auf.tuLi2frameAnnotations(annotLi_t, np.shape(M)[0], tf)
+        M = featExtFun(waveForm)
+        #annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
+        #y0_names = auf.tuLi2frameAnnotations(annotLi_t, np.shape(M)[0], tf)
+        m=len(M)
+        y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
         datO.addInstances(M, y0_names) 
-        #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
 
     return datO
-    
 
-    
-    
 
-    
+
 ##### READ DATA FILES #####
 
 def readCols(fName, colIndexes, sep='\t'):

@@ -669,7 +669,7 @@ def _bestCVScoresfromGridSearch(gs, mu_max=0):
     return np.mean(cv_max ), np.std(cv_max )
 
 
-def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
+def printScoresFromCollection(feExFun, clf, lt, collFi, fileName, labelsHierarchy):
     """
     clf : classifier
     le : label encoder (object)
@@ -680,11 +680,14 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, fileName):
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
     for wavF, annF in coll[:]:
         waveForm, fs = sT.wav2waveform(wavF)
+        tf = len(waveForm)/fs
 
         annF_bN = os.path.basename(annF)
         annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
 
-        M0, y0_names, featN, fExStr =  feExFun(waveForm, fs, annotations=annotLi_t)
+        M0 = feExFun(waveForm)
+        m = len(M0)
+        y0_names = annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
         datO = dataXy_names(M0, y0_names)
         A, a_names = datO.filterInstances(lt.classes_)
         a = lt.nom2num(a_names)
