@@ -117,28 +117,32 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     T: ndarray (m, 2), float
         time intervals
     L: ndarray (m,) str
-        labesl
+        labels
     m: int
         number of instances
     labelsHierarchy: list like object
         hierarchy of the annotations in case of overlaps.
         Only one label per instance, eg = ['c', 'w']
-    gaps: sting,
+    gaps: string,
         label for the gaps
     Returns
     -------
     labels_arr: ndarray (m, )
         array with the instance labels
     """
-    labels_arr = np.array([gaps]*m)   # inicialise array
+    labels_arr = np.array([gaps]*m, dtype=object)   # inicialise array
     assert(len(T) == len(L)), "T and L must match in length"
     assert isinstance( T, np.ndarray), "must be an ndarray"
     assert isinstance( L, np.ndarray), "must be an ndarray"
+    
+    ## Define labels order, first those not in the hierarchy
+    labelOrder = list(set(L) - set(labelsHierarchy)) \
+                + labelsHierarchy[::-1]
 
     tIntervals_arr = np.linspace(0, tf, m)
     #assert labelsSet = set(labelsHierarchy)
     ## overwrite sections hierarchically
-    for l in labelsHierarchy[::-1]:  # for each label
+    for l in labelOrder:  # for each label
         indices = np.where(L == l)[0]
         for i in indices:
             t_0, t_f = T[i, :]  # get time itervals
