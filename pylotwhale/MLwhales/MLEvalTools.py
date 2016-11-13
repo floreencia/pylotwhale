@@ -29,7 +29,7 @@ from sklearn import preprocessing
 from sklearn.externals import joblib
 #from sklearn.learning_curve import learning_curve
 from sklearn.model_selection import learning_curve
-from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
+from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix, classification_report
 
 
 #import time 
@@ -89,7 +89,7 @@ def _bestCVScoresfromGridSearch(gs):
     return np.mean(cv_max ), np.std(cv_max )
 
 
-def printScoresFromCollection(feExFun, clf, lt, collFi, fileName, labelsHierarchy):
+def printScoresFromCollectionFile(feExFun, clf, lt, collFi, fileName, labelsHierarchy):
     """
     clf : classifier
     le : label encoder (object)
@@ -97,24 +97,50 @@ def printScoresFromCollection(feExFun, clf, lt, collFi, fileName, labelsHierarch
     of : out file (*.txt)
     """
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+    printScoresFromCollection(feExFun, clf, lt, coll, fileName, labelsHierarchy)
+
+def getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy):
+    """
+    extracts features and its labels (ground truth) from wavF and annF files
+    and compares the clf predictions with the ground truth
+    Parameters
+    ----------
+    wavF: str
+    annF: str
+    feExFun: callable
+    clf : classifier
+    le : label encoder (object)
+    labelsHierarchy: list
+    """
+     #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+    waveForm, fs = sT.wav2waveform(wavF)
+    tf = len(waveForm)/fs
+
+    #  annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
+
+    M0 = feExFun(waveForm)
+    m = len(M0)
+    y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
+    datO = myML.dataXy_names(M0, y0_names)
+    A, a_names = datO.filterInstances(lt.classes_)
+    a = lt.nom2num(a_names)
+    return clfScoresO(clf, A, a)
+
+def printScoresFromCollection(feExFun, clf, lt, coll, of, labelsHierarchy):
+    """
+    clf : classifier
+    le : label encoder (object)
+    coll: list,
+        wav ann colection [(wav_file, ann_file), (wav_file, ann_file), ...]
+    of : out file (*.txt)
+    """
+     #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+
     for wavF, annF in coll[:]:
-        waveForm, fs = sT.wav2waveform(wavF)
-        tf = len(waveForm)/fs
-
-        annF_bN = os.path.basename(annF)
-        annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
-
-        M0 = feExFun(waveForm)
-        m = len(M0)
-        y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
-        datO = myML.dataXy_names(M0, y0_names)
-        A, a_names = datO.filterInstances(lt.classes_)
-        a = lt.nom2num(a_names)
-        
-        scsO = clfScoresO(clf, A, a)
-        with open(fileName, 'a') as f:
+        scsO = getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy)
+        annF_bN = os.path.basename(annF)        
+        with open(of, 'a') as f:
             f.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
-
         
 
 def clfGeneralizability(clf_list, wavAnnCollection, featExtFun, labelEncoder, labelSet=None):
@@ -351,6 +377,8 @@ class clfScoresO():
         R = self.recc
         self.f1 = np.array([2.*R[i]*P[i]/(P[i]+R[i]) for i in range(len(P))])
         
+        self.get_clf_report = self.clf_report(self.y, self.y_pred)#, target_names=self.classes)
+        
     def scores2str(self, fln=3, dgt=5):
         '''
         returns a string with the score of a classifier
@@ -372,7 +400,9 @@ class clfScoresO():
     def plConfusionMatrix(self, labels, outFig='', figsize=None):
         
         plConfusionMatrix(self.cM, labels, outFig=outFig, figsize=figsize)
-
+        
+    def clf_report(self, y_true, y_pred, target_names=None, **kwargs):
+        return classification_report(y_true, y_pred, target_names=target_names)
 
                
 #########################################################
