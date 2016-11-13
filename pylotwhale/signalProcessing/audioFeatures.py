@@ -148,8 +148,12 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
 
     return labels_arr
 
-
-
+def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
+    """reads annotations from file into instances"""
+    if labelsHierarchy is None:
+        labelsHierarchy = ['c', 'w'] 
+    T, L = annT.anns2TLndarrays(annFi)  
+    return annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
 
 
 def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
