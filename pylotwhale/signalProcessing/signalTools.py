@@ -454,7 +454,8 @@ def spectral_nDelta(waveform, sRate, NFFT=2**9, overlap=0.5, winN='hanning',
 #####                 cepstrograms                    #####
 ###########################################################
 
-def cepstral(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128):
+def cepstral(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
+             **kwargs):
     """
     Extracts the spectral features from a waveform
     Parameters:
@@ -474,10 +475,10 @@ def cepstral(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_
     ## settings																
 
     return cepstral_nDdelta(waveform, sRate, NFFT=NFFT, overlap=overlap, Nceps=Nceps,
-                logSc=logSc, order=0, n_mels=n_mels)
+                logSc=logSc, order=0, n_mels=n_mels, **kwargs)
 
 def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
-                order=1, logSc=True, n_mels=128):
+                order=1, logSc=True, n_mels=128, **kwargs):
 
     """
     cepstral feature matrix and the delta orders horizontaly appended
@@ -505,7 +506,7 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
     paramStr = '-Nceps%d'%(Nceps)
     ## CEPSTROGRAM
     M0 = librosa.feature.mfcc(waveform, sr=sRate, n_mels=n_mels, n_mfcc=Nceps, 
-                         n_fft=NFFT, hop_length=hopSz)#, hop_length=hopSz)
+                         n_fft=NFFT, hop_length=hopSz, **kwargs)#, hop_length=hopSz)
     m = np.shape(M0)[1]
     M=np.zeros((Nceps*(order+1), m))
     M[:Nceps, :] = M0
@@ -521,7 +522,7 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
 
 
 def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
-                order=1, logSc=True):
+                       order=1, logSc=True, **kwargs):
 
     """
     melspectrum Feature Matrix and the delta orders horizontaly appended
@@ -548,7 +549,7 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
 
     ## CEPSTROGRAM
     Mc = librosa.feature.melspectrogram(waveform, sr=sRate, n_mels=n_mels,
-                                   n_fft=NFFT, hop_length=hopSz)
+                                   n_fft=NFFT, hop_length=hopSz, **kwargs)
     Mc_log = np.log(Mc)
     M = Mc.copy()
     if logSc: M = np.log(M)

@@ -46,7 +46,7 @@ def predictSoundSections(wavF, clf, lt, feExFun,
         outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
 
     waveForm, fs = sT.wav2waveform(wavF)
-    return predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
+    return predictSectionsFromWaveform_genAnnotations(waveForm, fs, clf, lt, feExFun,
                                        outF=outF, annSections=annSections)
 
 
@@ -75,7 +75,7 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, o
         annSections = ['c']
 
     tf = 1.0*len(waveform)/fs    
-    M0, _, featN, fExStr =  feExFun(waveform, fs)#, annotations=annotLi_t)
+    M0 =  feExFun(waveform)#, annotations=annotLi_t)
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
     return outF

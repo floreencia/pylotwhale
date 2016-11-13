@@ -525,6 +525,14 @@ class TransformationsPipeline():
 
     def composeTransformation(self, fun):
         return compose2(fun, self.fun)
+        
+def makeTransformationsPipeline(settings):
+    """settings: list
+        ["step_name", ("transformation_name", settingsDict)]"""
+    transformationsList = []
+    for s, (tn, sD) in settings:
+        transformationsList.append((s, Transformation(tn, sD)))
+    return TransformationsPipeline(transformationsList)
 
 
 class wavFeatureExtraction():
