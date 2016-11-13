@@ -25,11 +25,27 @@ def loadAnnLabels(fi, cols=(2,)):
     
     
 def anns2TLndarrays(fi):
-    """like anns2arraybut returns 2 ndarrays T (n, 2) and L (n,)"""
+    """like anns2array but returns 2 ndarrays T (n, 2) and L (n,)"""
     T = np.loadtxt(fi, usecols=(0,1), ndmin=2)
     L = loadAnnLabels(fi)
     return T, L
     
+def save_TLannotations(T, L, outF, opening_mode='w'):
+    """saves T, L as an annotations file"""
+    
+    assert len(T) == len(L), "T and L must match in length"
+
+    if opening_mode == 'w':
+        try:
+            os.remove(outF)
+        except OSError:
+            pass
+        
+    with open(outF, opening_mode) as f:  # new annotations
+        for i in np.arange(len(L)):  # print new annotations
+            f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(T[i, 0],
+                    T[i, 1], L[i]))
+    return outF
     
 def parseAupFile(inFilename, sep='.'):
     """ 
