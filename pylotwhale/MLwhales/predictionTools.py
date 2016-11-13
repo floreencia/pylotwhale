@@ -5,7 +5,7 @@ Created on Wed Nov 25 17:13:27 2015
 @author: florencia
 """
 
-from __future__ import print_function, division # py3 compatibility
+from __future__ import print_function, division  # py3 compatibility
 #import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,7 @@ import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.utils.annotationTools as annT
 import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.signalProcessing.audioFeatures as auf
-
+import pylotwhale.utils.annotationTools as annT
 
 
 ### split
@@ -119,11 +119,9 @@ def WSD2predictions(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
             T, L = predictAnnotations(thisWaveform, fs, feExtFun, lt,
                                       WSD2_clf,
                                       annSections=keepSections)
-            with open(outF, 'a') as f:  # new annotations
-                newT = T + t0i - dt  # relative to the orginal ann sections
-                for i in np.arange(len(L)):  # print new annotations
-                    f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(newT[i, 0],
-                            newT[i, 1], L[i]))
+            newT = T + t0i - dt  # relative to the orginal ann sections
+
+            outF = annT.save_TLannotations(newT, L, outF, opening_mode='a')
     return outF
     
     
