@@ -27,72 +27,161 @@ import pylotwhale.utils.whaleFileProcessing as fp
 from pylotwhale.utils.dataTools import stringiseDict
 
 
-def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
-                                  featExtFun=None):
+#### WAV-ANNS
+### Extract features
+
+            
+def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     """
-    Computes and saves the features of a collection of annotated wavs.
-    The features are saved in the outDir and alongside an index file is created with
-    the paths to the features and the labels.
+    extracts features and its labels (ground truth) from wavF and annF files
+    and returns its dataXy_names instance
+    ----------
+    wavF: str
+    annF: str
+    feExFun: callable
+    labelsHierarchy: list
+    """
+     #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+    waveForm, fs = sT.wav2waveform(wavF)
+    tf = len(waveForm)/fs
 
-    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+    M0 = feExFun(waveForm)
+    m = len(M0)
+    y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
+    datO = myML.dataXy_names(M0, y0_names)
+    return datO
 
+def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None):
+    """Extract features from wavfile and labels from annotations
+    returns feature matrix (X) and labels (y_names)"""
+
+    datO = get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy)
+    X, y_names = datO.filterInstances(filter_classes)
+    return X, y_names
+                 
+
+
+def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
+    """
+    Extracts features and labels from wav-ann collction    
     Parameters
     ----------
-    < collectionList : list of tuples with the wav - annotation files
-                        tu[0] : path to wav file
-                        tu[1] : path to annotation file
-    < outdir : dir where the features will be saved
-    < featExtFun : the feature extraction function
-                    OR a dictionary with the feature extraction settings
-                    featureExtrationParams = dict(zip(i, i))
-    < indexFile :  file ith the paths to the featues and the labels
+    WavAnnCollection: list of tuples
+        [(<path to wavF>, <path to annF>), ...]
+    feExFun: callable
+        feature extraction functioN
+    labelsHierarchy: list
+        labels in hierarchical order for setting the label of the instances
 
     Return
-    ------
-    > indexFile :  a file with the paths to the features and their labels
-    """
-    ### out dir
-    if not os.path.isdir(outDir):
-        #os.remove( outDir ) # delet if already exists
-        os.mkdir(outDir)
-    ## index file
-    if indexFile == 'default':
-        indexFile = os.path.join(outDir, 'indexFile.txt')
-    if os.path.isfile(indexFile):
-        os.remove(indexFile)  # delet if already exists
+    ------    
+    > datO :  a file with the paths to the features and their labels
+    """   
+    if labelsHierarchy == 'default':
+        labelsHierarchy = ['c']
 
-    ### feature extraction settings
-    if not callable(featExtFun): # dictionary or None (defaul parameters)
-        fexO=wavFeatureExtractionSplit(featExtFun)
-        featExtFun = fexO.featExtrFun() # default
-        featStr = fexO.feature_str
+    datO = myML.dataXy_names() #inicialize data object
+
+    for wavF, annF in WavAnnCollection:
+        X, y0_names = getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, 
+                                         filter_classes=None)
+        datO.addInstances(X, y0_names) 
+
+    return datO
+
+
+####### TRANSFORMERS
+##### Feature extraction classes
+
+def get_transformationFun(funName=None):
+    '''
+    Dictionary of transformations
+    '''
+    D = {}
+    ## waveform --> waveform
+    D.update(waveformPreprocessingFun())
+    ## waveform --> audio features matrix
+    D.update(audioFeaturesFun())
+    ## audio features matrix --> summ clf features
+    D.update(auf.summarisationFun())
+
+    if funName in D.keys():
+        return D[funName]
     else:
-        featStr='featureExtractionCallable'
+        return D
         
-    ### extract and save features for each annotated section
-    for wavF, annF in collectionList: #  wav file loop
-        bN = os.path.splitext(os.path.basename(wavF))[0]
-        datO = wavAnn2sectionsXy(wavF, annF, featExtFun=None) # data object
-        for i in range(datO.m_instances): # ann-section loop --> save features
-            bN += '.%d_%s'%(i, datO.y_labels[i])
-            outFile = os.path.join(outDir, bN)
-            np.save(outFile, datO.X[i])
-            # write in index file
-            with open(indexFile, 'a') as g:
-                g.write("%s\t%s\n"%(outFile+'.npy', datO.y_labels[i]))
-                    
-    ### write the feature-extraction-especifications at the bigining of the index file
-    with open(indexFile, "r+") as f:
-        old = f.read() # read everything in the file
-        f.seek(0) # rewind
-        f.write("#%s\n%s"%(featStr, old))
+
+class Transformation():
+    """creates a transformation from a settings dictionary 
+    and the name of the transformation bonding: the dictionary, a string 
+    and the callable
+    """
+    def __init__(self, transformation_name, settings_di):
+        assert transformation_name in get_transformationFun().keys(), "trans\
+        formation not recognised"
+        self.name = transformation_name
+        self.settingsDict = settings_di
+        self.string = self.set_transformationStr(self.settingsDict, self.name)
+        self.fun = self.set_transformationFun(self.name, self.settingsDict)
+
+    def set_transformationStr(self, di, settStr=''):
+        """defines a string with transformation's intructions"""
+        settStr += stringiseDict(di, '')
+        return settStr
+
+    def set_transformationFun(self, Tname, settings,
+                              transformationFun=get_transformationFun):
+        """returns the feature extraction callable, ready to use!"""
+        return functools.partial(transformationFun(Tname), **settings)
+
+
+class TransformationsPipeline():
+    """pipeline of Transformations
+    """
+
+    def __init__(self, transformationsList):
+        self.transformationsList = transformationsList
+        self.string = ''
+        self.fun = lambda x: x
+        for (step, trO) in self.transformationsList:
+            #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
+            self.string = self.appendString(step, trO)
+            self.fun = self.composeTransformation(trO.fun)
+
+    def appendString(self, step_name, trOb):
+        return self.string + "-{}-{}".format(step_name, trOb.string)
+
+    def composeTransformation(self, fun):
+        return compose2(fun, self.fun)
+        
+def makeTransformationsPipeline(settings):
+    """settings: list
+        ["step_name", ("transformation_name", settingsDict)]"""
+    transformationsList = []
+    for s, (tn, sD) in settings:
+        transformationsList.append((s, Transformation(tn, sD)))
+    return TransformationsPipeline(transformationsList)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-    return indexFile
-    
-### call type classification    
+### OLD CODE call type classification    
     
 def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
     """
+    !!!! DEPRECATED: use get_DataXy_fromWavFannF
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
 
@@ -133,6 +222,8 @@ def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
     
 def wavAnnCollection2sectionsXy(wavAnnColl, featExtFun=None):
     """
+    !!!! DEPRECATED: use get_DataXy_fromWavFannF
+
     Computes the X, y for a collection of annotated wav files
     for each annotated section in the wav file
     ment to be used with feature extraction 'split' 
@@ -155,14 +246,17 @@ def wavAnnCollection2sectionsXy(wavAnnColl, featExtFun=None):
 
     datO_test = myML.dataXy_names() 
 
-    for wF, annF in wavAnnColl[:]:
-        datO_test_new = wavAnn2sectionsXy( wF, annF, featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
+    for wavF, annF in wavAnnColl[:]:
+        #datO_test_new = wavAnn2sectionsXy( wF, annF, featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
+        datO_test_new = wavAnn2sectionsXy( wavF, annF, featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
         datO_test.addInstances(datO_test_new.X, datO_test_new.y_names )
     
     return datO_test
     
 def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
     """
+        !!!! DEPRECATED: use get_DataXy_fromWavFannF
+
     Computes the Xy-data-object and save it as a dictionary, 
     using the wavF and annF as dictionary keys,
     for a collection of annotated wav files
@@ -194,6 +288,8 @@ def wavAnnCollection2XyDict(wavAnnColl, featExtFun=None):
     
 def XyDict2XyO(XyDict):
     '''
+        !!!! DEPRECATED: use get_DataXy_fromWavFannF
+
     Transforms a dictionary of Xy into an X, y object
     '''    
     datO = myML.dataXy_names() 
@@ -207,6 +303,8 @@ def XyDict2XyO(XyDict):
 def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocessingT=None,
                                ensembleSettings=None):
     """
+        !!!! DEPRECATED: use get_DataXy_fromWavFannF
+
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
 
@@ -306,48 +404,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     
 ### whale sound detector
     
-def wavAnnCollection2datXy(WavAnnCollection, featExtFun=None, labelsHierarchy='default'):
-    """
-    !!!! split it into wavAnn2datXy + a for loop that does it for the whole collection
-    !!!! see wavAnn2secionsXy and wavAnnCollection2sectionsXy
-    
-    returns the data object of a collection of annotated wavs.
-            
-        ( •_•)O*¯`·. whale sound detector (classification) .·´¯`°Q(•_• )
 
-    
-    Parameters
-    ----------
-    < WavAnnCollection : list of tuples with the wav - annotation files
-                        tu[0] : path to wav file
-                        tu[1] : path to annotation file
-    < featureExtractionFun : feature extraction function OR
-                            dictionary with the feature extraction settings
-    < wavPreprocessingT : waveform preorocessing function
-                            eg. filter
-
-    Return
-    ------    
-    > datO :  a file with the paths to the features and their labels
-    """   
-    if labelsHierarchy == 'default':
-        labelsHierarchy = ['c']
-        #!!! featExtFun = wavFeatureExtractionWalk(featExtFun).featExtrFun()
-        #featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
-
-    datO = myML.dataXy_names() #inicialize data object
-
-    for wavF, annF in WavAnnCollection:
-        waveForm, fs = wav2waveform(wavF, normalize=False)
-        tf = len(waveForm)/fs
-        M = featExtFun(waveForm)
-        #annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
-        #y0_names = auf.tuLi2frameAnnotations(annotLi_t, np.shape(M)[0], tf)
-        m=len(M)
-        y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
-        datO.addInstances(M, y0_names) 
-
-    return datO
 
 
 
@@ -463,78 +520,76 @@ def splitCollectionRandomly(collection, trainFraction = 0.75):
     return collection[:int(m*trainFraction)], collection[int(m*trainFraction):]    
 
 
-#####feature extraction
+            
+            
+            
+            
+##OLD
 
-def get_transformationFun(funName=None):
-    '''
-    Dictionary of transformations
-    '''
-    D = {}
-    ## waveform --> waveform
-    D.update(waveformPreprocessingFun())
-    ## waveform --> audio features matrix
-    D.update(audioFeaturesFun())
-    ## audio features matrix --> summ clf features
-    D.update(auf.summarisationFun())
+def wavAnnCollection2featureFiles(collectionList, outDir, indexFile='default',
+                                  featExtFun=None):
+    """
+    Computes and saves the features of a collection of annotated wavs.
+    The features are saved in the outDir and alongside an index file is created with
+    the paths to the features and the labels.
 
-    if funName in D.keys():
-        return D[funName]
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+
+    Parameters
+    ----------
+    < collectionList : list of tuples with the wav - annotation files
+                        tu[0] : path to wav file
+                        tu[1] : path to annotation file
+    < outdir : dir where the features will be saved
+    < featExtFun : the feature extraction function
+                    OR a dictionary with the feature extraction settings
+                    featureExtrationParams = dict(zip(i, i))
+    < indexFile :  file ith the paths to the featues and the labels
+
+    Return
+    ------
+    > indexFile :  a file with the paths to the features and their labels
+    """
+    ### out dir
+    if not os.path.isdir(outDir):
+        #os.remove( outDir ) # delet if already exists
+        os.mkdir(outDir)
+    ## index file
+    if indexFile == 'default':
+        indexFile = os.path.join(outDir, 'indexFile.txt')
+    if os.path.isfile(indexFile):
+        os.remove(indexFile)  # delet if already exists
+
+    ### feature extraction settings
+    if not callable(featExtFun): # dictionary or None (defaul parameters)
+        fexO=wavFeatureExtractionSplit(featExtFun)
+        featExtFun = fexO.featExtrFun() # default
+        featStr = fexO.feature_str
     else:
-        return D
+        featStr='featureExtractionCallable'
         
-
-class Transformation():
-    """creates a transformation from a settings dictionary 
-    and the name of the transformation bonding: the dictionary, a string 
-    and the callable
-    """
-    def __init__(self, transformation_name, settings_di):
-        assert transformation_name in get_transformationFun().keys(), "trans\
-        formation not recognised"
-        self.name = transformation_name
-        self.settingsDict = settings_di
-        self.string = self.set_transformationStr(self.settingsDict, self.name)
-        self.fun = self.set_transformationFun(self.name, self.settingsDict)
-
-    def set_transformationStr(self, di, settStr=''):
-        """defines a string with transformation's intructions"""
-        settStr += stringiseDict(di, '')
-        return settStr
-
-    def set_transformationFun(self, Tname, settings,
-                              transformationFun=get_transformationFun):
-        """returns the feature extraction callable, ready to use!"""
-        return functools.partial(transformationFun(Tname), **settings)
-
-
-class TransformationsPipeline():
-    """pipeline of Transformations
-    """
-
-    def __init__(self, transformationsList):
-        self.transformationsList = transformationsList
-        self.string = ''
-        self.fun = lambda x: x
-        for (step, trO) in self.transformationsList:
-            #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
-            self.string = self.appendString(step, trO)
-            self.fun = self.composeTransformation(trO.fun)
-
-    def appendString(self, step_name, trOb):
-        return self.string + "-{}-{}".format(step_name, trOb.string)
-
-    def composeTransformation(self, fun):
-        return compose2(fun, self.fun)
-        
-def makeTransformationsPipeline(settings):
-    """settings: list
-        ["step_name", ("transformation_name", settingsDict)]"""
-    transformationsList = []
-    for s, (tn, sD) in settings:
-        transformationsList.append((s, Transformation(tn, sD)))
-    return TransformationsPipeline(transformationsList)
-
-
+    ### extract and save features for each annotated section
+    for wavF, annF in collectionList: #  wav file loop
+        bN = os.path.splitext(os.path.basename(wavF))[0]
+        datO = wavAnn2sectionsXy(wavF, annF, featExtFun=None) # data object
+        for i in range(datO.m_instances): # ann-section loop --> save features
+            bN += '.%d_%s'%(i, datO.y_labels[i])
+            outFile = os.path.join(outDir, bN)
+            np.save(outFile, datO.X[i])
+            # write in index file
+            with open(indexFile, 'a') as g:
+                g.write("%s\t%s\n"%(outFile+'.npy', datO.y_labels[i]))        
+                
+                    ### write the feature-extraction-especifications at the bigining of the index file
+    with open(indexFile, "r+") as f:
+        old = f.read() # read everything in the file
+        f.seek(0) # rewind
+        f.write("#%s\n%s"%(featStr, old))
+    
+    return indexFile
+            
+            
+            
 class wavFeatureExtraction():
     """class for the extraction of wav features, statring from a dictionary of settings
     bounds:
@@ -557,7 +612,7 @@ class wavFeatureExtraction():
     def featExtrFun(self):
         '''returns the feature extraction callable, ready to use!'''
         return functools.partial(auf.waveform2featMatrix, **self.feature_extr_di)
-    
+
     def newFeatExtrDi(self, feature_extr_di):
         '''updates the feature-extractio-dictionary and string'''
         if isinstance(feature_extr_di, dict):
@@ -589,7 +644,5 @@ class wavFeatureExtractionSplit(wavFeatureExtraction):
     def defaultFeatureExtractionDi(self):
         '''default settings'''
         feExDict = {'featExtrFun' : 'melspectro', 'Nslices' : 10, 'n_mels' : 2**4}
-        return feExDict     
-            
-            
+        return feExDict                 
             
