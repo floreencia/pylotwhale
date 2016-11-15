@@ -32,12 +32,12 @@ auD["sRate"] = 48000
 NFFTpow = 10; auD["NFFT"] = 2**NFFTpow
 overlap = 0.5; auD["overlap"] = overlap
 n_mels = 20; auD["n_mels"]= n_mels;
-#fmin = 1000; auD["fmin"]= fmin;
+fmin = 1000; auD["fmin"]= fmin;
 audioF = 'melspectro'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 #### summ features
-summDict = {'n_textWS': 10, 'normalise': True}
+summDict = {'n_textWS': 5, 'normalise': True}
 summType = 'walking'
 T_settings.append(('summ', (summType, summDict)))
 
@@ -68,6 +68,7 @@ param_grid = [ {#'reduce_dim__n_components' : pca_range,
 ##### FILES
 ## INPUT -> collection files
 collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
+collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
 oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/test'
 

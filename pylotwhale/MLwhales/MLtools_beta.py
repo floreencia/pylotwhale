@@ -1,4 +1,3 @@
-#!/usr/mprg/bin/python
 
 from __future__ import print_function
 import os
@@ -38,6 +37,9 @@ sys.path.append('/home/florencia/whales/sipts/')
 #import matrixTools as mt 
 
 """
+
+    #!/usr/mprg/bin/python
+
     Preprocessing function of machine learning
     florencia @ 16.05.15
 
@@ -453,10 +455,10 @@ class dataXy_names(dataX):
         returns the instances with y_names in the y_namesSet
         Parameters
         ----------        
-        y_namesSet : list of y_names to keep
+        y_namesSet: list of y_names to keep
                         if None, don't filter
-        A : feature matrix
-        b : target vector (nominal)
+        A: feature matrix
+        b: target vector (nominal)
         
         Returns
         -------

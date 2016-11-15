@@ -298,3 +298,5 @@ def predictions2txt(y, outTxt, tf, sections):
             #print("keys:", t0, tf, sectionsD[(t0, tf)], sections)
             if sectionsD[(t0, tf)] in sections:
                 f.write("%f\t%f\t%s\n"%(t0, tf, sectionsD[(t0, tf)] ) )   
+                
+           
