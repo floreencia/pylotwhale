@@ -23,7 +23,7 @@ def test_Transformation_fun():
         M2 = fun2(M1)
 
         tList = [('audio_features', T1), ('summ', T2)]
-        Tpipe = fex.transformationsPipeline(tList)
+        Tpipe = fex.TransformationsPipeline(tList)
         Mpipe = Tpipe.fun(wf)
 
         np.testing.assert_almost_equal(M2, Mpipe, decimal=6)
