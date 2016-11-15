@@ -76,9 +76,8 @@ def bestCVScoresfromGridSearch(gs):
     mu, std = _bestCVScoresfromGridSearch(gs)
     assert mu - gs.best_score_ < 0.01, "retrived value doesn't match best score {} =/={}".format(mu, gs.best_score_)
     return mu, std
-    
-  
-    
+
+
 def _bestCVScoresfromGridSearch(gs):
     mu_max=0
     for pars, mu, cv_scrs in gs.grid_scores_[:]:
@@ -89,15 +88,16 @@ def _bestCVScoresfromGridSearch(gs):
     return np.mean(cv_max ), np.std(cv_max )
 
 
-def printScoresFromCollectionFile(feExFun, clf, lt, collFi, fileName, labelsHierarchy):
+def printScoresFromCollectionFile(feExFun, clf, lt, collFi, out_file, labelsHierarchy):
     """
     clf : classifier
     le : label encoder (object)
     collfi : annotated wav collection (*.txt)
-    of : out file (*.txt)
+    out_file : out file (*.txt)
     """
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
-    printScoresFromCollection(feExFun, clf, lt, coll, fileName, labelsHierarchy)
+    printScoresFromCollection(feExFun, clf, lt, coll, out_file, labelsHierarchy)
+    
 
 def getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy):
     """
@@ -126,20 +126,21 @@ def getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy):
     a = lt.nom2num(a_names)
     return clfScoresO(clf, A, a)
 
-def printScoresFromCollection(feExFun, clf, lt, coll, of, labelsHierarchy):
+def printScoresFromCollection(feExFun, clf, lt, coll, out_file, labelsHierarchy):
     """
     clf : classifier
     le : label encoder (object)
     coll: list,
         wav ann colection [(wav_file, ann_file), (wav_file, ann_file), ...]
-    of : out file (*.txt)
+    out_file: str,
+        file where scores will be printed
     """
      #np.loadtxt(collFi, delimiter='\t', dtype='|S')
 
     for wavF, annF in coll[:]:
         scsO = getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy)
-        annF_bN = os.path.basename(annF)        
-        with open(of, 'a') as f:
+        annF_bN = os.path.basename(annF)
+        with open(out_file, 'a') as f:
             f.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
         
 
