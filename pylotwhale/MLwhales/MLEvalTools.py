@@ -15,14 +15,15 @@ import pandas as pd
 import os
 import sys
 
+
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools_beta as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
-import pylotwhale.MLwhales.MLtools_beta as myML
+#import pylotwhale.MLwhales.featureExtraction as fex
+#import pylotwhale.MLwhales.MLtools_beta as myML
 
-
+import MLtools_beta as myML
 import featureExtraction as fex
-
 
 #from sklearn.utils import shuffle
 from sklearn import preprocessing
@@ -112,17 +113,9 @@ def getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy):
     le : label encoder (object)
     labelsHierarchy: list
     """
-     #np.loadtxt(collFi, delimiter='\t', dtype='|S')
-    waveForm, fs = sT.wav2waveform(wavF)
-    tf = len(waveForm)/fs
 
-    #  annotLi_t = auf.aupTxt2annTu(annF) ## in sample units
-
-    M0 = feExFun(waveForm)
-    m = len(M0)
-    y0_names = auf.annotationsFi2instances(annF, m, tf, labelsHierarchy=labelsHierarchy)
-    datO = myML.dataXy_names(M0, y0_names)
-    A, a_names = datO.filterInstances(lt.classes_)
+    A, a_names = fex.getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, 
+                                        filter_classes=lt.classes_)
     a = lt.nom2num(a_names)
     return clfScoresO(clf, A, a)
 
