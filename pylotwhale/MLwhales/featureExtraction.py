@@ -42,7 +42,7 @@ def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     labelsHierarchy: list
     """
      #np.loadtxt(collFi, delimiter='\t', dtype='|S')
-    waveForm, fs = sT.wav2waveform(wavF)
+    waveForm, fs = wav2waveform(wavF)
     tf = len(waveForm)/fs
 
     M0 = feExFun(waveForm)
@@ -83,11 +83,30 @@ def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='defa
     datO = myML.dataXy_names() #inicialize data object
 
     for wavF, annF in WavAnnCollection:
-        X, y0_names = getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, 
-                                         filter_classes=None)
-        datO.addInstances(X, y0_names) 
+        X, y0_names = getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy)
+        datO.addInstances(X, y0_names)
 
     return datO
+    
+def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='default'):
+    """
+    Extracts features and labels from wav-ann collction    
+    Parameters
+    ----------
+    WavAnnCollectionFi: str
+        path to file
+    feExFun: callable
+        feature extraction functioN
+    labelsHierarchy: list
+        labels in hierarchical order for setting the label of the instances
+
+    Return
+    ------    
+    > datO :  a file with the paths to the features and their labels
+    """   
+    coll = np.genfromtxt(WavAnnCollectionFi, dtype=object)
+
+    return wavAnnCollection2datXy(coll, feExFun, labelsHierarchy)
 
 
 ####### TRANSFORMERS
