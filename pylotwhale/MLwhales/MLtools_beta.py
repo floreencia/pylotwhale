@@ -341,6 +341,49 @@ def correctBextractLabelMess(X, y, m_cut=None, N_sections=1):
 
 ### X, y data objects
 
+def selectData(X, y, label):
+    """Returns the data with the specified labels
+    label: list like object"""
+    ix = y == label
+    return X[ix,:], y[ix]
+
+def resample(X, y, n_samples, random_state=1):
+    """sample without replasement"""
+    return sku.resample(Xb, yb, random_state=random_state, n_samples = n_samples)
+
+def balanceToClass(datO, class_label, random_state=1):
+    '''balances data to a given class, classes with less data '''
+    ## class data
+    balX, baly = selectData(datO.X, datO.y_names, class_label)
+    n_balclass = len(baly)
+    ## labels of the rest of the classes
+    balance_labels = set(datO.y_names) - set(class_label)
+
+    for l in balance_labels:
+        thisX, thisy = selectData(datO.X, datO.y_names, l)
+        class_n_samples = np.min((n_balclass, len(thisy)))
+        sX, sy = resample(thisX, thisy, class_n_samples)
+        balX = np.vstack((balX, sX))
+        baly = np.hstack((baly, sy))
+    return np.array(balX), np.array(baly)
+
+
+def balanceToClass(X, y, class_label, random_state=1):
+    '''balances data Xy to a given class, classes with less data are left the same '''
+    ## class data
+    balX, baly = selectData(X, y, class_label)
+    n_balclass = len(baly)
+    ## labels of the rest of the classes
+    balance_labels = set(y) - set(class_label)
+
+    for l in balance_labels:
+        thisX, thisy = selectData(X, y, l)
+        class_n_samples = np.min((n_balclass, len(thisy)))
+        sX, sy = resample(thisX, thisy, class_n_samples)
+        balX = np.vstack((balX, sX))
+        baly = np.hstack((baly, sy))
+    return np.array(balX), np.array(baly)
+
 
 ################# classes
 
@@ -454,25 +497,25 @@ class dataXy_names(dataX):
         '''
         returns the instances with y_names in the y_namesSet
         Parameters
-        ----------        
+        ----------    
         y_namesSet: list of y_names to keep
                         if None, don't filter
         A: feature matrix
         b: target vector (nominal)
-        
+
         Returns
         -------
         A_filt : filtered A
         a_filt : filtered a
         '''
-        if A is None : 
+        if A is None:
             #print("TEST ------ default")
             A = self.X
             a = self.y_names
-            
-        if y_namesSet is None: # don't filter
+
+        if y_namesSet is None:  # don't filter
             return( A, a)
-        else: 
+        else:
             selector = np.in1d(a, y_namesSet)
             return( A[selector, :], a[selector])
   
