@@ -50,15 +50,14 @@ metric='accuracy'
 cv = 5
 from pylotwhale.MLwhales.clf_pool import random_forest_clf as clfSettings
 
-
 ###
-#pca_range = [ 6, 8, 10, 12, None]
+pca_range = [ 6, 8, 10, 12, None]
 
 estimators = [#('reduce_dim', PCA()),
               #('clf', SVC()),
               ('clf',  clfSettings.fun)]
 
-paramsDi={}#'reduce_dim__n_components' : pca_range}
+paramsDi={'reduce_dim__n_components' : pca_range}
 paramsDi.update(clfSettings.grid_params_di)
 param_grid = [paramsDi] # clfSettings.grid_params #
 
@@ -69,27 +68,3 @@ collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collect
 collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
 oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/test'
-
-
-
-
-
-"""
-### parameters
-gamma_range = [ 0.1, 1.0]
-pen_range = [ 0.1, 1.0, 10.0]#, 100.0]
-
-from sklearn.decomposition import PCA
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.svm import SVC
-
-estimators = [('reduce_dim', PCA()),
-              #('clf', SVC()),
-              ('clf',  RandomForestClassifier())]
-
-param_grid = [ {#'reduce_dim__n_components' : pca_range,
-                'clf' : [SVC()],
-                'clf__C': pen_range, 
-                'clf__gamma': gamma_range, 
-                'clf__kernel': ['rbf'] }]
-"""

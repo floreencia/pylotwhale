@@ -10,17 +10,18 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import SVC
 import numpy as np
 
+
 class clfSettings():
     def __init__(self, clf_name, fun, grid_params_di):
         self.clf_name = clf_name
         self.fun = fun
         self.grid_params_di = grid_params_di
 
-        
+
 #SVC 
 gamma_range = [ 0.1, 1.0]
 pen_range = [ 0.1, 1.0, 10.0]
-param_grid_di = {'clf__C': pen_range, 
+param_grid_di = {'clf__C': pen_range,
                 'clf__gamma': gamma_range}
                 
 svc_rbf =  clfSettings('svc_rbf', SVC(), param_grid_di)
