@@ -23,21 +23,26 @@ runExperiment_prototypeCallType-clf.py
 n_experiments = 3  # identical experiment repetitions
 
 #### Feature extraction 
+fs = 48000
 T_settings = []
+
 ## preprocessing
+filt='band_pass_filter'
+settings_di={"fs":fs, "lowcut":1000, "highcut":22000, "order":5}
+T_settings.append(('bandFilter', (filt, settings_di)))
 
 #### audio features
 auD = {}
-auD["sRate"] = 48000
+auD["sRate"] = fs
 NFFTpow = 10; auD["NFFT"] = 2**NFFTpow
 overlap = 0; auD["overlap"] = overlap
-n_mels = 10; auD["n_mels"]= n_mels;
-fmin = 1000; auD["fmin"]= fmin;
+n_mels = 30; auD["n_mels"]= n_mels;
+fmin = 500; auD["fmin"]= fmin;
 audioF = 'melspectro'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 #### summ features
-summDict = {'n_textWS': 4, 'normalise': True}
+summDict = {'n_textWS': 10, 'normalise': True}
 summType = 'walking'
 T_settings.append(('summ', (summType, summDict)))
 
@@ -48,19 +53,23 @@ labsHierarchy = ['c', 'w']
 
 metric='accuracy'
 cv = 5
-from pylotwhale.MLwhales.clf_pool import random_forest_clf as clfSettings
 
 ###
-pca_range = [ 6, 8, 10, 12, None]
+paramsDi={}
+estimators=[]
 
-estimators = [#('reduce_dim', PCA()),
-              #('clf', SVC()),
-              ('clf',  clfSettings.fun)]
+##PCA
+from sklearn.decomposition import PCA
+pca_range = [ 6, 8, 10, 12]
+#paramsDi.update{'reduce_dim__n_components' : pca_range}
+#estimators.append(('reduce_dim',  PCA()))
 
-paramsDi={'reduce_dim__n_components' : pca_range}
+### CLF
+from pylotwhale.MLwhales.clf_pool import svc_rbf as clfSettings
+estimators.append(('clf',  clfSettings.fun))
 paramsDi.update(clfSettings.grid_params_di)
-param_grid = [paramsDi] # clfSettings.grid_params #
 
+param_grid = [paramsDi] # clfSettings.grid_params #
 
 ##### FILES
 ## INPUT -> collection files

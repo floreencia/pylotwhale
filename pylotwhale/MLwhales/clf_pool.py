@@ -20,7 +20,7 @@ class clfSettings():
 
 #SVC 
 gamma_range = [ 0.1, 1.0]
-pen_range = [ 0.1, 1.0, 10.0]
+pen_range = [ 0.1, 1.0, 10.0, 100]
 param_grid_di = {'clf__C': pen_range,
                 'clf__gamma': gamma_range}
                 
@@ -32,5 +32,5 @@ param_grid_di={}#"max_depth": [3, None],
               #"bootstrap": [True, False]}
 #              "n_estimators": ests_range}
               
-random_forest_clf =  clfSettings('rf', RandomForestClassifier(), param_grid_di)
+random_forest = clfSettings('rf', RandomForestClassifier(), param_grid_di)
 
