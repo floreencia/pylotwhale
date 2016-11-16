@@ -30,14 +30,14 @@ T_settings = []
 auD = {}
 auD["sRate"] = 48000
 NFFTpow = 10; auD["NFFT"] = 2**NFFTpow
-overlap = 0.5; auD["overlap"] = overlap
-n_mels = 20; auD["n_mels"]= n_mels;
+overlap = 0; auD["overlap"] = overlap
+n_mels = 10; auD["n_mels"]= n_mels;
 fmin = 1000; auD["fmin"]= fmin;
 audioF = 'melspectro'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 #### summ features
-summDict = {'n_textWS': 5, 'normalise': True}
+summDict = {'n_textWS': 4, 'normalise': True}
 summType = 'walking'
 T_settings.append(('summ', (summType, summDict)))
 
@@ -48,22 +48,20 @@ labsHierarchy = ['c', 'w']
 
 metric='accuracy'
 cv = 5
+from pylotwhale.MLwhales.clf_pool import random_forest_clf as clfSettings
 
-### parameters
+
+###
 #pca_range = [ 6, 8, 10, 12, None]
-gamma_range = [ 0.1, 1.0]
-pen_range = [ 1.0, 10.0, 100.0]
-
-from sklearn.decomposition import PCA
-from sklearn.svm import SVC
 
 estimators = [#('reduce_dim', PCA()),
-              ('clf', SVC())]
-param_grid = [ {#'reduce_dim__n_components' : pca_range,
-                'clf' : [SVC()],
-                'clf__C': pen_range, 
-                'clf__gamma': gamma_range, 
-                'clf__kernel': ['rbf'] }]
+              #('clf', SVC()),
+              ('clf',  clfSettings.fun)]
+
+paramsDi={}#'reduce_dim__n_components' : pca_range}
+paramsDi.update(clfSettings.grid_params_di)
+param_grid = [paramsDi] # clfSettings.grid_params #
+
 
 ##### FILES
 ## INPUT -> collection files
@@ -76,3 +74,22 @@ oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/tes
 
 
 
+"""
+### parameters
+gamma_range = [ 0.1, 1.0]
+pen_range = [ 0.1, 1.0, 10.0]#, 100.0]
+
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.svm import SVC
+
+estimators = [('reduce_dim', PCA()),
+              #('clf', SVC()),
+              ('clf',  RandomForestClassifier())]
+
+param_grid = [ {#'reduce_dim__n_components' : pca_range,
+                'clf' : [SVC()],
+                'clf__C': pen_range, 
+                'clf__gamma': gamma_range, 
+                'clf__kernel': ['rbf'] }]
+"""
