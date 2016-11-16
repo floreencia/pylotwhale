@@ -11,6 +11,7 @@ from sklearn.externals import joblib
 #from sklearn.learning_curve import learning_curve
 from sklearn.model_selection import learning_curve
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
+from sklearn import utils as sku
 
 import numpy as np
 import scipy.io.arff as arff
@@ -349,27 +350,11 @@ def selectData(X, y, label):
 
 def resample(X, y, n_samples, random_state=1):
     """sample without replasement"""
-    return sku.resample(Xb, yb, random_state=random_state, n_samples = n_samples)
-
-def balanceToClass(datO, class_label, random_state=1):
-    '''balances data to a given class, classes with less data '''
-    ## class data
-    balX, baly = selectData(datO.X, datO.y_names, class_label)
-    n_balclass = len(baly)
-    ## labels of the rest of the classes
-    balance_labels = set(datO.y_names) - set(class_label)
-
-    for l in balance_labels:
-        thisX, thisy = selectData(datO.X, datO.y_names, l)
-        class_n_samples = np.min((n_balclass, len(thisy)))
-        sX, sy = resample(thisX, thisy, class_n_samples)
-        balX = np.vstack((balX, sX))
-        baly = np.hstack((baly, sy))
-    return np.array(balX), np.array(baly)
-
+    return sku.resample(X, y, random_state=random_state, n_samples = n_samples)
 
 def balanceToClass(X, y, class_label, random_state=1):
-    '''balances data Xy to a given class, classes with less data are left the same '''
+    """balances data Xy to a given class, 
+    classes with less data are left the same """
     ## class data
     balX, baly = selectData(X, y, class_label)
     n_balclass = len(baly)
@@ -518,7 +503,7 @@ class dataXy_names(dataX):
         else:
             selector = np.in1d(a, y_namesSet)
             return( A[selector, :], a[selector])
-  
+
 
 class dataXy(dataXy_names):
     """
