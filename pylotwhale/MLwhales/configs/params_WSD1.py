@@ -28,16 +28,16 @@ T_settings = []
 
 ## preprocessing
 filt='band_pass_filter'
-settings_di={"fs":fs, "lowcut":1000, "highcut":22000, "order":5}
-T_settings.append(('bandFilter', (filt, settings_di)))
+filtDi={"fs":fs, "lowcut":1100, "highcut":22000, "order":5}
+T_settings.append(('bandFilter', (filt, filtDi)))
 
 #### audio features
 auD = {}
 auD["sRate"] = fs
-NFFTpow = 10; auD["NFFT"] = 2**NFFTpow
+NFFTpow = 9; auD["NFFT"] = 2**NFFTpow
 overlap = 0; auD["overlap"] = overlap
-n_mels = 30; auD["n_mels"]= n_mels;
-fmin = 500; auD["fmin"]= fmin;
+n_mels = 20; auD["n_mels"]= n_mels;
+fmin = 1100; auD["fmin"]= fmin;
 audioF = 'melspectro'
 T_settings.append(('Audio_features', (audioF, auD)))
 
@@ -76,4 +76,5 @@ param_grid = [paramsDi] # clfSettings.grid_params #
 collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
 collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
-oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/test'
+oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/test/experiments'
+savePredictions = True

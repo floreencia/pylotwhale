@@ -174,8 +174,12 @@ class TransformationsPipeline():
         return compose2(fun, self.fun)
         
 def makeTransformationsPipeline(settings):
-    """settings: list
-        ["step_name", ("transformation_name", settingsDict)]"""
+    """creates a transformations pipeline
+    settings: list
+        ["step_name", ("transformation_name", settingsDict)]
+        step_name: identifyer for the name of the step
+        transformation_name: must be a key from get_transformationFun
+        """
     transformationsList = []
     for s, (tn, sD) in settings:
         transformationsList.append((s, Transformation(tn, sD)))

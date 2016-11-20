@@ -35,7 +35,7 @@ def experimentsControlParams(iterParam):
 
 class controlVariable():
     '''
-    Data structute for an experiment's control variable
+    Data structure for an experiment's control variable
     Parameters:
     -----------
     paramater : str

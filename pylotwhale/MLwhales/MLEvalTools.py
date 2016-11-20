@@ -1,22 +1,17 @@
 #!/usr/mprg/bin/python
 
 from __future__ import print_function, division
+import os
+import functools
+from collections import Counter
+
 import numpy as np
 import scipy.io.arff as arff
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 
-from collections import Counter
-#from mpl_toolkits.axes_grid1 import ImageGrid
-from subprocess import call
-import pandas as pd
-
-import os
-import sys
-
-
-import pylotwhale.signalProcessing.audioFeatures as auf
+#import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools_beta as sT
 #import pylotwhale.utils.whaleFileProcessing as fp
 #import pylotwhale.MLwhales.featureExtraction as fex
@@ -30,17 +25,10 @@ from sklearn import preprocessing
 from sklearn.externals import joblib
 #from sklearn.learning_curve import learning_curve
 from sklearn.model_selection import learning_curve
+from sklearn import metrics as mt
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix, classification_report
 
 
-#import time 
-#import itertools as it
-#import os
-#import ast
-
-#import sequencesO_beta as seqs
-sys.path.append('/home/florencia/whales/sipts/')
-#import matrixTools as mt 
 
 """
     Preprocessing function of machine learning
@@ -52,6 +40,27 @@ sys.path.append('/home/florencia/whales/sipts/')
 #################################################################################
 ########################   CLASSIFIER EVALUATION    #############################
 #################################################################################    
+
+
+### scoring functions
+
+def class_f1_score(y_true, y_pred, classIndex=1, 
+                   scoringFuncion=mt.f1_score):
+    """defines a scoringFuncion that is maximal for classIndex
+    returns a scoring function from one componen (classIndex) 
+    from a vectorial scoring"""
+    return scoringFuncion(y_true, y_pred, average=None)[classIndex]
+
+def make_class_f1score_fun(lt, className = 'c', 
+                           scoringFuncion=class_f1_score):
+    """defines a scoringFuncion that is maximal at className"""
+    return functools.partial(scoringFuncion, classIndex=lt.nom2num(className))
+
+def getCallScorer(lt, className='c', **kwargs):
+    """returns a scoring funciton that maximises 
+    the the f1 score for className"""
+    return mt.make_scorer(make_class_f1score_fun(lt, className = 'c', **kwargs))
+
 
 ### Evaluate a list of classifiers over a collection   
 
@@ -317,7 +326,6 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
                 train_sizes=samples_arr, 
                 cv=cv,
                 n_jobs=n_jobs)
-
     
     train_mean = np.mean(train_scores, axis=1)
     train_std = np.std(train_scores, axis=1)

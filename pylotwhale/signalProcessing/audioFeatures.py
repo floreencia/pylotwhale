@@ -13,7 +13,7 @@ import pylotwhale.signalProcessing.signalTools_beta as sT0
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
 
-warnings.simplefilter('always', DeprecationWarning)
+#warnings.simplefilter('always', DeprecationWarning)
 
 ######     ANNOTATIONS     #########
 

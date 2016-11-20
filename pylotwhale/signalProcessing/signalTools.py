@@ -30,7 +30,7 @@ import librosa  # Librosa for audio
     florencia @ 06.09.14
 """
 
-warnings.simplefilter('always', DeprecationWarning)
+#warnings.simplefilter('always', DeprecationWarning)
 
 
 def waveformPreprocessingFun(funName=None):
