@@ -37,29 +37,55 @@ from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_sc
 """
 
 
-#################################################################################
-########################   CLASSIFIER EVALUATION    #############################
-#################################################################################    
+############################################################################
+#####################   CLASSIFIER EVALUATION    ###########################
+############################################################################
 
 
-### scoring functions
+#### scoring functions
 
-def class_f1_score(y_true, y_pred, classIndex=1, 
-                   scoringFuncion=mt.f1_score):
-    """defines a scoringFuncion that is maximal for classIndex
-    returns a scoring function from one componen (classIndex) 
+
+## f1 score for one class: calls
+
+def get_scorer(scorer_name, **kwargs):
+    """NOT WORKING!!!! returns scorer from str"""
+    myScorers={
+            'f1c': make_class_f1score_fun}  # classTag=1
+    if scorer_name in myScorers.keys():
+        scFun=myScorers[scorer_name] 
+        return mt.make_scorer(scFun(**kwargs))
+    else:
+        return scorer_name
+
+
+def classIndex_f1_score(y_true, y_pred, classIndex=1,
+                        scoringFunction=mt.f1_score):
+    """defines a scoringFunction that is maximal for classIndex
+    returns a scoring function from one component (classIndex)
     from a vectorial scoring"""
-    return scoringFuncion(y_true, y_pred, average=None)[classIndex]
+    return scoringFunction(y_true, y_pred, average=None)[classIndex]
 
-def make_class_f1score_fun(lt, className = 'c', 
-                           scoringFuncion=class_f1_score):
-    """defines a scoringFuncion that is maximal at className"""
-    return functools.partial(scoringFuncion, classIndex=lt.nom2num(className))
 
-def getCallScorer(lt, className='c', **kwargs):
-    """returns a scoring funciton that maximises 
-    the the f1 score for className"""
-    return mt.make_scorer(make_class_f1score_fun(lt, className = 'c', **kwargs))
+def make_class_f1score_fun(classTag=1, lt=None,
+                           scoringFunction=classIndex_f1_score):
+    """defines a scoringFuncion that is maximal at className
+    if a label transformer is given, className is transformed from numeric
+    with nom2num"""
+    if isinstance(lt, myML.labelTransformer):  # check whether a labelTransfomer is given
+        classTag = lt.nom2num(classTag)
+    return functools.partial(scoringFunction, classIndex=classTag)
+
+def getCallScorer(classTag=1, lt=None):
+    """returns a scoring function that maximises
+    the f1 score for classTag
+    Parameters
+    ----------
+    classTag: str, int
+        class id
+    lt: myML.labelTransformer
+        ehrn lt is given the classTag is transformed with lt.nom2num
+    """
+    return mt.make_scorer(make_class_f1score_fun(classTag=classTag, lt=lt))
 
 
 ### Evaluate a list of classifiers over a collection   
@@ -195,7 +221,7 @@ def coll_clf_scores(clf, wavAnnCollection, featExtFun, labelTransformer, labelSe
    
 def clfScores(clf, X, y):
     '''
-    calculets the scores for the predictability of clf over the set X y
+    calculates the scores for the predictability of clf over the set X y
     Parameters
     -----------
     clf :  classifier
@@ -216,6 +242,19 @@ def clfScores(clf, X, y):
     F1 = [2.*R[i]*P[i]/(P[i]+R[i]) for i in range(len(P))]	
     return(s, P, R, F1)
     
+    
+### print scores in file
+
+def print_precision_recall_fscore_support(y_true, y_pred, ofile, sep=", "):
+    scores = mt.precision_recall_fscore_support(y_true, y_pred)
+    with open(ofile, 'a') as f:
+        for sc in scores[:-1]:
+            f.write("{}{}".format(sep.join(["{:.2f}".format(item*100) for item in sc]), sep))
+        sc = scores[-1]
+        f.write(sep.join(["{}".format(item) for item in sc]))
+
+
+
 def printClfScores( fileN, clf, X, y, l0):
     '''
     prints the scores of the classifier (clf) over the set X y
