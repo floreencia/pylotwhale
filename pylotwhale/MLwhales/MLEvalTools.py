@@ -13,6 +13,9 @@ from matplotlib.ticker import NullFormatter
 
 #import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools_beta as sT
+import pylotwhale.signalProcessing.audioFeatures as auf
+import pylotwhale.MLwhales.predictionTools as pT
+
 #import pylotwhale.utils.whaleFileProcessing as fp
 #import pylotwhale.MLwhales.featureExtraction as fex
 #import pylotwhale.MLwhales.MLtools_beta as myML
@@ -28,22 +31,16 @@ from sklearn.model_selection import learning_curve
 from sklearn import metrics as mt
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix, classification_report
 
-
-
 """
     Preprocessing function of machine learning
     florencia @ 09.11.16
-
 """
-
 
 ############################################################################
 #####################   CLASSIFIER EVALUATION    ###########################
 ############################################################################
 
-
 #### scoring functions
-
 
 ## f1 score for one class: calls
 
@@ -245,13 +242,43 @@ def clfScores(clf, X, y):
     
 ### print scores in file
 
-def print_precision_recall_fscore_support(y_true, y_pred, ofile, sep=", "):
-    scores = mt.precision_recall_fscore_support(y_true, y_pred)
+def print_precision_recall_fscore_support(y_true, y_pred, ofile, labels=None,
+                                          sep=", ", strini="", strend=""):
+    scores = mt.precision_recall_fscore_support(y_true, y_pred, labels=labels)
     with open(ofile, 'a') as f:
+        f.write(strini)
         for sc in scores[:-1]:
             f.write("{}{}".format(sep.join(["{:.2f}".format(item*100) for item in sc]), sep))
         sc = scores[-1]
         f.write(sep.join(["{}".format(item) for item in sc]))
+        f.write(strend)
+
+def printWSD2_scores(wavF, true_annF, template_annF, WSD2_clf, WSD2_feExFun, lt,
+                    scoreClassLabels, outF, strini="", strend="", m='auto',
+                    readSectionsWSD2='default', # for WSD2
+                    labelsHierarchy='default'): # for instantiating truth labels
+
+    if labelsHierarchy == 'default':
+        labelsHierarchy = ['c']
+    # load waveform
+    waveForm, fs = sT.wav2waveform(wavF)
+    tf = len(waveForm)/fs
+    if m == 'auto':
+        m = int(len(waveForm)/512)
+
+    # ground thruth
+    y_true_names = auf.annotationsFi2instances(true_annF, m, tf,
+                                                labelsHierarchy=labelsHierarchy)
+
+    # predictions
+    y_pred_names = pT.WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
+                                  readSections=readSectionsWSD2)
+
+    # print P, R, f1, support
+    print_precision_recall_fscore_support(y_true_names, y_pred_names, outF,
+                                               strini=strini, strend=strend,
+                                               labels=scoreClassLabels)
+    return outF
 
 
 
