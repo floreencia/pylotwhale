@@ -60,7 +60,6 @@ def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None
     return X, y_names
                  
 
-
 def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
     """
     Extracts features and labels from wav-ann collction    

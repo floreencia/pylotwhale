@@ -132,9 +132,9 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     """
     labels_arr = np.array([gaps]*m, dtype=object)   # inicialise array
     assert(len(T) == len(L)), "T and L must match in length"
-    assert isinstance( T, np.ndarray), "must be an ndarray"
-    assert isinstance( L, np.ndarray), "must be an ndarray"
-    
+    assert isinstance(T, np.ndarray), "must be an ndarray"
+    assert isinstance(L, np.ndarray), "must be an ndarray"
+
     ## Define labels order, first those not in the hierarchy
     labelOrder = list(set(L) - set(labelsHierarchy)) \
                 + labelsHierarchy[::-1]
@@ -155,8 +155,8 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
 def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
     """reads annotations from file into instances"""
     if labelsHierarchy is None:
-        labelsHierarchy = ['c', 'w'] 
-    T, L = annT.anns2TLndarrays(annFi)  
+        labelsHierarchy = ['c', 'w']
+    T, L = annT.anns2TLndarrays(annFi)
     return annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
 
 

@@ -34,7 +34,6 @@ import featureExtraction as fex
 #import ast
 
 #import sequencesO_beta as seqs
-sys.path.append('/home/florencia/whales/sipts/')
 #import matrixTools as mt 
 
 """
@@ -602,7 +601,7 @@ class labelTransformer():
 
 ###### save model
 
-def saveModel(clf, outModelName, fileModelName_fN=None):
+def saveModel(clf, outModelName, fileModelName_fN=None, feExSettings=None):
     '''saves clf model and appends model_name in a register file
     Parameters:
     -----------
@@ -622,9 +621,10 @@ def saveModel(clf, outModelName, fileModelName_fN=None):
     if fileModelName_fN:
         with open(fileModelName_fN, 'a') as out_file:
             out_file.write("{}\n".format(outModelName))
-            print(outModelName)
-            out_file.write("###---------   {}"
-                           "---------###\n".format(time.strftime("%H:%M:%S")))
+            
+    if feExSettings:
+        ### TO BE IMPLEMENTED save feExSettings
+        pass
     return outModelName
 
 

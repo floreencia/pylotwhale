@@ -212,7 +212,8 @@ def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
 def getSections(y, tf=None):
     """
     takes labels (numeric) vector and returns a dictionary of the sections
-    if tf is given the sections will have time units otherwise they'll have
+    by joining labels of the same type into sections.
+    If tf is given the sections will have time units otherwise they'll have
     sample units
     Parameters
     ----------
@@ -243,7 +244,7 @@ def getSections(y, tf=None):
     return(sectionsDict)
     
 def annDi2annArrays(sectionsD):
-    """reformats the ourput of setSections into T array with the times and L
+    """reformats sectionsD into T array with the times and L
     array with the labels"""
     times = sorted(sectionsD.keys(), key = lambda x: x[0]) # sort annotations
     T = np.zeros((len(times), 2))

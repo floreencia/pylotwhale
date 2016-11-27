@@ -18,53 +18,63 @@ runExperiment_prototypeCallType-clf.py
 ##############################
 
 
+
 #### Experiment settings
 # when random numbers are involved, repeat the experiment to get the stats
-n_experiments = 3  # identical experiment repetitions
+#### Feature extraction 
+fs = 48000
+T_settings = []
 
 #### Feature extraction 
 ## preprocessing
 prepro='maxabs_scale'
 preproDict = {}
+T_settings.append(('normaliseWF', (prepro, preproDict)))
 
 #### audio features
 auD = {}
-auD["sRate"] = 48000
-NFFTpow = 10; auD["NFFT"] = 2**NFFTpow
-overlap = 0.5; auD["overlap"] = overlap
-n_mels = 20; auD["n_mels"]= n_mels;
+auD["sRate"] = fs
+NFFTpow = 9; auD["NFFT"] = 2**NFFTpow
+overlap = 0; auD["overlap"] = overlap
+n_mels = 12; auD["n_mels"]= n_mels;
+#fmin = 1100; auD["fmin"]= fmin;
 audioF = 'melspectro'
-#T1 = fex.Transformation(featExtract, auD)
+T_settings.append(('Audio_features', (audioF, auD)))
 
 #### summ features
 summDict = {'n_textWS': 5, 'normalise': True}
 summType = 'walking'
+T_settings.append(('summ', (summType, summDict)))
 
 ##### clf
 testFrac = 0.2
-labs = ['b', 'c', 'echo', 'w']
+clf_labs = ['b', 'c', 'w']
+WSD2readSections = ['c']
+labsHierarchy = ['c', 'w']
 
 metric='accuracy'
 cv = 10
 
-### parameters
-pca_range = [ 6, 8, 10, 12, None]
-gamma_range = [ 0.1, 1.0]
-pen_range = [ 1.0, 10.0, 100.0]
+### inicialise Clf settings
+paramsDi={}
+estimators=[]
 
+### PCA
 from sklearn.decomposition import PCA
-from sklearn.svm import SVC
+pca_range = [ 6, 8, 10, 12]
+#paramsDi.update{'reduce_dim__n_components' : pca_range}
+#estimators.append(('reduce_dim',  PCA()))
 
-estimators = [('reduce_dim', PCA()), ('clf', SVC())]
-
+### CLF
+from pylotwhale.MLwhales.clf_pool import svc_rbf as clfSettings
+estimators.append(('clf',  clfSettings.fun))
+paramsDi.update(clfSettings.grid_params_di)
+param_grid = [paramsDi] # clfSettings.grid_params #
 
 ##### FILES
 ## INPUT -> collection files
 collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
+collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
-oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/test'
-
-
-
-
-
+oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/WSD2/test'
+savePredictions = True
