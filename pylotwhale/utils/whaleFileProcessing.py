@@ -40,7 +40,7 @@ def parseHeikesNameConv(fileN):
         #print("cannot parse time stamp (7) groups")
 
     try: # second try, try to parse (5) groups, at least until the date            
-        m=re.search(r'(N\wW)-(\w+)-(\w)-(\w)-([0-9]{5,6})', bN)
+        m=re.search(r'(N\wW)-(\w+)-(\w+)-(\w)-([0-9]{5,6})', bN)
         di = {"whale": m.group(1), "call": m.group(2), "group": m.group(3), "quality": m.group(4), "date": m.group(5)}
         return di
     except AttributeError: # not even possible to parse until the date
