@@ -6,9 +6,7 @@
 SETTINGS
 ========
 
-Parameters to be used in classification experiment:
-
-runExperiment_prototypeCallType-clf.py
+Parameters to be used in classification WSD2 experiment
 
 @author: florencia
 """
@@ -48,7 +46,7 @@ T_settings.append(('summ', (summType, summDict)))
 
 ##### clf
 testFrac = 0.2
-clf_labs = ['b', 'c', 'w']
+clf_labs = ['b', 'c']#, 'w']
 WSD2readSections = ['c']
 labsHierarchy = ['c', 'w']
 
@@ -76,5 +74,5 @@ param_grid = [paramsDi] # clfSettings.grid_params #
 collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
 collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
-oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/WSD2/test'
-savePredictions = True
+oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/WSD2/clf_cb/acc/melspectral'
+savePredictions = False

@@ -6,9 +6,7 @@
 SETTINGS
 ========
 
-Parameters to be used in classification experiment:
-
-runExperiment_prototypeCallType-clf.py
+Parameters to be used in classification WSD1 experiment
 
 @author: florencia
 """
@@ -35,23 +33,23 @@ filtDi={"fs":fs, "lowcut":0, "highcut":22000, "order":5}
 auD = {}
 auD["sRate"] = fs
 NFFTpow = 9; auD["NFFT"] = 2**NFFTpow
-overlap = 0.3; auD["overlap"] = overlap
-n_mels = 12; auD["n_mels"]= n_mels;
-#fmin = 1100; auD["fmin"]= fmin;
+overlap = 0.2; auD["overlap"] = overlap
+n_mels = 8; auD["n_mels"]= n_mels;
+#fmin = 200; auD["fmin"]= fmin;
 audioF = 'melspectro'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 #### summ features
-summDict = {'n_textWS': 10, 'normalise': True}
+summDict = {'n_textWS': 31, 'normalise': True}
 summType = 'walking'
 T_settings.append(('summ', (summType, summDict)))
 
 ##### clf
 testFrac = 0.2
-clf_labs = ['b', 'c']
+clf_labs = ['b', 'c']#, 'w']
 labsHierarchy = ['c', 'w']
 
-metric= 'f1c'#'accuracy'
+metric= 'accuracy'
 metricSettingsDi={'classTag':1}
 cv = 5
 
@@ -76,5 +74,5 @@ param_grid = [paramsDi] # clfSettings.grid_params #
 collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
 collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
-oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/coarse'
+oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/WSD1/clf_cb/f1c/melspectral'
 savePredictions = True

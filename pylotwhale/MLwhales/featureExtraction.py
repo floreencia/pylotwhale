@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Nov 15 13:55:12 2015
-
 @author: florencia
 """
 
@@ -79,7 +78,7 @@ def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='defa
     if labelsHierarchy == 'default':
         labelsHierarchy = ['c']
 
-    datO = myML.dataXy_names() #inicialize data object
+    datO = myML.dataXy_names() #initialiase data object
 
     for wavF, annF in WavAnnCollection:
         X, y0_names = getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy)
@@ -107,7 +106,152 @@ def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='
 
     return wavAnnCollection2datXy(coll, feExFun, labelsHierarchy)
 
+### 
 
+def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
+    """
+    Instantiates the annotated sections of a wavfile
+    extracting a feature vector for each annotated section in the wav file
+    ment to be used with feature extraction 'split'
+
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+
+    Parameters
+    ----------
+    wavF: str
+        path to wavefile
+    annF: str
+        path to wavfile
+    featExtFun:  callable
+        feature extraction function 
+                  
+    Returns
+    -------
+    datO: ML.dataXy_names
+        classification features
+    """
+
+    ### check feature extraction function
+    if not callable(featExtFun): # dictionary or None (defaul parameters)
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
+
+    ### extract features for each annotated section
+    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)    
+
+    datO = myML.dataXy_names()     
+    ## for each annotation in the wavfile compute the features
+    for annIndex in range(len(segmentsLi)): 
+        label = segmentsLi[annIndex]['label']
+        waveform = segmentsLi[annIndex]['waveform']
+        M = featExtFun(waveform)
+        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])                                           
+
+    return datO    
+    
+def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
+    """
+    Computes the Xy-data-object and save it as a dictionary, 
+    using the wavF and annF as dictionary keys,
+    for a collection of annotated wav files
+    ment to be used with feature extraction 'split' 
+
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+    
+    Parameters
+    ----------
+    < wavAnnColl : collection of annotated wavfiles
+    < featExtFun : feature extraction function (callable)
+                    or a dictionary with the feature extraction settings
+                    featureExtrationParams = dict(zip(i, i))
+    Return
+    ------    
+    > XyDict : dictionary of features object
+    """
+    ### check feature extraction function
+    if not callable(featExtFun): # dictionary or None (defaul parameters)
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
+
+    XyDict = {}
+
+    for wF, annF in wavAnnColl[:]:
+        datO_test_new = wavAnn2annSecs_dataXy_names( wF, annF, featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
+        XyDict['{}, {}'.format(wF, annF)]=(datO_test_new.X, datO_test_new.y_names )
+    
+    return XyDict
+
+### ensemble generation
+
+def wavFAnnF2sections_wavsEnsemble_datXy_names(wavF, annF, featExtFun=None,
+                                               wavPreprocessingT=None,
+                                               ensembleSettings=None):
+    """
+    Computes the features of each annotated section in the wav file
+    ment to be used with feature extraction 'split' 
+
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+    
+    Parameters:
+    ----------
+    wavFi: str
+        path to wave file
+    featExtFun: callable
+        feature extraction function function
+    wavPreprocessingT : callable
+        applied before ensemble generation
+    ensembleSettings: dict
+        instructions for ensemeble generation
+
+    Return:
+    ------
+        > datXy_names : data object
+    """
+
+    ### check feature extraction function
+    if not callable(featExtFun): # dictionary or None (defaul parameters)
+        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
+    if not callable(wavPreprocessingT): 
+        wavPreprocessingT = lambda x, y: x
+    if ensembleSettings is None:
+        ensembleSettings = dict(effectName='addWhiteNoise', generate_data_grid=np.ones(1) )
+                
+    ### extract features for each annotated section
+    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)
+    #assert sr==fs, "noise and signal waves have different sampling rates"
+
+    datO = myML.dataXy_names()     
+    ## for each annotation in the wavfile compute the features
+    for annIndex in range(len(segmentsLi)): 
+        label = segmentsLi[annIndex]['label']
+        waveform = segmentsLi[annIndex]['waveform']
+        ##        
+        waveform = wavPreprocessingT(waveform, fs)  # preproces waveform
+        ## generate ensemble
+        Y = eff.generateWaveformEnsemble( waveform,  **ensembleSettings) ## noise
+        # Extrac
+        for i in range(len(Y)):#np.shape(Y)[0]):
+            #M, _, _, featStr = featExtFun(Y[i], fs) #
+            M = featExtFun(Y[i,:])
+            datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])                                           
+    
+    return datO
+
+
+def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun=None,
+                                             wavPreprocessingT=None,
+                                             ensembleSettings=None):
+    datO = myML.dataXy_names() # inicialise data object
+    for wavF, annF in wavAnnColl[:]:
+        datO_new = wavFAnnF2sections_wavsEnsemble_datXy_names( wavF, annF, 
+                                                              featExtFun=featExtFun, 
+                                                              wavPreprocessingT=wavPreprocessingT,
+                                                              ensembleSettings=ensembleSettings) 
+        datO.addInstances(datO_new.X, datO_new.y_names )
+    
+    return datO
+
+
+    
+    
 ####### TRANSFORMERS
 ##### Feature extraction classes
 
@@ -325,7 +469,7 @@ def XyDict2XyO(XyDict):
 def wavAnn2sectionsXy_ensemble(wavF, annF, featExtFun=None, wavPreprocessingT=None,
                                ensembleSettings=None):
     """
-        !!!! DEPRECATED: use get_DataXy_fromWavFannF
+        !!!! DEPRECATED: use wavFAnnF2sections_ensemble_datXy_names
 
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 

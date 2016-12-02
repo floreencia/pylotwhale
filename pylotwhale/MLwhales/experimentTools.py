@@ -37,13 +37,13 @@ def generateData_ensembleSettings(whiteNoiseAmp=0.0025, n_artificial_samples=5):
         whiteNoiseAmp=0.0023
         n_artificial_samples = 10
     '''
-    ensembleSettings = {"effectName" : 'addWhiteNoise'} #, "param_grid" : np.ones(10)}
+    ensembleSettings = {"effectName": 'addWhiteNoise'} #, "param_grid" : np.ones(10)}
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*whiteNoiseAmp
     return(ensembleSettings)
 
-def featureExtractionInstructions2Xy(wavAnnColl, lt, featExtFun=None, labelSet=None,
-                                     **feExParamDict):
-    '''All instructions for feature extraction
+def featureExtractionInstructions2Xy(wavAnnColl, lt, TpipeSettings, labelSet=None, 
+                                     **kwargs):
+    """All instructions for feature extraction
     Params:
     -------
         wavAnnColl : 
@@ -52,8 +52,10 @@ def featureExtractionInstructions2Xy(wavAnnColl, lt, featExtFun=None, labelSet=N
         labelSet : list with the subset of labels to consider
         **feExParamDict : other kwargs for feature extraction
             eg. dict(wavPreprocessingT=None, ensembleSettings=ensembleSettings)
-    '''
-    datO = fex.wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun, **feExParamDict)
+    """
+    Tpipe = fex.makeTransformationsPipeline(TpipeSettings)
+    feExFun = Tpipe.fun
+    datO = fex.wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, feExFun,**kwargs)
     X_train, y_train_labels = datO.filterInstances(labelSet)
     y_train = lt.nom2num(y_train_labels)
     return X_train, y_train
@@ -71,9 +73,10 @@ def clf_experiment(clf_settings, **feExInstructionsDict):
     '''
     #print(feExInstructionsDict)
     X_train, y_train = featureExtractionInstructions2Xy(**feExInstructionsDict)
-    clf = train_clf(X_train, y_train, clf_settings) # train    
-    return clf #X_train, y_train # clf
-    
+    clf = train_clf(X_train, y_train, clf_settings) # train
+    return clf  #X_train, y_train # clf
+
+
 class clf_experimentO():
     '''
     object to run clf experiments
@@ -145,8 +148,8 @@ def updateParamTestSet(wavAnnColl_te, lt, featExtFun,
     <test_set_features> : as a dict, ar as X, y nparray pair
     '''
     #paramDict['featExtFun'][paramKey] = param # update featExFun
-    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te,
-                                              featExtFun=featExtFun)
+    XyDict_test = fex.wavAnnCollection2datXyDict(wavAnnColl_te,
+                                                 featExtFun=featExtFun)
 
     if output_type =='dict':
         return XyDict_test
@@ -158,12 +161,13 @@ def updateParamTestSet(wavAnnColl_te, lt, featExtFun,
         return X_test, y_test
 
 
-def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
-                            paramKey, updateParamInDict,
+def run_iter_clf_experiment(param_grid, paramKey, paramDict,
+                            clf_settings, feExParamsDict,
+                            #updateParamInDict,
                             wavAnnColl_te, lt,
                             updateTestSet=True,
                             scores_file=None,
-                            accum_file=None):
+                            accum_file=None, ):
     """
     Run a clf experiments for different parameters (param_grid)
     Parameters:
@@ -171,29 +175,32 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
     param_grid : array_like
         Experiment parameters.
         Often repeated according to n_experiments
+    paramKey : str
+        key of paramDict, used to specify the and aupdate the experiments parameter
+        which can be a feature name (ceps), NFFT or the instructions for the ensemble
+        generation. See updateParamInDict() and feExParamsDict.
+    paramDict: dict
+        dictionary where the experment param was defined
     clf_settings : dictionary
            clf settings
-    feExParamDict : dictionary
+    feExParamsDict: feExParamDict : dictionary
         Instructions for the extraction of features and ensemble generation.
-            Used user over the train set and sometimes also over the test set.
+        Used user over the train set and sometimes also over the test set.
             wavAnnColl : collection of annotated wavs
             lt : label transformer
             featExtFun : feature extraction instructions callable or dicT
             labelSet : set of clf-labels
             ensembleSettings :  instructions for the generation of a sound ensemble (dict)
-    paramKey : str
-        Argument of the param dictionary, used to update parameter of the experiment,
-        which can be a feature name (ceps), NFFT or the instructions for the ensemble
-        generation. See updateParamInDict() and feExParamDict.
+
     updateParamInDict : callable
-        Instructions for updating the experimental parameter. 
-        Often specified by feExParamDict.
+        Instructions for updating the experimental parameter.
+        Often specified by paramsDict.
     wavAnnColl_te : list,
         test collection
     lt : label transformer
     updateTestSet : bool
         True if feture extraction changes over the experiment
-        False, otherwise, i.e. no need to update feature representation if the test set
+        False, no need to update feature representation if the test set
     scores_file : str
         output file for saving clf scores
     accum_file : str
@@ -201,9 +208,12 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
 
     """
 
-    #TEST DATA
-    XyDict_test = fex.wavAnnCollection2XyDict(wavAnnColl_te,
-                                              feExParamDict['featExtFun'])
+    ### TEST DATA
+    ## data settings
+    paramDict[paramKey]=param_grid[0]
+    ## 
+    feExFun = fex.makeTransformationsPipeline(feExParamsDict["TpipeSettings"]).fun
+    XyDict_test = fex.wavAnnCollection2datXyDict(wavAnnColl_te, feExFun)
     XyO_test = fex.XyDict2XyO(XyDict_test)
     X_test, y_test_labels = XyO_test.filterInstances(lt.classes_)
     y_test = lt.nom2num(y_test_labels)
@@ -211,17 +221,18 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
     scoresDict = None
 
     for param in param_grid:
-
-        feExParamDict = updateParamInDict(feExParamDict, paramKey, param)
-        clfExp = clf_experimentO(clf_settings, **feExParamDict)
-        #print("param", param, '\n\n', feExParamDict['featExtFun'])
+        paramDict[paramKey]=param  #paramsDict = updateParamInDict(feExParamsDict, paramKey, param)
+        print(paramKey, paramDict[paramKey], feExParamsDict["TpipeSettings"])
+        clfExp = clf_experimentO(clf_settings, **feExParamsDict)
+        #print("param", param, '\n\n', paramsDict['featExtFun'])
 
         if updateTestSet:  # True when changing feature extraction instructions
+            feExFun = fex.makeTransformationsPipeline(feExParamsDict["TpipeSettings"]).fun
             XyDict_test = updateParamTestSet(wavAnnColl_te, lt,
-                                             featExtFun=feExParamDict['featExtFun'],
+                                             featExtFun=feExFun,
                                              output_type='dict')
             X_test, y_test = updateParamTestSet(wavAnnColl_te, lt,
-                                             featExtFun=feExParamDict['featExtFun'],
+                                                featExtFun=feExFun,
                                                 output_type='Xy')
 
         if scores_file is not None:
@@ -231,7 +242,7 @@ def run_iter_clf_experiment(param_grid, clf_settings, feExParamDict,
             scoresDict = clfExp.accumPredictions(XyDict_test, param,
                                                  predictionsDict=scoresDict)
 
-    if XyDict_test is not None:
+    if accum_file is not None:
         clfExp.print_predictions(accum_file, scoresDict, lt)
 
     return True

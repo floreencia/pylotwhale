@@ -69,9 +69,12 @@ out_file_scores = os.path.join(oDir, "scores.txt")
 out_file_votes = os.path.join(oDir, "votes.txt")
 
 ## ensemble
+Tpipe = fex.makeTransformationsPipeline(T_settings)
+feExFun = Tpipe.fun
+featureStr = Tpipe.string
 ## feature extraction object
-feExOb = fex.wavFeatureExtractionSplit(featConstD)  # feature extraction settings
-featureStr = feExOb.feature_str
+#feExOb = fex.wavFeatureExtractionSplit(featConstD)  # feature extraction settings
+#featureStr = feExOb.feature_str
 
 #### classes mapping
 lt = myML.labelTransformer(callSet)
@@ -99,14 +102,13 @@ gs = grid_search.GridSearchCV(**gs_settings)
 ######### Functions #######
 #ensembleSettings = exT.genrateData_ensembleSettings(param)
 
-feExParamDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
-                 'featExtFun': featConstD,
-                 'labelSet': callSet,  # depreciated !!!
-                 #'wavPreprocessingT' : None,
-                 'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
-                 }  # , 'ensembleSettings' : ensembleSettings}
+paramsDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
+              'TpipeSettings': T_settings,
+              'labelSet': callSet,  # depreciated !!!
+              #'wavPreprocessingT' : None,
+              'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
+              }  # , 'ensembleSettings' : ensembleSettings}
 
-print("TEST", feExParamDict)
 ###################  TASK  ####################
 
 ## print experiment settings header
@@ -118,9 +120,8 @@ with open(out_file_scores, 'w') as f:
 print('--------\nSETTINGS\n--------\n:', out_file_scores)  # ,
       #np.shape(X_test), np.shape(y_test),'\n',param_grid, '\n', feExParamDict)
 
-exT.run_iter_clf_experiment(param_grid, gs_settings, feExParamDict,
-                            paramKey, updateParamInDict,
-                            wavAnnColl_te, lt,
+exT.run_iter_clf_experiment(param_grid, paramKey, paramsDict, gs_settings,
+                            paramsDict, wavAnnColl_te, lt,
                             updateTestSet=updateTestSet,
                             scores_file=out_file_scores,
                             accum_file=out_file_votes)

@@ -3,7 +3,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Nov 27 18:05:03 2015
-#!/usr/bin/python
 @author: florencia
 """
 #####
@@ -18,7 +17,7 @@ def experimentsControlParams(iterParam):
     given the control parameter name (str), returns an object for
     setting up the experiment variables
     """
-    controlParamsDict = {"Nslices" : NslicesO,
+    controlParamsDict = {"Nslices": NslicesO,
                          "overlap": overlapO,
                          "NArtificialSamples": ArtificialSamplesO,
                          "noiseAmplitude": noiseAmplitudeO,

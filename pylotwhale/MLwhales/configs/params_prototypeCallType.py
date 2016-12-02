@@ -28,22 +28,28 @@ ensembleSettingsD['n_artificial_samples'] = 6 # number of artificial samples to 
 ensembleSettingsD['whiteNoiseAmp'] = 0.09
 
 #### Feature extraction 
+fs = 48000
+T_settings = []
+
 ## preprocessing
-lb = 1500; hb = 24000; order = 3 # None
-wavPreprocessingFun = None  # functools.partial(sT.butter_bandpass_filter, lowcut=lb, highcut=hb, order=order)
-#preproStr +=''#'bandfilter{}_{}'.format(lb, hb)
+filt='band_pass_filter'
+filtDi={"fs":fs, "lowcut":0, "highcut":22000, "order":5}
+#T_settings.append(('bandFilter', (filt, filtDi)))
 
 #### features dictionary
-featConstD = {}
-summDict = {'summarisation': 'splitting', 'Nslices':5, 'normalise':True}
-featConstD['summariseDict'] = summDict
-NFFTpow = 7; featConstD["NFFTpow"] = NFFTpow
-overlap = 0.5; featConstD["overlap"] = overlap
-#Nslices = 4; featConstD["Nslices"] = Nslices
-#normalize = True; featConstD["normalize"] = normalize
-featExtract='spectral'; featConstD["featExtrFun"]= featExtract
-#n_mels = 64; featConstD["n_mels"]= n_mels; featExtract='melspectro'; featConstD["featExtrFun"]= featExtract
-#Nceps=2**4; featConstD["Nceps"]= Nceps; featExtract='cepstral'; featConstD["featExtrFun"]= featExtract
+auD = {}
+auD["sRate"] = fs
+NFFTpow = 7; auD["NFFT"] = 2**NFFTpow
+overlap = 0.5; auD["overlap"] = overlap
+#Nslices = 4; auD["Nslices"] = Nslices
+audioF='spectral'#; auD["featExtrFun"]= featExtract
+#n_mels = 64; auD["n_mels"]= n_mels; audioF='melspectro'; 
+#Nceps=2**4; auD["Nceps"]= Nceps; audioF='cepstral'
+T_settings.append(('Audio_features', (audioF, auD)))
+
+summDict = {'Nslices': 5, 'normalise': True}
+summType = 'splitting'
+T_settings.append(('summ', (summType, summDict)))
 
 ##### clf
 metric='accuracy'
