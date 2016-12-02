@@ -43,14 +43,14 @@ print("Control variable: ", controlVariable)
 
 #### Control parameters
 controlParamO = experimentsControlParams(controlVariable)
+
 ## variables
 parameter = controlParamO.parameter
-paramKey = controlParamO.paramKey
 controlParams = controlParamO.controlParams
-updateParamInDict = controlParamO.updateParamInDict
+paramDict = controlParamO.paramDict
 updateTestSet = controlParamO.updateTestSet
 preproStr = controlParamO.settingsStr
-print(parameter, paramKey)
+print(parameter)
 #sys.exit()
 #### parameter grid for the experiments
 param_grid = np.repeat(controlParams, n_experiments)  # repeat each experiment n_experiments times
@@ -102,12 +102,12 @@ gs = grid_search.GridSearchCV(**gs_settings)
 ######### Functions #######
 #ensembleSettings = exT.genrateData_ensembleSettings(param)
 
-paramsDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
-              'TpipeSettings': T_settings,
-              'labelSet': callSet,  # depreciated !!!
-              #'wavPreprocessingT' : None,
-              'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
-              }  # , 'ensembleSettings' : ensembleSettings}
+feExParamsDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
+                  'TpipeSettings': T_settings,
+                  'labelSet': callSet,  # depreciated !!!
+                  #'wavPreprocessingT' : None,
+                  'ensembleSettings': exT.generateData_ensembleSettings(**ensembleSettingsD)
+                  }  # , 'ensembleSettings' : ensembleSettings}
 
 ###################  TASK  ####################
 
@@ -120,8 +120,8 @@ with open(out_file_scores, 'w') as f:
 print('--------\nSETTINGS\n--------\n:', out_file_scores)  # ,
       #np.shape(X_test), np.shape(y_test),'\n',param_grid, '\n', feExParamDict)
 
-exT.run_iter_clf_experiment(param_grid, paramKey, paramsDict, gs_settings,
-                            paramsDict, wavAnnColl_te, lt,
+exT.run_iter_clf_experiment(param_grid, parameter, paramDict, gs_settings,
+                            feExParamsDict, wavAnnColl_te, lt,
                             updateTestSet=updateTestSet,
                             scores_file=out_file_scores,
                             accum_file=out_file_votes)

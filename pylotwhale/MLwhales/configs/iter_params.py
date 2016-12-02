@@ -45,14 +45,13 @@ class controlVariable():
     updateTestSet : bool
     updateParamInDict : callable
     '''
-    def __init__(self, parameterName, paramKey,
-                 controlParams, updateTestSet,
-                 updateParamInDict, settingsStr):
+    def __init__(self, parameterName, controlParams, updateTestSet, 
+                 paramDict,# updateParamInDict, 
+                 settingsStr):
         self.parameter = parameterName
-        self.paramKey = paramKey
         self.controlParams = controlParams
         self.updateTestSet = updateTestSet
-        self.updateParamInDict = updateParamInDict
+        self.paramDict = paramDict
         self.settingsStr = settingsStr
 
 
@@ -63,18 +62,15 @@ parameter="Nslices"
 Nsl0 = 1
 Nsl = 12
 controlParam = np.arange(Nsl0, Nsl)
-
-def updateParamInDict_Nslices(paramDict, paramKey, param):
-    paramDict['featExtFun']['summariseDict'][paramKey] = param
-    print('\n\nTEST\n\n', paramDict, "\n\n", paramKey)
-    return paramDict
+from pylotwhale.MLwhales.configs.params_prototypeCallType import summDict
+paramDict = summDict
 
 NslicesO = controlVariable(parameterName=parameter,
-                           paramKey=parameter,
                            controlParams=controlParam,
                            updateTestSet=True,
-                           updateParamInDict=updateParamInDict_Nslices,
+                           paramDict=paramDict,
                            settingsStr="{}_{}_{}".format(parameter, Nsl0, Nsl))
+
 
 
 #### NArtificialSamples = ensembleSettings[n_artificial_samples]
@@ -82,18 +78,13 @@ parameter = "NArtificialSamples"
 N0 = 4
 N = 10
 controlParam_NArtSamps = np.arange(N0, N)  # less than 5 doesn't work with CV=10
-
-
-def updateParamInDict_NArtSamps(paramDict, paramKey, param):
-    paramDict[paramKey] = exT.generateData_ensembleSettings(
-                                                n_artificial_samples=param)
-    return paramDict
+from pylotwhale.MLwhales.configs.params_prototypeCallType import ensembleSettingsD
+paramDict=ensembleSettingsD
 
 ArtificialSamplesO = controlVariable(parameterName=parameter,
-                                     paramKey="ensembleSettings",
                                      controlParams = controlParam_NArtSamps,
                                      updateTestSet=False,
-                                     updateParamInDict=updateParamInDict_NArtSamps,
+                                     paramDict=paramDict,
                                      settingsStr="{}_{}_{}".format(parameter, N0, N))
 
 
@@ -103,16 +94,14 @@ parameter = 'overlap'
 N0 = 0
 Ndelta = 0.1
 N = 1
-
-def updateParamInDict_over(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param
-    return paramDict
+from pylotwhale.MLwhales.configs.params_prototypeCallType import auD
+paramDict=auD
 
 overlapO = controlVariable(parameterName=parameter,
-                           paramKey=parameter,
                            controlParams=np.arange(N0, N, Ndelta),
                            updateTestSet=True,
-                           updateParamInDict=updateParamInDict_over,
+                           paramDict=paramDict,
+                           #updateParamInDict=updateParamInDict_over,
                            settingsStr="{}_{}".format(
                                        parameter, '{}_{}'.format(N0, N))
                            )
@@ -124,17 +113,14 @@ n_amps = 10
 a0 = 0.001
 a = 0.2 # 0.005 for ceps
 amps = np.linspace(a0, a, n_amps)  # paramter domain np.arange(5,a)#
+paramDict=ensembleSettingsD
 
-
-def updateParamInDict_noise(paramDict, paramKey, param):
-    paramDict[paramKey] = exT.generateData_ensembleSettings(whiteNoiseAmp=param) #
-    return paramDict
 
 noiseAmplitudeO = controlVariable(parameterName=parameter,
-                                  paramKey='ensembleSettings',
                                   controlParams=amps,
                                   updateTestSet=False,
-                                  updateParamInDict=updateParamInDict_noise,
+                                  paramDict=paramDict,
+                                  #updateParamInDict=updateParamInDict_noise,
                                   settingsStr="{}_{}_{}".format(parameter, a0, a)
                                   )
 
@@ -146,37 +132,30 @@ parameter = 'Nceps'
 N0 = 8
 Ndelta = 4
 N = 34
-
-
-def updateParamInDict_Nceps(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param
-    return paramDict
+paramDict = auD
 
 NcepsO = controlVariable(parameterName=parameter,
-                         paramKey=parameter,
                          controlParams=np.arange(N0, N, Ndelta),
-                         updateTestSet=True,
-                         updateParamInDict=updateParamInDict_Nceps,
+                         updateTestSet=True,                           
+                         paramDict=paramDict,
+                         #updateParamInDict=updateParamInDict_Nceps,
                          settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
                          )
 
-##### NFFTpow
-parameter = 'NFFTpow'
-N0 = 8
+##### NFFT
+parameter = 'NFFT'
+N0 = 7
 Ndelta = 1
 N = 10
-NFFTs = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps)
-
-
-def updateParamInDict_NFFT(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param
-    return paramDict
+NFFTpows = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps)
+NFFTs = np.array([2**p for p in NFFTpows])
+paramDict = auD
 
 NFFTO = controlVariable(parameterName=parameter,
-                        paramKey=parameter,
                         controlParams=NFFTs,
                         updateTestSet=True,
-                        updateParamInDict=updateParamInDict_NFFT,
+                        paramDict=paramDict,
+                        #updateParamInDict=updateParamInDict_NFFT,
                         settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
                         )
 
@@ -184,19 +163,16 @@ NFFTO = controlVariable(parameterName=parameter,
 parameter = 'n_mels'
 N0 = 2
 Ndelta = 1
-N = 7
+N = 30
 Nmels = np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps) 
+paramDict = auD
 
-
-def updateParamInDict_Nmels(paramDict, paramKey, param):
-    paramDict['featExtFun'][paramKey] = param 
-    return paramDict
 
 NmelsO = controlVariable(parameterName=parameter,
-                         paramKey=parameter,
                          controlParams=Nmels,
                          updateTestSet=True,
-                         updateParamInDict=updateParamInDict_NFFT,
+                         paramDict=paramDict,
+                         #updateParamInDict=updateParamInDict_NFFT,
                          settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
                          )
                          
@@ -207,4 +183,3 @@ NmelsO = controlVariable(parameterName=parameter,
 #NcepsO.NmelsO.paramKey
 
 
-                        

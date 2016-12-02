@@ -222,7 +222,7 @@ def run_iter_clf_experiment(param_grid, paramKey, paramDict,
 
     for param in param_grid:
         paramDict[paramKey]=param  #paramsDict = updateParamInDict(feExParamsDict, paramKey, param)
-        print(paramKey, paramDict[paramKey], feExParamsDict["TpipeSettings"])
+        print(paramKey, paramDict[paramKey], paramDict, feExParamsDict["TpipeSettings"])
         clfExp = clf_experimentO(clf_settings, **feExParamsDict)
         #print("param", param, '\n\n', paramsDict['featExtFun'])
 
