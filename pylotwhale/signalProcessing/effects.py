@@ -119,7 +119,7 @@ def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=Non
         effect : name of the effect to use (string)
         generate_data_grid : parameter grid for the effect (np.array)
         kwEffect : kwargs for the effect
-    Returns:
+    Returns
     -------
         Y : waveform ensemble (np.array), one waveform per row
     '''

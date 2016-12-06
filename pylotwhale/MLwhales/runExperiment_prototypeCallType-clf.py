@@ -56,11 +56,11 @@ print(parameter)
 param_grid = np.repeat(controlParams, n_experiments)  # repeat each experiment n_experiments times
 
 ##### LOAD COLLECTIONS
-wavAnnColl_tr = fex.readCols(collFi_train, (0, 1))
-wavAnnColl_te = fex.readCols(collFi_test, (0, 1))
+#wavAnnColl_tr = 
+wavAnnColl_te = np.genfromtxt(filesDi['test'], dtype=object) #fex.readCols(filesDi['test'], (0, 1))
 
 ##### OUTPUT FILES
-oDir = os.path.join(oDir, parameter)
+oDir = os.path.join(filesDi['outDir'], audioF, parameter)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -70,7 +70,7 @@ out_file_votes = os.path.join(oDir, "votes.txt")
 
 ## ensemble
 Tpipe = fex.makeTransformationsPipeline(T_settings)
-feExFun = Tpipe.fun
+#feExFun = Tpipe.fun
 featureStr = Tpipe.string
 ## feature extraction object
 #feExOb = fex.wavFeatureExtractionSplit(featConstD)  # feature extraction settings
@@ -101,8 +101,9 @@ gs = grid_search.GridSearchCV(**gs_settings)
 
 ######### Functions #######
 #ensembleSettings = exT.genrateData_ensembleSettings(param)
-
-feExParamsDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
+train_coll = np.genfromtxt(filesDi['train'], dtype=object)
+feExParamsDict = {'wavAnnColl': train_coll,
+                  'lt': lt,
                   'TpipeSettings': T_settings,
                   'labelSet': callSet,  # depreciated !!!
                   #'wavPreprocessingT' : None,
@@ -115,7 +116,7 @@ feExParamsDict = {'wavAnnColl': wavAnnColl_tr, 'lt': lt,
 with open(out_file_scores, 'w') as f:
     f.write("#{}\n#TRAIN: {}\n#TEST: {}\n#{}\n#{}\t{}\n".format(
             time.strftime("%Y.%m.%d\t\t%H:%M:%S"),
-            collFi_train, collFi_test, settingsStr, parameter, metric))
+            filesDi['train'], filesDi['test'], settingsStr, parameter, metric))
 
 print('--------\nSETTINGS\n--------\n:', out_file_scores)  # ,
       #np.shape(X_test), np.shape(y_test),'\n',param_grid, '\n', feExParamDict)
