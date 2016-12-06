@@ -455,7 +455,11 @@ class dataXy_names(dataX):
         new_y_names : targets
                     np.array (m,)
         '''
-        m, n = np.shape(new_X) # m (instances) x n (features)
+        try:
+            m, n = np.shape(new_X) # m (instances) x n (features)
+        except ValueError: # notthing to add new_X=None
+            return None
+            
         ## check dimensions
         if self.X is None: # first time we load data
             self.load_X(new_X)
