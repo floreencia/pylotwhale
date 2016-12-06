@@ -28,6 +28,7 @@ from pylotwhale.utils.dataTools import stringiseDict
 
 #### WAV-ANNS
 ### Extract features
+### hieraarchical annotations (WALKING)
 
             
 def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
@@ -61,7 +62,7 @@ def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None
 
 def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
     """
-    Extracts features and labels from wav-ann collction    
+    Extracts features and labels from wav-ann colletion    
     Parameters
     ----------
     WavAnnCollection: list of tuples
@@ -69,7 +70,7 @@ def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='defa
     feExFun: callable
         feature extraction functioN
     labelsHierarchy: list
-        labels in hierarchical order for setting the label of the instances
+        labels in hierarchical order for setting the label of the instances (WALKING)
 
     Return
     ------    
@@ -106,7 +107,7 @@ def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='
 
     return wavAnnCollection2datXy(coll, feExFun, labelsHierarchy)
 
-### 
+### 1 section x feature vector (SPLITTING)
 
 def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
     """
@@ -129,11 +130,7 @@ def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
     -------
     datO: ML.dataXy_names
         classification features
-    """
-
-    ### check feature extraction function
-    if not callable(featExtFun): # dictionary or None (defaul parameters)
-        featExtFun = wavFeatureExtraction(featExtFun).featExtrFun() # default
+    """  
 
     ### extract features for each annotated section
     segmentsLi, fs = auf.getAnnWavSec(wavF, annF)    
@@ -147,6 +144,36 @@ def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])                                           
 
     return datO    
+    
+def wavAnnCollection2annSecs_dataXy_names(wavAnnColl, featExtFun=None):
+    """
+    Computes the X, y for a collection of annotated wav files
+    for each annotated section in the wav file
+    ment to be used with feature extraction 'split' 
+
+    ( •_•)O*¯`·. Used for call type classification .·´¯`°Q(•_• )
+    
+    Parameters
+    ----------
+    < wavAnnColl : collection of annotated wavfiles
+    < featExtFun :  feature extraction function (callable)
+                    or a dictionary with the feature extraction settings
+                    featureExtrationParams = dict(zip(i, i))
+    Return
+    ------    
+    > datXy_names : features object
+    """
+
+    datO = myML.dataXy_names() 
+
+    for wavF, annF in wavAnnColl[:]:
+        #datO_test_new = wavAnn2sectionsXy( wF, annF, featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
+        datO_new = wavAnn2annSecs_dataXy_names(wavF, annF, 
+                                               featExtFun=featExtFun) #wavPreprocessingT = wavPreprocessingFun )
+        datO.addInstances(datO_new.X, datO_new.y_names )
+
+    return datO
+    
     
 def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
     """
@@ -236,9 +263,10 @@ def wavFAnnF2sections_wavsEnsemble_datXy_names(wavF, annF, featExtFun=None,
     return datO
 
 
-def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun=None,
+def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun,
                                              wavPreprocessingT=None,
                                              ensembleSettings=None):
+        
     datO = myML.dataXy_names() # inicialise data object
     for wavF, annF in wavAnnColl[:]:
         datO_new = wavFAnnF2sections_wavsEnsemble_datXy_names( wavF, annF, 
@@ -248,6 +276,87 @@ def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun=None,
         datO.addInstances(datO_new.X, datO_new.y_names )
     
     return datO
+
+
+def annotationsSamplesSpace(wavAnnColl):
+    """create dictionary of labels and a list of waveforms from collection"""
+    sampSpaceDi={}
+    for wavF, annF in wavAnnColl:
+        segmentsLi, fs = auf.getAnnWavSec(wavF, annF)
+        for i, segment in enumerate(segmentsLi):
+            label = segment['label']
+            waveform = segment['waveform']
+            if label not in sampSpaceDi.keys():
+                sampSpaceDi[label] = [waveform]
+            else:
+                sampSpaceDi[label].append(waveform)
+    return sampSpaceDi
+
+def waveformsLi2DatXy_names(waveformsLi, label, feExFun, nInstances):
+    """Extracts features from an waveformlist and returns data object"""
+    n_samps = len(waveformsLi)
+    stopIdx=None
+    if n_samps > nInstances:
+        stopIdx = nInstances
+
+    datO = myML.dataXy_names() #initialise data object
+    for waveform in waveformsLi[:stopIdx]:
+        M = feExFun(waveform)
+        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [np.array(label)])
+    return datO
+
+
+def waveformsLi2aritificial_DatXy_names(waveformsLi, label, feExFun, n_instances,
+                                        **ensemble_settings):
+    """takes a list of waveforms, all with the same label, generates artificial samples, 
+    extracts features and returns data object
+    Paramters
+    ---------
+    n_instances: int
+        total number of artificial samples (instances) to generate
+    ensemble_settings: dict
+        kwards for the geneation of artificial samples
+        see exT.generateData_ensembleSettings(n_artificial_samples=1)
+    """
+    n_samps = len(waveformsLi)
+    # indices to take different waveforms untill created desired number of samples
+    indices = np.arange(n_instances)%n_samps 
+    datO = myML.dataXy_names() #initialise data object
+
+    for i in indices:
+        waveform = waveformsLi[i]
+        artificial_waveform = eff.generateWaveformEnsemble( waveform,  **ensemble_settings)[0]
+        art_samp=feExFun(artificial_waveform)
+        datO.addInstances(np.expand_dims(art_samp.flatten(), axis=0), [np.array(label)])
+    return datO
+
+def extractFeaturesWDataAugmentation(sampSpace, feExFun, n_instances = 10, **ensSettings):
+    """Prepares data with the labels in wavAnnCollection, 
+    balancing the classes generating artitificial samples
+    Parameter
+    ---------
+    sampSpace: dict
+        labels and waveforms (samples space)
+    feExfun: callable
+    n_instances: int
+    ensemble_settings: dict
+        kwards for the geneation of artificial samples
+        see exT.generateData_ensembleSettings(n_artificial_samples=1)"""
+
+    datO = myML.dataXy_names()  # data object
+    for call in sampSpace.keys():
+        ### extract features from original samples
+        dat = waveformsLi2DatXy_names(sampSpace[call], call, feExFun, nInstances=n_instances)
+        datO.addInstances(dat.X, dat.y_names)
+        n_art_instances = n_instances - dat.m_instances
+        ### generate artificial samples
+        datArt = waveformsLi2aritificial_DatXy_names(sampSpace[call], call, feExFun, 
+                                                     n_instances=n_art_instances, **ensSettings)
+        datO.addInstances(datArt.X, datArt.y_names)
+    return datO
+
+    
+
 
 
     
