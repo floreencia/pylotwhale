@@ -74,7 +74,7 @@ class annotationsValidity():
 
 
 def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, dpi=None,
-                         labelsHeight=10, cmapName='seismic', lw = 1, cmapIm=None, **kwargs): 
+                         labelsHeight=10, cmapName='seismic', lw = 1, **kwargs): 
     '''
     plots the spectrogram with it's annotations
     Parameters
@@ -94,7 +94,7 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, d
     plt.ioff()
     fig, ax = plt.subplots(figsize=figsize)
 
-    ax.imshow(M.T, aspect='auto', origin='bottom', cmap=cmapIm, #interpolation='nearest', 
+    ax.imshow(M.T, aspect='auto', origin='bottom', #interpolation='nearest', 
               extent=[0, tf, 0, fs/2/1000.], **kwargs)
     ax.set_xlabel('time (s)')
     ax.set_ylabel('frequecy (KHz)')
@@ -119,6 +119,7 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, d
     outPl = os.path.join( outDir, os.path.basename(wavFi).replace('wav', 'png'))
     plt.savefig(outPl, dpi=dpi)
     del fig, ax
+    return outPl
     
     
 def annWavColl2annotatedSpectroPlots( wavAnnCollection, outDir, callAsTitle=True, 
