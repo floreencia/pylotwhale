@@ -22,6 +22,30 @@ from sklearn import svm
 import time
 
 
+###### Iter parameters
+
+class controlVariable():
+    '''
+    Data structure for an experiment's control variable
+    Parameters:
+    -----------
+    paramater : str
+    paramKey : str
+        paramKey
+    controlParams: numpy array
+        experiment's control parameter
+    updateTestSet : bool
+    updateParamInDict : callable
+    '''
+    def __init__(self, parameterName, controlParams, updateTestSet, 
+                 paramDict,# updateParamInDict, 
+                 settingsStr):
+        self.parameter = parameterName
+        self.controlParams = controlParams
+        self.updateTestSet = updateTestSet
+        self.paramDict = paramDict
+        self.settingsStr = settingsStr
+
 def train_clf(X, y, clf_settings):
     gs = GridSearchCV(**clf_settings)
     gs.fit(X, y)
@@ -40,6 +64,7 @@ def generateData_ensembleSettings(whiteNoiseAmp=0.0025, n_artificial_samples=5):
     ensembleSettings = {"effectName": 'addWhiteNoise'} #, "param_grid" : np.ones(10)}
     ensembleSettings["generate_data_grid"] = np.ones(n_artificial_samples)*whiteNoiseAmp
     return(ensembleSettings)
+
 
 def featureExtractionInstructions2Xy(wavAnnColl, lt, TpipeSettings, labelSet=None, 
                                      **kwargs):
@@ -222,7 +247,7 @@ def run_iter_clf_experiment(param_grid, paramKey, paramDict,
 
     for param in param_grid:
         paramDict[paramKey]=param  #paramsDict = updateParamInDict(feExParamsDict, paramKey, param)
-        print(paramKey, paramDict[paramKey], paramDict, feExParamsDict["TpipeSettings"])
+        print(paramKey, paramDict[paramKey], paramDict)#, feExParamsDict["TpipeSettings"])
         clfExp = clf_experimentO(clf_settings, **feExParamsDict)
         #print("param", param, '\n\n', paramsDict['featExtFun'])
 
