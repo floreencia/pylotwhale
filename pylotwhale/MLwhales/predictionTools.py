@@ -12,7 +12,7 @@ import numpy as np
 import os
 #import sys
 import featureExtraction as fex
-import pylotwhale.signalProcessing.signalTools_beta as sT
+import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
 import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.signalProcessing.audioFeatures as auf
@@ -25,7 +25,7 @@ import pylotwhale.utils.annotationTools as annT
 def predictSoundSections(wavF, clf, lt, feExFun,
                          outF='default', annSections='default'):
     '''
-    predicts and generates the annotations of the given wavF
+    predicts and generates the annotations of the given wavF walking
     Parameters:
     -----------
     wavF : str
@@ -253,8 +253,57 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None, sep='
                 li += '\t{}\t{}\n'.format(lt.num2nom(y)[0], y_probs[0])
             g.write(li)
     return outFile
-    
-def predictAnnotationSections(wavF, annF, clf, feExtParams, lt, outFile=None,
+
+
+def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
+                              sep='\t', printProbs=False, header='',
+                              readSections=None, printreadSectionsC=True):
+    """predicts annotations for call types sections
+    Parameters
+    ----------
+    wavF: str
+    annF: str
+    clf: estimator
+    featExtFun: callable
+    lt: labelTransformer
+    outFil: str
+    sep: str
+    printProbs: bool
+    header: str
+    readSections: list of str
+        regions in the annF for wich we predict
+    printreadSectionsC: bool"""
+
+    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                        
+    ## load files
+    waveform, fs = sT.wav2waveform(wavF)
+    T, L = annT.anns2TLndarrays(annF)
+    if readSections == None: 
+        readSections = list(set(L))
+    ## for each annotation section
+    for i, label in enumerate(L):
+        if label in readSections:
+            waveformSec = auf.getWavSec(waveform, fs, *T[i] )
+            ## predict
+            try:
+                M0 = featExtFun(waveformSec)
+                M = np.expand_dims(M0.flatten(), axis=0)
+                y_pred = lt.num2nom(clf.predict(M))
+            except AssertionError:
+                y_pred = [label]
+            ## write
+            with open(outFile, 'a') as f:
+                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, *y_pred))
+        elif printreadSectionsC:
+            with open(outFile, 'a') as f:
+                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, label))
+
+    return outFile   
+                                  
+                                  
+                                  
+  
+def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
                               sep='\t', printProbs=False, header=''):
     '''
     Predicts the label (call types) of each annotated section and writes 
@@ -274,23 +323,21 @@ def predictAnnotationSections(wavF, annF, clf, feExtParams, lt, outFile=None,
         os.remove(outFile)
     except OSError:
         pass
-    
+
     ## read data
-    predO = fex.wavAnn2sectionsXy(wavF, annF, featExtFun=feExtParams)
+    predO = fex.wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=feExtParams)
     ## predict
     predictions = np.expand_dims(lt.num2nom(clf.predict(predO.X)), axis=1)
     if printProbs:
         predictions = np.hstack((predictions, clf.predict_proba(predO.X)))
         header = '{}'.format(le.classes_)
     ## save file
-    A = np.loadtxt(annF, delimiter='\t', dtype='|S', ndmin=2)#,usecols=[0,1])
+    A = np.loadtxt(annF, delimiter='\t', dtype=object, ndmin=2)#,usecols=[0,1])
     np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s', 
                delimiter = '\t', header=header)
     return outFile
-    
-    
-    
-    
+   
+
 ### GARBAGE    
     
 def plConfusionMatrix(cM, labels, outFig='', figsize=None):
