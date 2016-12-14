@@ -16,10 +16,11 @@ import time
 import sys
 import numpy as np
 
-from pylotwhale.MLwhales.configs.params_CallTypeClf import *
-from pylotwhale.MLwhales.configs.iter_params_callClf import experimentsControlParams
 import pylotwhale.MLwhales.MLtools_beta as myML
+
+from pylotwhale.MLwhales.configs.params_CallTypeClf import *
 from pylotwhale.MLwhales.experiment_callClf import runCallClfExperiment
+from pylotwhale.MLwhales.configs.iter_params_callClf import experimentsControlParams
 
 """
 import pylotwhale.MLwhales.featureExtraction as fex
@@ -80,7 +81,6 @@ out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
 out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
 out_file.write("#" + settingsStr+'\n')
 out_file.close()
-
 
 for param in exp_grid_params:
     settingsDi[iterParam] = param
