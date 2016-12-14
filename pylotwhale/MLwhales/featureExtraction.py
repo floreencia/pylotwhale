@@ -28,7 +28,7 @@ from pylotwhale.utils.dataTools import stringiseDict
 
 #### WAV-ANNS
 ### Extract features
-### hieraarchical annotations (WALKING)
+### hierarchical annotations (WALKING)
 
             
 def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
@@ -133,9 +133,9 @@ def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
     """  
 
     ### extract features for each annotated section
-    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)    
+    segmentsLi, fs = auf.getAnnWavSec(wavF, annF)
 
-    datO = myML.dataXy_names()     
+    datO = myML.dataXy_names()
     ## for each annotation in the wavfile compute the features
     for annIndex in range(len(segmentsLi)): 
         label = segmentsLi[annIndex]['label']
@@ -205,6 +205,38 @@ def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
         XyDict['{}, {}'.format(wF, annF)]=(datO_test_new.X, datO_test_new.y_names )
     
     return XyDict
+    
+def wavLCollection2datXy(wavLabelCollection, featExtFun=None):
+    """
+    returns the data object of a collection of labeled wavs
+
+        ( •_•)O*¯`·. call type (classification) .·´¯`°Q(•_• )
+
+    Parameters
+    ----------
+    wavLabelCollection : list of tuples
+        tu[0] : path to wav file
+        tu[1] : wav label
+    featExtFun : callable
+
+    Return
+    ------
+    > datO: myML.dataXy_names
+        data
+    """   
+        
+    datO = myML.dataXy_names() #inicialize data object    
+
+    for wavF, l in wavLabelCollection:
+        waveForm, fs = wav2waveform(wavF, normalize=False)
+        M = featExtFun(waveForm)
+        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])
+        
+        #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
+    return datO      
+    
+    
+    
 
 ### ensemble generation
 
@@ -456,6 +488,7 @@ def makeTransformationsPipeline(settings):
     
 def wavAnn2sectionsXy(wavF, annF, featExtFun=None):
     """
+    USE: wavAnn2annSecs_dataXy_names
     !!!! DEPRECATED: use get_DataXy_fromWavFannF
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
@@ -663,10 +696,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     ------
     > datO :  a file with the paths to the features and their labels
     """   
-    if isinstance(featExtFun, dict):
-        featExtFun = functools.partial(auf.waveform2featMatrix, **featExtFun)
-    if not callable(wavPreprocessingT): 
-        wavPreprocessingT = lambda x, y : x
+
         
     datO = myML.dataXy_names() #inicialize data object    
 

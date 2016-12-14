@@ -72,7 +72,6 @@ class annotationsValidity():
 
 ### plot
 
-
 def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, dpi=None,
                          labelsHeight=10, cmapName='seismic', lw = 1, **kwargs): 
     '''

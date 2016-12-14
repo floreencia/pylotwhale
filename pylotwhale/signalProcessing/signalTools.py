@@ -239,11 +239,11 @@ def _wav2waveform(wavF, normalize=False):
     "read wavfile and return sRate, waveform"
     try:
         sRate, waveform = wavfile.read(wavF)
-        if normalize : waveform = normalizeWF(waveform)
-        return waveform, sRate
-    except IOError:
+    except IOError, TypeError:
         print( "Oops!  Couldn't read:\n %s "%wavF)
         return IOError
+    if normalize : waveform = normalizeWF(waveform)
+    return waveform, sRate
 
 
 def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):

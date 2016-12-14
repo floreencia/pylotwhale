@@ -51,7 +51,7 @@ overlap = 0.5; auD["overlap"] = overlap
 Nceps=2**4; auD["Nceps"]= Nceps; audioF='cepstral'
 T_settings.append(('Audio_features', (audioF, auD)))
 
-summDict = {'Nslices': 2, 'normalise': True}
+summDict = {'Nslices': 5, 'normalise': True}
 summType = 'splitting'
 T_settings.append(('summ', (summType, summDict)))
 

@@ -24,10 +24,10 @@ def loadAnnLabels(fi, cols=(2,)):
     return np.loadtxt(fi, dtype=str, usecols=cols, ndmin=1)
     
     
-def anns2TLndarrays(fi):
+def anns2TLndarrays(fi, Tcols=(0,1), Lcols=(2,)):
     """like anns2array but returns 2 ndarrays T (n, 2) and L (n,)"""
-    T = np.loadtxt(fi, usecols=(0,1), ndmin=2)
-    L = loadAnnLabels(fi)
+    T = np.loadtxt(fi, usecols=Tcols, ndmin=2)
+    L = loadAnnLabels(fi, cols=Lcols)
     return T, L
     
 def save_TLannotations(T, L, outF, opening_mode='w'):

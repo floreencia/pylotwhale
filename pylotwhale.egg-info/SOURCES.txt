@@ -3,6 +3,7 @@ pylotwhale.egg-info/PKG-INFO
 pylotwhale.egg-info/SOURCES.txt
 pylotwhale.egg-info/dependency_links.txt
 pylotwhale.egg-info/top_level.txt
+pylotwhale/MLwhales/MLEvalTools.py
 pylotwhale/MLwhales/MLtools_beta.py
 pylotwhale/MLwhales/__init__.py
 pylotwhale/MLwhales/annAudio2SVMclf.py
@@ -10,14 +11,21 @@ pylotwhale/MLwhales/annAudio2SVMclf_train.py
 pylotwhale/MLwhales/chooseFeatures-fast.py
 pylotwhale/MLwhales/chooseFeatures.py
 pylotwhale/MLwhales/chooseFeatures_callTypes.py
+pylotwhale/MLwhales/clf_pool.py
 pylotwhale/MLwhales/experimentTools.py
+pylotwhale/MLwhales/experiment_WSD1.py
+pylotwhale/MLwhales/experiment_WSD2.py
+pylotwhale/MLwhales/experiment_callClf.py
 pylotwhale/MLwhales/featureExtraction.py
 pylotwhale/MLwhales/loadAndRun.py
 pylotwhale/MLwhales/predictionTools.py
 pylotwhale/MLwhales/runExperiment_artificialCallTypes-sec.py
 pylotwhale/MLwhales/runExperiment_artificialCallTypes.py
 pylotwhale/MLwhales/runExperiment_prototypeCallType-clf.py
+pylotwhale/MLwhales/runExperiment_soundDetector-clf-overfitting.py
 pylotwhale/MLwhales/runExperiment_soundDetector-clf.py
+pylotwhale/MLwhales/runExperiments_WSD1.py
+pylotwhale/MLwhales/runExperiments_callClf-cutWavs.py
 pylotwhale/NLP/__init__.py
 pylotwhale/NLP/analyseAnnotations-shuffle.py
 pylotwhale/NLP/analyseAnnotations.py
@@ -35,7 +43,6 @@ pylotwhale/NLP/sequencesO_beta.py
 pylotwhale/NLP/statMechT_beta.py
 pylotwhale/signalProcessing/__init__.py
 pylotwhale/signalProcessing/audioFeatures.py
-pylotwhale/signalProcessing/audioFeaturespy.py
 pylotwhale/signalProcessing/effects.py
 pylotwhale/signalProcessing/myCepstrogram-guakamole.py
 pylotwhale/signalProcessing/myCepstrogram.py
@@ -48,6 +55,7 @@ pylotwhale/signalProcessing/plotDataInPC.py
 pylotwhale/signalProcessing/run-plCepsgram.py
 pylotwhale/signalProcessing/run-plPCApack.py
 pylotwhale/signalProcessing/run-plWavSpectro.py
+pylotwhale/signalProcessing/signalTools.py
 pylotwhale/signalProcessing/signalTools_beta.py
 pylotwhale/signalProcessing/wavs-binMatrices_beta.py
 pylotwhale/signalProcessing/wavs-matrices_beta.py
@@ -56,6 +64,7 @@ pylotwhale/utils/__init__.py
 pylotwhale/utils/annotationTools.py
 pylotwhale/utils/dataTools.py
 pylotwhale/utils/fileCollections.py
+pylotwhale/utils/funTools.py
 pylotwhale/utils/netTools.py
 pylotwhale/utils/plotTools.py
 pylotwhale/utils/whaleFileProcessing.py

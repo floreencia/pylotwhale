@@ -14,10 +14,26 @@ import matplotlib.colors as colors
 from matplotlib import ticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import scipy
-import pylab
+from scipy.signal import get_window
+
 import scipy.cluster.hierarchy as sch
 
+
+
+def cbarLabels(minV, maxV):
+    """
+    give me the maximum and the minimum values of color bar and I will retun 3 label
+    the lables returned are int type. ment for exponents.
+    """
+    minV = int(np.ceil(minV))
+    maxV = int(np.floor(maxV))
+    ml = (minV + maxV)/2
+    #print minV, maxV,"ml", ml
+    D = min(abs(ml-maxV),abs(minV-ml))
+    ul = ml - D
+    ll = ml + D
+    #print D, ul, ll
+    return (ll, ml, ul)
 
 def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
                    key_labels=None, figsize=None, outFigName=None,
@@ -126,7 +142,8 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
 
     return fig, ax     
     
-    
+
+
 def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
               plTitle='', clrMap = 'winter_r', cbarAxSize=2, 
               cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
@@ -175,7 +192,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
 ### Clustering plots
 
-def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
+def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu,
                          NcbarTicks=4, cbarAxis=None):
     
     Y = linkage_matrix = sch.ward(distM)
@@ -224,4 +241,98 @@ def plDmatrixWDendrogram(distM, labels, cmap=pylab.cm.RdYlBu,
     cbar.locator = tick_locator
     cbar.update_ticks() 
     
-        
+#### spectrogrms
+
+def plspectro(waveform, sRate, outF='', N = 2**9, v0_cut = 1000,
+              vf_cut = 20*1000, overFrac = 0.5, winN = 'hanning',
+              spec_fac=0.99999, plTitle='', plTitleFontSz=0, cmN='bone_r',
+              figsize=None):
+    """
+    plots spectrogram
+    Parameters
+    ----------
+    v0_cut: float
+    frequency threshold
+    vf_cut: 20*1000, 
+    overFrac: float [0,1)
+    NFFT overlap
+    spec_fac: 
+    thresould all with variations smaller than
+    """
+
+
+    #tf = float(N)/sRate
+    tf = 1.0*(len(waveform)) /sRate
+    #ff = sRate/2.0
+    N=int(N)
+    win = get_window(winN, N)
+    noverlap = int(overFrac*N)
+    A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, window = win)[0]
+
+    # Spectro edditing
+    A = selectBand(A0, fr_f = sRate/2, v0_cut=v0_cut, vf_cut=vf_cut) # band filter
+    A = reeScale_E(A, spec_factor=spec_fac) # zero the the spectral energy smaller than 0.001% of <E>
+
+    plt.clf()
+    fig, ax = plt.subplots(figsize=figsize)#figsize=(max([3,int(tf/0.3)]), ff/8000))
+
+    cax = ax.imshow(np.log(A), extent=[ 0, tf, v0_cut/1000, vf_cut/1000],
+                    origin='lower', aspect = 'auto', cmap=plt.cm.get_cmap(cmN))#, interpolation = 'nearest')
+
+    #labels
+    ax.set_xlabel('time [s]')#, fontsize=16)
+    ax.set_ylabel('frequency [KHz]')#, fontsize=16)
+    if plTitleFontSz: ax.set_title(plTitle, fontsize=plTitleFontSz)
+
+    if tf<1:
+        plt.xticks(np.arange(0, tf, tf/2.0))
+    else:
+        plt.xticks(np.arange(0, tf, 1.0))
+
+    #cbar
+    ( ll, ml, ul ) = cbarLabels( np.log(A).min(), np.log(A).max() )
+    cbar = fig.colorbar(cax, ticks=[ll, ml, ul])
+    cbar.ax.set_yticklabels(['10$^{%d}$'%ll,'10$^{%d}$'%ml,'10$^{%d}$'%ul])
+
+    #save
+    #    outF = baseSpecN+'.jpg'
+    if outF:
+        print( "out:", outF )
+        fig.savefig(outF, bbox_inches='tight')
+
+
+def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000):
+    """
+    selects a band on frquencies from the matrix M
+    fr_0, initial frequency of the matrix
+    fr_f, final frequency of the matrix, sampR/2
+    cutting frequencies
+    v0_cut
+    vf_cut
+    """
+    ny, nx = np.shape(M)
+    n0_cut = int( ny*v0_cut/( fr_f - fr_0 ) )
+    nf_cut = int( ny*vf_cut/( fr_f - fr_0 ) )
+    #print n0_cut, nf_cut, nx, ny
+    return M[ n0_cut:nf_cut, : ]
+
+
+def reeScale_E(M, spec_factor = 1.0/3.0):
+    """
+    Zeroes the noise by taking only the part of the spectrum with the higest energy.
+    - spec_factor \in [0,1],
+    --- 0 - max cutting energy (we don't see anything)
+    --- 1 - min cutting energy (returns M without doing anything )
+    * M, log (spectrogram)
+    """
+
+    assert(spec_factor >= 0 and spec_factor <= 1)
+    cutE = (np.min(M) - np.max(M))*spec_factor + np.max(M)
+    nx, ny = np.shape(M)
+    M_tr = np.copy(M)
+
+    for i in range(nx):
+        for j in range(ny):
+            if M_tr[i,j] < cutE: M_tr[i, j] = cutE
+
+    return M_tr

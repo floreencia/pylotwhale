@@ -9,6 +9,8 @@ Created on Fri Nov 27 18:05:03 2015
 from __future__ import print_function, division
 import numpy as np
 import pylotwhale.MLwhales.experimentTools as exT
+from pylotwhale.MLwhales.configs.params_prototypeCallType import auD, summDict, filesDi
+
 
 ### Control parameter mapping to settings object
 def experimentsControlParams(iterParam):
@@ -19,14 +21,14 @@ def experimentsControlParams(iterParam):
     """
     controlParamsDict = {"Nslices": NslicesO,
                          "overlap": overlapO,
-                         "NArtificialSamples": ArtificialSamplesO,
-                         "noiseAmplitude": noiseAmplitudeO,
+                         "n_artificial_samples": ArtificialSamplesO,
+                         "whiteNoiseAmp": noiseAmplitudeO,
                          "Nceps": NcepsO,
                          "NFFT": NFFTO,
-                         "Nmels" : NmelsO
+                         "n_mels" : NmelsO,
+                         #"trainCollection": trainCollO
                          }
-    assert iterParam in controlParamsDict.keys(), '{} is not a valid'
-    'control parameter\nValid: {}'.format(iterParam, ', '.join(controlParamsDict.keys()))
+    assert iterParam in controlParamsDict.keys(), '{} is not a valid control parameter\nValid: {}'.format(iterParam, ', '.join(controlParamsDict.keys()))
     return controlParamsDict[iterParam]
 
 
@@ -62,7 +64,6 @@ parameter="Nslices"
 Nsl0 = 1
 Nsl = 12
 controlParam = np.arange(Nsl0, Nsl)
-from pylotwhale.MLwhales.configs.params_prototypeCallType import summDict
 paramDict = summDict
 
 NslicesO = controlVariable(parameterName=parameter,
@@ -74,8 +75,8 @@ NslicesO = controlVariable(parameterName=parameter,
 
 
 #### NArtificialSamples = ensembleSettings[n_artificial_samples]
-parameter = "NArtificialSamples"
-N0 = 4
+parameter = "n_artificial_samples"
+N0 = 2
 N = 10
 controlParam_NArtSamps = np.arange(N0, N)  # less than 5 doesn't work with CV=10
 from pylotwhale.MLwhales.configs.params_prototypeCallType import ensembleSettingsD
@@ -94,7 +95,6 @@ parameter = 'overlap'
 N0 = 0
 Ndelta = 0.1
 N = 1
-from pylotwhale.MLwhales.configs.params_prototypeCallType import auD
 paramDict=auD
 
 overlapO = controlVariable(parameterName=parameter,
@@ -107,7 +107,7 @@ overlapO = controlVariable(parameterName=parameter,
                            )
 
 #### noiseAmplitude
-parameter = 'noiseAmplitude'
+parameter = 'whiteNoiseAmp'
 # noise amplitude
 n_amps = 10
 a0 = 0.001
@@ -177,9 +177,17 @@ NmelsO = controlVariable(parameterName=parameter,
                          )
                          
                          
-##### N mels
-#parameter = 'Nceps'
-#NcepsO = NmelsO
-#NcepsO.NmelsO.paramKey
+##### trainCollO
+parameter = 'wavAnnColl'
+expSettings = [1,7,1]
+collTemplateName = '/home/florencia/whales/data/Vocal-repertoire-catalogue-Pilot-whales-Norway/flo/annotations/callClassifier/collections/wavAnnColl_calltypes-NSAMPSSamplesTrainCollection.txt'
+controlParams = [np.genfromtxt(collTemplateName.replace('NSAMPS', "%s"%i), dtype=object) for i in np.arange(*expSettings)]
+paramDict = filesDi
+settingsStr = '{}_{}'.format(parameter, '_'.join(['{}'.format(item) for item in expSettings]))
 
+trainCollO = controlVariable(parameterName=parameter,
+                             controlParams=controlParams,
+                             updateTestSet=False,
+                             paramDict=paramDict,
+                             settingsStr=settingsStr)
 

@@ -18,13 +18,20 @@ class clfSettings():
         self.grid_params_di = grid_params_di
 
 
-#SVC 
+#SVC rbf
 gamma_range = [ 0.1, 1.0]
 pen_range = [ 0.1, 1.0, 10.0, 100]
 param_grid_di = {'clf__C': pen_range,
                 'clf__gamma': gamma_range}
                 
 svc_rbf =  clfSettings('svc_rbf', SVC(), param_grid_di)
+
+#SVC linear
+pen_range = [ 0.1, 1.0, 10.0, 100]
+param_grid_di = {'clf__kernel': ['linear'],
+                 'clf__C': pen_range}
+                
+svc_l =  clfSettings('svc_rbf', SVC(), param_grid_di)
 
 #RF
 ests_range = np.array([50, 100])
