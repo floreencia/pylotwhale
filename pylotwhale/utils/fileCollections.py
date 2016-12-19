@@ -120,7 +120,8 @@ def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
 
 def findFilePathInDir(guessFile, searchDir):
     '''
-    looks for the path of a file, assuming this is in searchDir
+    looks for the path of a file (base name), 
+    assuming this is in searchDir
     '''
     for root, dirs, files in os.walk(searchDir):
         for name in files:
@@ -128,3 +129,14 @@ def findFilePathInDir(guessFile, searchDir):
                 return os.path.abspath(os.path.join(root, name))
     return False
     
+def findFilesInThreeDir(searchDir, startFN='', endFN=''):
+    """searches for all the files with a given
+    end and or ending in a directory all the subdirectories
+    returns a list with the filenames"""
+    filesList=[]
+    for root, dirs, files in os.walk(searchDir):
+        for f in files:
+            if f.endswith(endFN):
+                if f.startswith(startFN):
+                     filesList.append(os.path.join(root, f))
+    return filesList
