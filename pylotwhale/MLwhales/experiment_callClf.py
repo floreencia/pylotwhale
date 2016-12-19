@@ -33,13 +33,12 @@ import pylotwhale.MLwhales.predictionTools as pT
 #import pylotwhale.MLwhales.experimentTools as exT
 from pylotwhale.MLwhales import MLEvalTools as MLvl
 ### load parameters
-from pylotwhale.MLwhales.configs.params_CallTypeClf import *
+from pylotwhale.MLwhales.configs.params_callClf import *
 
 ###################  ASSIGNMENTS  ####################
 ##### OUTPUT FILES
 """
 Runs call clf experiments from a collection of labeled cutted wave files
-
 
 
 try:
@@ -77,15 +76,16 @@ test_coll = np.genfromtxt(collFi_test, dtype=object)
 lt = myML.labelTransformer(clf_labs)
 """
 
-wavColl = fex.readCols(filesDi['train'], (0,1))[:100]
+wavColl = fex.readCols(filesDi['train'], (0,1))
 labels = [l[1] for l in wavColl]
 lt = myML.labelTransformer(labels)
 
 
 
-def runCallClfExperiment(wavColl, lt, T_settings, out_fN,
-                  cv, pipe_estimators, gs_grid, scoring=None,
-                  param=None):
+def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
+                         cv, pipe_estimators, gs_grid, 
+                         filterClfClasses=lt.classes_, scoring=None,
+                         param=None):
     """Runs clf experiments
     Parameters
     ----------
@@ -95,10 +95,11 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN,
         T_settings: list of tuples
         labelsHierachy: list of strings
         cv: cv folds
-        extimators: list
+        estimators: list
             for pipline
         gs_grid: list
-                    
+        filterClfClasses: list
+            default, use all classes in label transformer
         out_fN: str
         returnClfs: dict, Flase => clfs are not stored
         predictionsDir: str
@@ -112,13 +113,12 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN,
     #### prepare DATA: collections --> X y
     ## compute features
     datO = fex.wavLCollection2datXy( wavColl, featExtFun=feExFun )
-    X, y_names = datO.filterInstances(lt.classes_)
+    X, y_names = datO.filterInstances(filterClfClasses)
     y = lt.nom2num(y_names)
 
     X_train, X_test, y_train, y_test = train_test_split(X,
                                                         y, test_size=testFrac, 
                                                         random_state=0)
-
 
     #### CLF
     pipe = Pipeline(pipe_estimators)

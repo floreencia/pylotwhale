@@ -12,24 +12,24 @@ import os
 """
 tools for the preparation of annotated files
 """
-    
+
 #### AUP annotations <---> mtl (marsyas) annotations
-    
+
 def anns2array(annF):
     '''loads annotations file into ndarray'''
     return np.genfromtxt(annF, dtype=None)
-    
+
 def loadAnnLabels(fi, cols=(2,)):
     """Loads labels from annotations file (3rd column)"""
-    return np.loadtxt(fi, dtype=str, usecols=cols, ndmin=1)
-    
-    
+    return np.loadtxt(fi, dtype=object, usecols=cols, ndmin=1)
+
+
 def anns2TLndarrays(fi, Tcols=(0,1), Lcols=(2,)):
     """like anns2array but returns 2 ndarrays T (n, 2) and L (n,)"""
     T = np.loadtxt(fi, usecols=Tcols, ndmin=2)
     L = loadAnnLabels(fi, cols=Lcols)
     return T, L
-    
+
 def save_TLannotations(T, L, outF, opening_mode='w'):
     """saves T, L as an annotations file"""
     

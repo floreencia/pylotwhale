@@ -15,21 +15,13 @@ import time
 
 import sys
 import numpy as np
+from collections import Counter
 
 import pylotwhale.MLwhales.MLtools_beta as myML
 
-from pylotwhale.MLwhales.configs.params_CallTypeClf import *
+from pylotwhale.MLwhales.configs.params_callClf import *
 from pylotwhale.MLwhales.experiment_callClf import runCallClfExperiment
 from pylotwhale.MLwhales.configs.iter_params_callClf import experimentsControlParams
-
-"""
-import pylotwhale.MLwhales.featureExtraction as fex
-from pylotwhale.MLwhales.configs.params_WSD1 import *
-from pylotwhale.MLwhales.experiment_WSD1 import runExperiment
-from pylotwhale.MLwhales.configs.iter_params_WSD import experimentsControlParams
-from pylotwhale.MLwhales import MLEvalTools as MLvl
-import pylotwhale.MLwhales.MLtools_beta as myML
-"""
 
 parser = argparse.ArgumentParser(description='Runs controled experiment.')
 parser.add_argument("-cnv", "--controlVariable", type=str,
@@ -54,11 +46,9 @@ updateTestSet = controlParamO.updateTestSet
 expSettingsStr = controlParamO.settingsStr
 
 ## more settings
-fex.readCols(filesDi['train'], (0,1))[:100]
-wavColl = fex.readCols(filesDi['train'], (0,1))[:100]
+wavColl = fex.readCols(filesDi['train'], (0,1))[:]
 call_labels = [l[1] for l in wavColl]
 lt = myML.labelTransformer(call_labels)
-
 
 ##### OUTPUT FILES
 oDir = os.path.join(filesDi['outDir'], iterParam)
@@ -76,15 +66,25 @@ clfStr = 'cv{}_{}'.format(cv, metric)
 settingsStr = "{}-{}".format(Tpipe.string, clfStr)
 
 ## write in out file
-out_file = open(out_fN, 'a')
-out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
-out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
-out_file.write("#" + settingsStr+'\n')
-out_file.close()
+with open(out_fN, 'a') as out_file: # print details about the dataset into status file
+    out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
+    out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
+    #out_file.write("#{}\n".format(lt.classes_))
+    out_file.write("#" + settingsStr+'\n')
+    ### dateset info
+    out_file.write("# {}\n".format( filesDi['train']))
+    out_file.write("# label_transformer {} '{}'\n# data {}\n".format(lt.targetNumNomDict(), 
+                                                               "', '".join(lt.classes_), Counter(call_labels)))
+    ### train and test sets
+    #out_file.write("#TRAIN, shape {}, {}\n".format(np.shape(X_train), Counter(lt.num2nom(y_train))))
+    #out_file.write("#TEST, shape {}, {}\n".format(np.shape(X_test), Counter(lt.num2nom(y_test))))
+
 
 for param in exp_grid_params:
     settingsDi[iterParam] = param
     print(param, T_settings)
-    runCallClfExperiment(wavColl, lt, T_settings, out_fN, 
-                         cv, pipe_estimators, gs_grid, metric, param=param)
+    runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac=testFrac,
+                         cv=cv, pipe_estimators=pipe_estimators, gs_grid=gs_grid, scoring=metric, param=param)
 
+with open(out_fN, 'a') as out_file: # print details about the dataset into status file
+    out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
