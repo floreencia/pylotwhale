@@ -143,7 +143,7 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
         acc = mt.accuracy_score(y_test, y_pred)
         out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}\n".format(acc*100, P*100, R*100, f1*100))
 
-    return clf_best
+    return clf_best.fit(X, y)
 
 
 

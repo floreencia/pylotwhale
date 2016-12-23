@@ -66,7 +66,7 @@ def returnSortingKeys(di, minCounts=None, reverse=True):
     '''keys that sort a dictionary
         di : key --> num dictionary, eg. Counter dictionary'''
     return np.array([item[0] for item in 
-            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] > minCounts])
+            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] >= minCounts])
             
 ### search sequence in PANDAS dataframe           
             

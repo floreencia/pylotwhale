@@ -2,7 +2,7 @@
 from __future__ import print_function
 import os
 import sys
-import warnings
+#import warnings
 from collections import Counter
 import shutil
 
@@ -669,13 +669,12 @@ def saveModel(clf, outModelName, fileModelName_fN=None, feExSettings=None):
 #################################################################################    
 
 ### Evaluate a list of classifiers over a collection   
-
+"""
 def fun():
     '''print deprecation warning'''
     # warnings.warn(DEPRECATION_MSG, DeprecationWarning)
     return warnings.warn(DEPRECATION_MSG, DeprecationWarning)
-
-
+"""
 def bestCVScoresfromGridSearch(gs):
     '''retieve CV scores of the best model from a gridsearch object
     Params:
