@@ -149,7 +149,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
               cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
               cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
               figsize=None,
-              underClr = 'white', badClr='gray'):
+                   underClr = 'white', badClr='gray', **kwarg):
     """
     plot a matrix with ticks
     fraction=0.0
@@ -162,7 +162,7 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
     cmap.set_under(underClr) #min
     cmap.set_bad(badClr) #nan
 
-    im = ax.imshow(A, interpolation = 'nearest', cmap = cmap, origin='bottom')
+    im = ax.imshow(A, interpolation = 'nearest', cmap = cmap, origin='bottom', **kwarg)
                    # extent = [0, len(xTickL),0,len(yTickL)], origin='bottom')
 
     ax.set_yticks(np.arange(len(yTickL)))  # + 0.5 ) #flo -> +0.1)

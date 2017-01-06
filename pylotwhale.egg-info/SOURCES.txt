@@ -25,10 +25,13 @@ pylotwhale/MLwhales/runExperiment_prototypeCallType-clf.py
 pylotwhale/MLwhales/runExperiment_soundDetector-clf-overfitting.py
 pylotwhale/MLwhales/runExperiment_soundDetector-clf.py
 pylotwhale/MLwhales/runExperiments_WSD1.py
+pylotwhale/MLwhales/runExperiments_callClf-cutWavs-testColl.py
 pylotwhale/MLwhales/runExperiments_callClf-cutWavs.py
 pylotwhale/NLP/__init__.py
 pylotwhale/NLP/analyseAnnotations-shuffle.py
+pylotwhale/NLP/analyseAnnotations-times.py
 pylotwhale/NLP/analyseAnnotations.py
+pylotwhale/NLP/annFeatureExtractionTools.py
 pylotwhale/NLP/annotations_analyser.py
 pylotwhale/NLP/csvDatFr-ict.py
 pylotwhale/NLP/csvDatFr-seqs-2gramN_shuffledDistributions.py
@@ -37,10 +40,12 @@ pylotwhale/NLP/csvShuffledDistributions-chiSqr.py
 pylotwhale/NLP/csvShuffledDistributions-confidenceIntervals-binary2GramMtx.py
 pylotwhale/NLP/csvShuffledDistributions-diffProportions.py
 pylotwhale/NLP/csvShuffledDistributions-plotBigrams.py
+pylotwhale/NLP/distanceTools.py
 pylotwhale/NLP/myStatistics_beta.py
 pylotwhale/NLP/ngramO_beta.py
 pylotwhale/NLP/sequencesO_beta.py
 pylotwhale/NLP/statMechT_beta.py
+pylotwhale/sequences/tempoTools.py
 pylotwhale/signalProcessing/__init__.py
 pylotwhale/signalProcessing/audioFeatures.py
 pylotwhale/signalProcessing/effects.py

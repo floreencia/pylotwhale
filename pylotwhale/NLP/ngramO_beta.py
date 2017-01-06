@@ -198,22 +198,22 @@ def bigrams2Dict(bigrams_tu):
 def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     '''returns the bigram matrix of the conditionsList and samplesList, with:
         conditions as the rows
-        and the saples as columns
-    Parameters:
+        and the samples as columns
+    Parameters
     -----------
-        df : conditional data frame (output of twoDimDict2DataFrame)
-        conditionsList : list/np.array of conditions to read (None reads all)
-        samplesList : list/np.array of samples to read (None reads all)
+    df: conditional data frame (output of twoDimDict2DataFrame)
+    conditionsList: list/np.array of conditions to read (None reads all)
+    samplesList: list/np.array of samples to read (None reads all)
     Return:
     -------
-        M : matrix representations of the df values
-        samps : labels of the columns of the matrix
-        conds : labels of the rows of the matrix
+    M: matrix representations of the df values
+    samps: labels of the columns of the matrix
+    conds: labels of the rows of the matrix
     NOTICE that the matrix is transposed with respect to the df
     '''
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
-        
+
     bigrsDF = df[conditionsList].loc[samplesList]
     samps = bigrsDF.index
     conds = bigrsDF.columns
@@ -224,15 +224,16 @@ def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None)
     '''2dim bigram counts dict --> bigrams matrix
     Parameters:
     -----------
-        bigramsDict : two entry dict, eg. D[a][b] (nltk.ConditionalFreqDist())
-        conditionsList : list/np.array of conditions to read (None reads all)
-        samplesList : list/np.array of samples to read (None reads all)
-     Return:
+    bigramsDict : nltk.ConditionalFreqDist
+        two entry dict,  eg. D[a][b]
+    conditionsList : list/np.array of conditions to read (None reads all)
+    samplesList : list/np.array of samples to read (None reads all)
+    Return
     -------
-        M : matrix representations of the frequency values, with:
-            conditions as the rows and the saples as columns
-        samps : labels of the columns of the matrix
-        conds : labels of the rows of the matrix        
+    M : matrix representations of the frequency values, with:
+            conditions as the rows and the samples as columns
+    samps : labels of the columns of the matrix
+    conds : labels of the rows of the matrix        
     '''
     df = twoDimDict2DataFrame(bigramsDict)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)

@@ -182,7 +182,7 @@ def svAnn2t0_tf_label(svAnnFile, newAnnFi=None):
             continue
     return newAnnFi
     
-    
+
 def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
     '''
     Filters out annotations shorter that minTime
@@ -204,7 +204,9 @@ def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
             with open(outFi, 'a') as g:
                 g.write(li)
                 
-    return(outFi)    
+    return(outFi)
+    
+#def fixAnnotationsFromHeikesCurations():
 
                     
 #### back to time stamps -- audio frame analyser (walking)

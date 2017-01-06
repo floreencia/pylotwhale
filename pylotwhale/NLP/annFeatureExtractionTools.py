@@ -1,6 +1,7 @@
 #!/usr/mprg/bin/python
 
 from __future__ import print_function
+import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -10,12 +11,11 @@ import pylotwhale.utils.dataTools as daT
 """
     Extracting features from annotations
     florencia @ 16.05.16
-
 """
 
 
 def df2X_stry(df, groupingKey='tape', call='note', sep='\s'):
-    """returns the feature list from a dataframe grouping  
+    """returns the feature list from a dataframe grouping
     the value of the grouping key
     Parameteres
     -----------
@@ -50,6 +50,6 @@ def df2Xy(df, groupingKey='tape', call='note', sep='\s',
     vectorizer = CountVectorizer(lowercase=False, token_pattern=token_pattern)
     X_sparse = vectorizer.fit_transform(X_str)
     X =  X_sparse.toarray()
-    return X, y
+    return X, np.array(y)
 
 

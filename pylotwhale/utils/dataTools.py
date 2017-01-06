@@ -24,11 +24,11 @@ def stringiseDict(di, distr):
 
 def dictOfGroupedDataFrames(df0, groupingKey='tape'):
     '''groups a dataframe according to groupingKey and returns a dictionary of data frames'''
-    df = {}
+    df_dict = {}
     keysSet = set(df0[groupingKey])
     for t in keysSet:
-        df[t] = df0[df0[groupingKey] == t].reset_index(drop=True)
-    return df
+        df_dict[t] = df0[df0[groupingKey] == t].reset_index(drop=True)
+    return df_dict
 
 def groupedCountsInDataFrame(df, group_key, count_key):
     '''group dataframe by group_key and count the frequencies of group_key
@@ -70,17 +70,17 @@ def returnSortingKeys(di, minCounts=None, reverse=True):
             
 ### search sequence in PANDAS dataframe           
             
-def search_sequence_numpy(arr,seq):
+def search_sequence_numpy(arr, seq):
     """ Find sequence in an array
 
-    Parameters:
+    Parameters
     ----------    
-        arr    : input 1D array
-        seq    : input 1D array
+    arr: input 1D array
+    seq: input 1D array
 
     Return:
     -------   
-        Output : 1D Array of indices in the input array that satisfy the 
+    Output : 1D Array of indices in the input array that satisfy the 
         matching of input sequence in the input array.
         In case of no match, empty array is returned.
     """
@@ -101,38 +101,41 @@ def search_sequence_numpy(arr,seq):
     else:
         return np.array([])
     
-def filterIndexesForIct(ixArray):
+def filterIndexesForIct(ixArray, seqSize=2):
     '''get the indexes of a dataframe corresponding to the ict
-        ixArray  : an array with the indexes of a dataframe we are interested in
-        we filter this array to keep their corresponding ict (dismis last index of a sequence)'''
-    return ixArray[ixArray[1:] - ixArray[:-1] == 1]
+    because the ict are defined by two consecutive calls, we are interested in the 
+    index of the first element of a size 2 sequence
+    Parameters
+    ----------
+    ixArray: an array with the indices of a dataframe we are interested in
+        we filter this array to keep their corresponding ict (dismiss last index of a sequence)'''
+    return ixArray[::seqSize]#[ixArray[1:] - ixArray[:-1] == 1]
 
 def returnSequenceDf(df0, seq, label='call'):
     '''returns the dataframe with the sequences (type label) of interest
-    Parameters:
+    Parameters
     -----------
-        < df0 : pandas dataframe
-        < seq : np array with the seq. of interest
-        < label : column name in the df0 of the seq.
-    Returns:
-    --------
-        > a pandas dataframe containing only the sequence'''
+    df0: pandas dataframe
+    seq: np array with the seq. of interest
+    label: column name in the df0 of the seq.
+    Returns
+    -------
+    a pandas dataframe containing only the sequence'''
     arr = df0[label].values
     ix=filterIndexesForIct(search_sequence_numpy(arr, np.array(seq)))
     return df0.loc[ix].reset_index()
-    
-    
-### matrixes \\ 2dim numpy arrat
 
-def matrixSubsample(M, rwl, cll, rwsuset, cllsuset):
+### matrices \\ 2dim numpy array
+
+def matrixSubsample(M, rwl, cll, rwsbset, cllsbset):
     '''Resturns a subset of a matrix
     Parameters:
     -----------
         M : matrix
         rwl, cll : rows and column labels
-        rwsuset, cllsuset : row and label subsets
+        rwsbset, cllsbset : row and label subsets
     Returns: subset (Matrix, rw_labels, col_labels)'''
-    IOrw=np.array([True if item in rwsuset else False for item in rwl ])
-    IOcl=np.array([True if item in cllsuset else False for item in cll ])
+    IOrw=np.array([True if item in rwsbset else False for item in rwl ])
+    IOcl=np.array([True if item in cllsbset else False for item in cll ])
     return M[IOrw,:][:, IOcl], rwl[IOrw], cll[IOcl]    
             

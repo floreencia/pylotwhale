@@ -11,5 +11,6 @@ setup(name='pylotwhale',
                 'pylotwhale.NLP',
                 'pylotwhale.signalProcessing', 
                 'pylotwhale.utils', 
-                'pylotwhale.MLwhales'],
+                'pylotwhale.MLwhales',
+                'pylotwhale.sequences']
      )
