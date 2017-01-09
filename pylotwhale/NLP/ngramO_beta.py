@@ -16,6 +16,8 @@ import nltk
 from nltk.probability import ConditionalProbDist, MLEProbDist
 import pylotwhale.utils.dataTools as daT
 
+import pylotwhale.NLP.annotations_analyser as aa
+
 #import sequencesO_beta as seqs
 sys.path.append('/home/florencia/whales/scripts/')
 import matrixTools as mt 
@@ -139,92 +141,7 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
         print figN
 
 
-### TIMING ####
-### stats plots
 
-def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig=None, 
-                       violinInner='box', yrange='default', ylabel='time (s)',
-                       minNumBigrams=5):
-    '''violin plot of the ict of a my_bigrams
-    Parameters:
-    -----------
-        df0 : pandas dataframe wirth ict column
-        mu_bigrams : sequence to search for
-        ignoteKeys : 'default' removes  ['_ini', '_end']
-        label : type of sequence
-        oFig : output figure
-        violinInner : viloin lor parameter
-        yrange : 'default' (0, mu*2)
-    '''
-
-    if ignoreKeys == 'default': ignoreKeys = ['_ini', '_end']
-
-    topBigrams = daT.removeFromList(daT.returnSortingKeys(Counter(my_bigrams)), ignoreKeys)
-    bigrTimes=[]
-    bigrNames=[]
-
-    for seq in topBigrams:
-        df = daT.returnSequenceDf(df0, seq, label=label)
-        #print(len(df))
-        ict = df.ict.values
-        if len(ict) > minNumBigrams:
-            #bigrTimes[tuple(seq)] = ict[ ~ np.isnan(ict)]
-            bigrTimes.append(ict[ ~ np.isnan(ict)]) 
-            bigrNames.append(seq)
-        
-    kys = ["{}{}".format(a,b) for a,b in bigrNames ]
-    #sns.violinplot( bigrTimes, names=kys, inner=violinInner)
-    sns.boxplot( bigrTimes, names=kys)
-            
-    if yrange == 'default':
-        meanVls = [np.mean(item) for item in bigrTimes if len(item) > 1]
-        yrange = (0, np.mean(meanVls))
-    plt.ylim(yrange)
-    plt.ylabel(ylabel)
-    plt.savefig(oFig)  
-
-
-### chuck structure
-
-def Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel='call', time_param='ict_end_start'):
-    """Returns the distribution of ngrams (list) at the times specified by Dtvec"""
-    ngramFreqsDtvec_li = []
-    for Dt in Dtvec: # delta t iteration
-        seqsLi = []
-        for thisdf in df_tapes.values(): # tape iteration
-            seqsLi += aa.df2listOfSeqs( thisdf, Dt=(None, Dt), l=seqLabel, 
-                                       time_param=time_param) # sequences list (of lists)
-
-        seqlens = [ len(item) for item in seqsLi] # Ngrams --> N
-        ngramFreqsDtvec_li.append(np.bincount(seqlens))
-
-    return ngramFreqsDtvec_li
-
-def flattenlists_2darray(liofli):
-    """Maps a list of lists into a 2d ndarray filling with zeroes"""
-    n_rows = len(liofli)
-    n_cols = len(liofli[-1])
-    twoDarray = np.zeros((n_rows, n_cols)) # inicialise
-    
-    for i in np.arange(n_rows):
-        item = liofli[i]
-        twoDarray[i,:len(item)] = item
-        
-    return twoDarray
-
-def Ngrams_distributionDt_ndarray(df_tapes, Dtvec, seqLabel='call', time_param='ict_end_start'):
-    """Returns the distributions of ngrams at different values of tau as an 2d array
-    where the column number marches the number of ngrams and the rows value of tau"""
-    ngramsDt_li = Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel=seqLabel, 
-                                             time_param=time_param)
-    return flattenlists_2darray(ngramsDt_li)
-
-
-def NgramsDist2callsInNgramsDist(ngrams_dist):
-    """transforms a ngram_distritribution matrix into a call in ngrams distribution"""
-    ngrams_nCalls_arr =  np.arange(ngrams_dist.shape[1])
-    return ngrams_dist*ngrams_nCalls_arr
-    
 
 ##### NLTK - pandas - related ngram code  #####
 
