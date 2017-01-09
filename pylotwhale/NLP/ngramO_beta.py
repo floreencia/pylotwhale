@@ -139,6 +139,7 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
         print figN
 
 
+### TIMING
 ### stats plots
 
 
@@ -288,37 +289,43 @@ def twoDimDict2DataFrame(kykyDict):
 
 ### bigrams and time
 
-def dictOfBigramIcTimes(listOfBigrams, df, ict=None, label='call'):
-    '''searches sequences (listOfBigrams) of type <label> in the dataframe
-    Parameters:
-    -----------
-        listOfBigrams : list of bigrams
-        df : pandas data frame
-        ict : dictionary with the bigrams as keys and the ict of the bigrams as values
-        label : type of squence, or name of the column in df where to look for the sequences
-    Return:
-    -------
-        ict : ictimes bigram dictionary
+def dictOfBigramIcTimes(listOfBigrams, df, ict_XY=None, label='call', ict_label='ict'):
+    '''searches sequences (listOfBigrams) of type <label> in the dataframe and returns a 
+    dictionary with the ict_label values of the sequences
+    Parameters
+    ----------
+    listOfBigrams: list of bigrams
+    df: pandas data frame
+    ict_XY: dictionary 
+        bigrams as keys and the ict of the bigrams as values
+    label: type of squence, or name of the column in df where to look for the sequences
+    ict_label: str
+        name of the column
+    Return
+    ------
+    ict_XY: ictimes bigram dictionary
     '''
-    if ict is None: ict = defaultdict(list)
+    if ict_XY is None: ict_XY = defaultdict(list)
     for seq in listOfBigrams:
         try:
             seqdf = daT.returnSequenceDf(df, seq, label='call')
-        except ValueError: #sequence not found, continue with the next seq
+        except ValueError: # sequence not found, continue with the next seq
             continue
         ky = ''.join(seq) # seqdf.head(20)
-        ict[ky].extend(seqdf.ict.values)
-    return ict
+        ict_XY[ky].extend(seqdf[ict_label].values)
+    return ict_XY
 
-def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict=None, label='call'):
+def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict_XY=None, label='call', 
+                               ict_label='ict'):
     '''searches sequences (listOfBigrams) in the dataframes from dfDict'''
     for thisdf in dfDict.values():
-        ict=dictOfBigramIcTimes(listOfBigrams, thisdf, ict=ict, label=label)
-    return ict
+        ict_XY=dictOfBigramIcTimes(listOfBigrams, thisdf, ict_XY=ict_XY, label=label,
+                                ict_label=ict_label)
+    return ict_XY
     
 def selectBigramsAround_dt(ictDict, dt=None, minCts=10):
-    '''takes a dictionary of ict-bigrams (ict) and returns the keys in the dt interval
-    with at least <minCts> counts'''
+    '''takes a dictionary of ict-bigrams (ict) and returns the keys of the elements 
+    with at least <minCts> counts within the dt interval'''
     if dt is None : dt = (None, np.inf)
     collector=[]
     ict_mean = dict([(item, np.mean(ictDict[item])) for item in ictDict.keys() 

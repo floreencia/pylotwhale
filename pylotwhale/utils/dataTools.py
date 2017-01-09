@@ -13,6 +13,15 @@ Various handy functions (sorting, spliting, searching) for working with data
 import numpy as np
 from collections import Counter
 
+
+def arrShuffleSplit(arr, frac=0.5):
+    """samples an array into two arrays shuffling the elements"""
+    n=len(arr)
+    indices = np.arange(n)
+    np.random.shuffle(indices)
+    idx=int(n*0.5)
+    return arr[indices[:idx]], arr[indices[idx:]]
+
 def stringiseDict(di, distr): 
     '''converts a dictionary into string, supports dictionaries as values'''
     for ky, val in di.items(): # for each element in the dictionary
@@ -101,15 +110,23 @@ def search_sequence_numpy(arr, seq):
     else:
         return np.array([])
     
-def filterIndexesForIct(ixArray, seqSize=2):
-    '''get the indexes of a dataframe corresponding to the ict
+def filterIndexesForIct(ixArray, seqSize=2, diffCall=True):
+    """get the indexes of a dataframe corresponding to the ict
     because the ict are defined by two consecutive calls, we are interested in the 
     index of the first element of a size 2 sequence
     Parameters
     ----------
     ixArray: an array with the indices of a dataframe we are interested in
-        we filter this array to keep their corresponding ict (dismiss last index of a sequence)'''
-    return ixArray[::seqSize]#[ixArray[1:] - ixArray[:-1] == 1]
+        we filter this array to keep their corresponding ict (dismiss last index of a sequence)
+    seqSize: int
+    diffCall: bool
+        True =  different calls (XY), False = repetition (XX)"""
+    
+    if diffCall is True: # different calls
+        return ixArray[::seqSize]
+    else: # same call
+        idx = np.array(ixArray[1:] - ixArray[:-1] == 1)
+        return ixArray[:-1][idx]
 
 def returnSequenceDf(df0, seq, label='call'):
     '''returns the dataframe with the sequences (type label) of interest
@@ -121,8 +138,14 @@ def returnSequenceDf(df0, seq, label='call'):
     Returns
     -------
     a pandas dataframe containing only the sequence'''
+    ## Determine whether the call are different or the same
+    if seq[0] == seq[1]:
+        diffCall = False
+    else:
+        diffCall = True
+    ## search indices with seq
     arr = df0[label].values
-    ix=filterIndexesForIct(search_sequence_numpy(arr, np.array(seq)))
+    ix=filterIndexesForIct(search_sequence_numpy(arr, np.array(seq)), diffCall=diffCall)
     return df0.loc[ix].reset_index()
 
 ### matrices \\ 2dim numpy array

@@ -281,7 +281,7 @@ def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
     seqsLi=[]
 
     for thisdf in dfDict.values():
-        seqsLi += df2listOfSeqs(thisdf, Dt=Dt, l=l, time_param='ict') # sequences objec
+        seqsLi += df2listOfSeqs(thisdf, Dt=Dt, l=l, time_param=time_param) # sequences objec
     return seqsLi
     
 

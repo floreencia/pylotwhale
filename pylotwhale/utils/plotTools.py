@@ -19,7 +19,6 @@ from scipy.signal import get_window
 import scipy.cluster.hierarchy as sch
 
 
-
 def cbarLabels(minV, maxV):
     """
     give me the maximum and the minimum values of color bar and I will retun 3 label
@@ -29,7 +28,7 @@ def cbarLabels(minV, maxV):
     maxV = int(np.floor(maxV))
     ml = (minV + maxV)/2
     #print minV, maxV,"ml", ml
-    D = min(abs(ml-maxV),abs(minV-ml))
+    D = min(abs(ml-maxV), abs(minV-ml))
     ul = ml - D
     ll = ml + D
     #print D, ul, ll
