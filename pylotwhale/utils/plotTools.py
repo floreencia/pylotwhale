@@ -70,7 +70,7 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
         ax.bar(ind, arr, bottom=arr0,
                color=next(color), label=key_labels[i])
         arr0 += arr
-        
+
     plt.legend()
     ax.set_xticks(np.arange(n_items)+0.4)
     ax.set_xticklabels(freq_arr_names)
@@ -86,7 +86,7 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
 ### 2D plots ###
 
 def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15, 
-                  xTicks=None, yTicks=None,
+                  xTicks=None, yTicks=None, figsize=None,
                   tickLabsDict='', outplN='', plTitle='', xL='N', yL=r'$\tau$ (s)',
                   figureScale=(), extendCbar='both', extent=None):
     
@@ -105,7 +105,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
             <tick_location> array with the tick locations
             <tick_names>, array with the labels of the previous array
     '''
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=figsize)
 
     #colors setting
     #cmap = plt.cm.get_cmap('jet', clrBarGaps)    # discrete colors
@@ -115,8 +115,8 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
 
     #plot
     cax=ax.imshow(X[:,:maxN], aspect ='auto', interpolation='nearest', 
-               norm = colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
-               cmap=cmap, extent=extent)
+                  norm = colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
+                  cmap=cmap, extent=extent)
     #labels
     ax.set_xlabel(xL)
     ax.set_ylabel(yL)

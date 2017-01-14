@@ -9,8 +9,12 @@ Created on Fri May 27 22:12:01 2016
 
 from __future__ import print_function
 import networkx as nx
-import pygraphviz as pgv
+#import pygraphviz as pgv
+import numpy as np
 import matplotlib.pyplot as plt
+
+import pylotwhale.utils.dataTools as daT
+import pylotwhale.utils.plotTools as pT
 
 
 #### pygraphviz
@@ -25,14 +29,14 @@ def drawGraphviz(A, dotFile=None, figName=None):
     if figName: A.draw(figName)
 
 def conceptualiseNodes(graphO, nodeLi=None):
-    '''invisibilises nodes in nodeLi kkeping the edge label if any,
+    """invisibilises nodes in nodeLi keeping the edge label if any,
     useful for removing _ini and _end    
-    WARNING: self linking nodes can leand to undesirable outcomes
+    WARNING: self linking nodes can lead to undesirable outcomes
     Parameters:
     ----------
         graphO : pygraphviz object (see nxGraph2pgv )
         nodeLi : list of nodes to remove    
-    '''
+    """
     if nodeLi is None: nodeLi = []
     for nn in nodeLi:
         for edge in graphO.edges():
@@ -119,3 +123,41 @@ def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
 
     A = conceptualiseNodes( nx.to_agraph(G), invisibleNodes )
     drawGraphviz(A, dot_file, fig_file)    
+    
+### network properties  
+    
+def cfd2nxDiGraph(cfd, rmNodes='default'):
+    if rmNodes == 'default':
+        rmNodes = ['_ini', '_end']
+    G0 = nx.DiGraph(cfd)
+    for n in rmNodes:
+        G0.remove_node(n)
+    return G0
+  
+    
+def pl_nx_propertie(G, nx_property, pltitle=None, oFig=None):
+    
+    deg_di = dict(nx_property(G).items())
+    calls_by_deg = daT.returnSortingKeys(deg_di)
+    
+    labs = []
+    h = np.zeros((1, len(calls_by_deg)))
+    for i, c in enumerate(calls_by_deg):
+        h[0,i] = deg_di[c]
+        labs.append(c)
+
+    labs = np.array(labs)
+    fig, ax = pT.stackedBarPlot(h, labs)
+    if pltitle: ax.set_title(pltitle)
+    if oFig: fig.savefig(oFig)
+
+    return( fig, ax)
+    
+def pl_degree_centrality(G, pltitle= 'degree centrality', oFig=None):
+    return pl_nx_propertie(G, nx_property=nx.degree_centrality,
+                            pltitle=pltitle, oFig=oFig)
+    
+def pl_betweenness_centrality(G, pltitle='betweenness centrality',
+                              oFig=None):
+    return pl_nx_propertie(G, nx_property=nx.betweenness_centrality,
+                           pltitle=pltitle, oFig=oFig)  
