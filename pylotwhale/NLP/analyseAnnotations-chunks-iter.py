@@ -3,9 +3,9 @@ from __future__ import print_function, division
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-#import argparse
+import argparse
 import os
-#import sys
+import sys
 
 from scipy.integrate import simps
 from collections import Counter
@@ -51,10 +51,8 @@ labelList = [item[0] for item in sorted(Counter(df0[subsetLabel]).items(),
 try: os.mkdir(os.path.join(oFigDir))
 except OSError: pass
 
-def chunkplots(df, l, 
-               timeLabel=timeLabel, callLabel=callLabel,
-               Dtvec=Dtvec, ixtimesteps=ixtimesteps): #  ["all"]:#
-    
+for l in labelList: #  ["all"]:#
+    df = df0[df0[subsetLabel] == l].reset_index(drop=True)
     tapesdf = daT.dictOfGroupedDataFrames(df)
 
     ####### ngrams distribution
@@ -181,7 +179,8 @@ def chunkplots(df, l,
     pT.plImshowLabels(dist, y, y, clrMap = plt.cm.viridis, figsize=(5,5),
                       norm=colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
                       plTitle='{}'.format(l),  outFig=oFig)
-
+                      
+                      
     ### integral: P(k')
     A = []
     Asu = []
@@ -205,8 +204,3 @@ def chunkplots(df, l,
     ax2.set_xlabel('r$\tau (s)$')
     ax2.set_ylabel(r'A($\tau $)')
     fig2.savefig(oFig)
-
-
-
-if __name__ == '__main__':
-  chunkplots(df0, 'all')

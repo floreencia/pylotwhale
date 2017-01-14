@@ -5,22 +5,20 @@ Created on Fri Nov 13 17:45:10 2015
 """
 
 from __future__ import print_function
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-
-import os
+#import networkx as nx
 
 import pylotwhale.signalProcessing.signalTools_beta as sT
-import pylotwhale.utils.whaleFileProcessing as fp
+#import pylotwhale.utils.whaleFileProcessing as fp
 import pylotwhale.utils.annotationTools as annT
 
 
-
 ### annotations validity
-
 def isCronologicalyOrdered(t):
-    return not (t[1:]<t[:-1]).any()
+    return not (t[1:] < t[:-1]).any()
 
 def isLast_tf_theLargest(t):
     return np.max(t) == t[-1]
@@ -67,7 +65,7 @@ class annotationsValidity():
         print("continuous:", whereIsContinuous(self.t0, self.tf))
         print("overlaps:", whereOverlaps(self.t0, self.tf))
         print("isLast_tf_theLargest:", isLast_tf_theLargest(self.tf))
-    
+
 
 
 ### plot
@@ -206,10 +204,10 @@ class file2annotationsDF(annotationsDF):
         reads a text file into a pandas dataframe
         ict (gaps), call length
         Parameters
-        -----------
-            path2file : path to a somple (eg. csv) text file
-            names : names of the columns
-                default = ['t0', 'tf', 'l']
+        ----------
+        path2file : path to a somple (eg. csv) text file
+        names : names of the columns
+            default = ['t0', 'tf', 'l']
         """
         ### load data
         if names is None: names=['t0', 'tf', 'l']
@@ -261,6 +259,25 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
     plt.ylim(yrange)
     plt.ylabel(ylabel)
     plt.savefig(oFig)  
+    
+def pl_calling_rate(df, t_interval=10, t0='t0', xL='time (s)', yL='# calls',
+                    plTitle=None, oFig=None):
+    """plots the calling rate: # calls/t_interval"""
+    call_t = df[t0].values
+    ti = 0
+    times_arr = np.arange(t_interval, call_t[-1]+t_interval, t_interval)
+    call_rate = np.zeros(len(times_arr))
+    for (i, tf) in enumerate(times_arr):
+        call_rate[i] = len(call_t [np.logical_and(call_t > ti, call_t < tf)])
+        ti = tf
+
+    fig, ax = plt.subplots()
+    ax.plot(times_arr, call_rate, marker='x')
+    ax.set_xlabel(xL)
+    ax.set_ylabel(yL)
+    plt.autoscale()
+    if plTitle: ax.set_title(plTitle)
+    if oFig: fig.savefig(oFig)
 
 
 ### chuck structure
@@ -275,7 +292,7 @@ def Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel='call', time_param='ict
                                        time_param=time_param) # sequences list (of lists)
 
         seqlens = [ len(item) for item in seqsLi] # Ngrams --> N
-        ngramFreqsDtvec_li.append(np.bincount(seqlens))
+        ngramFreqsDtvec_li.append(np.bincount(seqlens)[1:])
 
     return ngramFreqsDtvec_li
 
@@ -293,14 +310,14 @@ def flattenlists_2darray(liofli):
 
 def Ngrams_distributionDt_ndarray(df_tapes, Dtvec, seqLabel='call', time_param='ict_end_start'):
     """Returns the distributions of ngrams at different values of tau as an 2d array
-    where the column number marches the number of ngrams and the rows value of tau"""
+    where the column number matches the number of ngrams and the rows value of tau"""
     ngramsDt_li = Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel=seqLabel, 
                                              time_param=time_param)
     return flattenlists_2darray(ngramsDt_li)
 
 def NgramsDist2callsInNgramsDist(ngrams_dist):
     """transforms a ngram_distritribution matrix into a call in ngrams distribution"""
-    ngrams_nCalls_arr =  np.arange(ngrams_dist.shape[1])
+    ngrams_nCalls_arr =  np.arange(1, ngrams_dist.shape[1]+1)
     return ngrams_dist*ngrams_nCalls_arr
     
 
@@ -398,4 +415,8 @@ def annsDf2lisOfSeqs(df, Dt=None, l='l'):
         
     seqsLi.append(subLi)
     
-    return seqsLi        
+    return seqsLi
+    
+    
+  
+                             

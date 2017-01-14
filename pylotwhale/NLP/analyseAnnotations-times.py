@@ -1,6 +1,8 @@
 #!/usr/bin/python
-from __future__ import print_function
+from __future__ import print_function, division
 import numpy as np
+import matplotlib
+
 import matplotlib.pyplot as plt
 import argparse
 import os
@@ -10,30 +12,30 @@ from collections import Counter
 import pandas as pd
 import nltk
 
-import pylotwhale.utils.whaleFileProcessing as fp
-import pylotwhale.utils.fileCollections as fcll
-import pylotwhale.utils.plotTools as pT
+#import pylotwhale.utils.whaleFileProcessing as fp
+#import pylotwhale.utils.fileCollections as fcll
+#import pylotwhale.utils.plotTools as pT
 import pylotwhale.utils.dataTools as daT
-import pylotwhale.utils.netTools as nT
+#import pylotwhale.utils.netTools as nT
 
 import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
 import pylotwhale.NLP.tempoTools as tT
 
+matplotlib.rcParams.update({'font.size': 18})
 
 ### SETTINGS
 subsetLabel ='tape'
 callLabel = 'call'#'note'
-#Dtint = (None, Dt)
-
+t_interval = 10 #caling rate
 timeLabel = 'ict_end_start'
-oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/images/times'
-#'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/images/times/tapes'
+
+oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/images/times/tapes'
+#'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/images/times'
+cfile = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/groupB_tapes_ict.csv'
+#'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/groupB_0111_001_ict.csv'
 #
 
-cfile = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/groupB_0111_001_ict.csv'
-#'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/groupB_tapes_ict.csv'
-#
 statusFile = os.path.join(oFigDir, 'status.txt')
 df0 = pd.read_csv(cfile)
 #call_label = 'note'
@@ -46,7 +48,6 @@ labelList = [item[0] for item in sorted(Counter(df0[subsetLabel]).items(),
 with open(statusFile, 'a') as out_file:
     out_file.write('#{}\n#{}'.format(cfile, subsetLabel))
 
-
 ### create dirs
 #for dirName in ["times"]:
 try: os.mkdir(os.path.join(oFigDir))
@@ -55,8 +56,7 @@ except OSError: pass
 
 for l in labelList:
     df = df0[df0[subsetLabel] == l].reset_index(drop=True)
-
-    ict = df[timeLabel].values # df0.ict.values#
+    ict = df[timeLabel].values # df0.ict.values
     ict = ict[~np.isnan(ict)]
     N_tapeSamples = len(ict)
 
@@ -67,18 +67,39 @@ for l in labelList:
     tT.y_histogram(np.log10(ict), range=None, Nbins=Nbins, xl='$log_{10}(ict)$',
                    oFig=oFig, plTitle=pltitle)
     oFig = os.path.join(oFigDir, 'ict-{}hist-{}.png'.format(Nbins, l))
-    tT.y_histogram(ict, Nbins=Nbins, oFig=oFig, plTitle='%s'%l)
+    rg = (np.nanmin(ict), 1)
+    tT.y_histogram(ict, range=rg, Nbins=Nbins, oFig=oFig, plTitle=pltitle)
+    
+    ## fraction of calls with ict smaller than x
+    ict_sorted = np.sort(ict)
+    x = ict_sorted[:-1]
+    y = np.arange(len(x))/len(x)
+    
+    fig, ax = plt.subplots()
+    ax.plot(x, y, 'bo')
+    ax.set_xlabel("t' (s)")
+    ax.set_ylabel('fraction of calls')
+    ax.set_xlim((x[0], x[int(0.75*len(x))]))
+    ax.set_title(pltitle)
+    oFig = os.path.join(oFigDir, 'ictSorted_ict0-ict3of4-{}.png'.format(l)) 
+    fig.savefig(oFig)
 
     ## plot call length histogram
     cl = df.cl.values
     cl_max = np.max(cl)
     oFig = os.path.join(oFigDir, 'cl-{}hist-{}.png'.format(Nbins, l)) 
-    tT.y_histogram(cl, range=(0,cl_max), Nbins=Nbins, oFig=oFig, xl='call length [s]', plTitle='%s'%l)
+    tT.y_histogram(cl, range=(0,cl_max), Nbins=Nbins, oFig=oFig, xl='call length [s]', plTitle=pltitle)
+    
+    ## calling rate
+    oFig = os.path.join(oFigDir, 'callingRate-Dt{}-{}.png'.format(t_interval, l)) 
+    aa.pl_calling_rate(df, t_interval, oFig=oFig, plTitle=pltitle)    
 
     ## print stats of the current ict dist
     with open(statusFile, 'a') as out_file:
         out_file.write("\n{}\n{}".format(l, df[timeLabel].describe()))
+        out_file.write("\nFraction of calls with an ict<=0.2c {}\n".format(len(x[x<0.2])/len(x)))
 
+    ##### call-coloured histograms
     ## sequences
     ta=0
     tb=Dt=20
@@ -115,8 +136,7 @@ for l in labelList:
         
         cmap = plt.cm.gist_rainbow(np.linspace(0,1,len(bigrs))) #gist_car
         ax.hist([ict_di[''.join(item)] for item in bigrs[:]], stacked=True, range=rg, 
-                             label=bigrs, 
-                 rwidth='stepfilled', bins=Nbins, color=cmap)#, cumulative=True)
+                label=bigrs, rwidth='stepfilled', bins=Nbins, color=cmap)#, cumulative=True)
         ax.set_xlabel('ict')
         plt.legend()
         oFig = os.path.join(oFigDir, 'ict-XYhist-{}.png'.format(l)) # ict-hist-all-rg{}.png'.format('None'))#
@@ -145,9 +165,9 @@ for l in labelList:
         oFig = os.path.join(oFigDir, 'log_ict-XYhist-{}.png'.format(l)) # ict-hist-all-rg{}.png'.format('None'))#
 
         fig.savefig(oFig)
-        
 
-plt.legend()
+
+
                   
 
 

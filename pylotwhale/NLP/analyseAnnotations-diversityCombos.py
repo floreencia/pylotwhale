@@ -104,11 +104,20 @@ for l in labelList:
                   plTitle = "{}, $\Delta t$={} s".format(l, Dt), outFig=oFile )
     plt.clf()
 
-            
     ### DRAW networks
     oFile = os.path.join(oFigDir, "networks", 
                          "{}_{}-net_minCll{}-dt{}".format(subsetLabel, l, minCalls, Dt))
     nT.drawNetFrom2DimDict(cfd, oFile+'.dot', oFile+'.png', cpd, 2, rmNodes=rmNodes)
+
+
+    ### network properties
+    G = nT.cfd2nxDiGraph(cfd)
+    oFile = os.path.join(oFigDir, "networks", 
+                         "{}_{}-betweenness_centrality_minCll{}-dt{}.png".format(subsetLabel, l, minCalls, Dt))
+    nT.pl_betweenness_centrality(G, oFig=oFile)
+    oFile = os.path.join(oFigDir, "networks", 
+                         "{}_{}-degree_centrality_minCll{}-dt{}.png".format(subsetLabel, l, minCalls, Dt))
+    nT.pl_degree_centrality(G, oFig=oFile)
     
     ### PLOT time violins
     oFile = os.path.join(oFigDir, "times", 
