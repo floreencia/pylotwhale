@@ -110,7 +110,7 @@ def search_sequence_numpy(arr, seq):
     else:
         return np.array([])
     
-def filterIndexesForIct(ixArray, seqSize=2, diffCall=True):
+def filterIndicesForIct(ixArray, seqSize=2, diffCall=True):
     """get the indexes of a dataframe corresponding to the ict
     because the ict are defined by two consecutive calls, we are interested in the 
     index of the first element of a size 2 sequence
@@ -145,7 +145,7 @@ def returnSequenceDf(df0, seq, label='call'):
         diffCall = True
     ## search indices with seq
     arr = df0[label].values
-    ix=filterIndexesForIct(search_sequence_numpy(arr, np.array(seq)), diffCall=diffCall)
+    ix=filterIndicesForIct(search_sequence_numpy(arr, np.array(seq)), diffCall=diffCall)
     return df0.loc[ix].reset_index()
 
 ### matrices \\ 2dim numpy array
