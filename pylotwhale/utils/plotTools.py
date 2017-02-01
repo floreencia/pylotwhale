@@ -79,11 +79,26 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     if outFigName:fig.savefig(outFigName)
 
     return fig, ax     
-    
-    
-        
+  
         
 ### 2D plots ###
+        
+        
+###### ultilities ######
+        
+def display_numbers(fig, ax, M, fontSz, format=int, condition=lambda x: True):
+        
+    r,c = np.shape(M)
+    
+    ## display numbers in the matrix
+    for i in range(r):
+        for j in range(c):
+            if condition(M[i,j]):
+                ax.text(x=j, y=i, s=format(M[i, j]), va='center', ha='center', 
+                        fontsize=fontSz )                        
+    return fig, ax
+        
+        
 
 def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15, 
                   xTicks=None, yTicks=None, figsize=None,
