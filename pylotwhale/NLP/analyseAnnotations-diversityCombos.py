@@ -33,7 +33,7 @@ bN = os.path.splitext(os.path.basename(cfile))[0]
 
 #'/home/florencia/whales/pilot-whales/NPW/sequences/data/WAV_0111_001-48kHz-predictions_svc-prototypesNoiseFiltered.csv'
 df0 = pd.read_csv(cfile)#, sep='\t')#, names=header)
-Dt = 0.5
+Dt = 0.3
 Dtint = (None, Dt)
 timeLabel = 'ict_end_start'
 subsetLabel = 'tape'
@@ -99,9 +99,12 @@ for l in labelList:
     ## PLOT cond probs
     oFile = os.path.join(oFigDir, "bigrams",
                          "{}_{}-bigramProbs_minCll{}-dt{}.png".format(subsetLabel, l, minCalls, Dt))
-    pT.plImshowLabels( Mp, samps, conds, cbarLim=(0.001, None), cbarAxSize=5, 
+    fig, ax = pT.plImshowLabels( Mp, samps, conds, cbarLim=(0.001, None), cbarAxSize=5, 
                   xLabel='$c_i$', yLabel='$c_{i-1}$', 
-                  plTitle = "{}, $\Delta t$={} s".format(l, Dt), outFig=oFile )
+                  plTitle = "{}, $\Delta t$={} s".format(l, Dt))
+                  
+    fig, ax = pT.display_numbers(fig, ax, M, 12, condition=lambda x:x>0)
+    fig.savefig(oFile)
     plt.clf()
 
     ### DRAW networks

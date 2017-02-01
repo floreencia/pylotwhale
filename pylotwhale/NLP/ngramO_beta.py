@@ -176,7 +176,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     bigrsDF = df[conditionsList].loc[samplesList]
     samps = bigrsDF.index
     conds = bigrsDF.columns
-    M = bigrsDF.as_matrix().T # transpose to have consitions as rows
+    M = bigrsDF.as_matrix().T # transpose to have conditions as rows
     return M, samps, conds
     
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):

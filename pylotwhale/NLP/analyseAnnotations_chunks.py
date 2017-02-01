@@ -3,26 +3,19 @@ from __future__ import print_function, division
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-#import argparse
 import os
-#import sys
 
 from scipy.integrate import simps
 from collections import Counter
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.colors as colors
-#import nltk
 
-#import pylotwhale.utils.whaleFileProcessing as fp
-#import pylotwhale.utils.fileCollections as fcll
 import pylotwhale.utils.plotTools as pT
 import pylotwhale.utils.dataTools as daT
-#import pylotwhale.utils.netTools as nT
 
 import pylotwhale.NLP.annotations_analyser as aa
-#import pylotwhale.NLP.ngramO_beta as ngr
-#import pylotwhale.NLP.tempoTools as tT
+
 
 oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/images/chunks'
 #'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/images/chunks'
@@ -35,7 +28,7 @@ matplotlib.rcParams.update({'font.size': 14})
 ### SETTINGS
 subsetLabel ='tape'
 timeLabel = 'ict_end_start'
-callLabel = 'call'#'note'
+callLabel = 'call' #'note'
 t0 = 0
 tf = 2
 n_time_steps = 300
@@ -88,10 +81,10 @@ def chunkplots(df, l,
         cax.set_xlabel('k')
         
     oFig = os.path.join(oFigDir, 
-                        '{}-ngramDist_invCumSumNgrams-Dt{:d}_{:d}ms.png'.format(l, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
+                        '{}-ngramDist_invCumSumNgrams.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig1.savefig(oFig)
     oFig = os.path.join(oFigDir, 
-                        '{}-ngramDistCounts-Dt{:d}_{:d}ms.png'.format(l, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
+                        '{}-ngramDistCounts.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig2.savefig(oFig)
 
     print(oFig)
@@ -127,11 +120,11 @@ def chunkplots(df, l,
         cax.set_xlabel("k")
         
     oFig = os.path.join(oFigDir, 
-                        '{}-calls_in_ngramDist_invCumSumNgrams-Dt{:d}_{:d}ms.png'.format(l, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
+                        '{}-calls_in_ngramDist_invCumSumNgrams.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig1.savefig(oFig)    
     
     oFig = os.path.join(oFigDir, 
-                        '{}-calls_in_ngramDist-Dt{:d}_{:d}ms.png'.format(l, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
+                        '{}-calls_in_ngramDist.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig2.savefig(oFig)
     print(oFig)    
 
@@ -140,11 +133,15 @@ def chunkplots(df, l,
     nT, nN = np.shape(ngramDist_Dt)
     n_ticks = 8
     yT0 = np.linspace(0, nT, n_ticks)
+    maxN=10
+    #xt = np.arange(1, maxN+1)
     yt = (yT0, ['{:2.2}'.format(item) for item in np.linspace(T0, Tf, len(yT0))])
 
     ## ngrams dist
     vmax = int(np.max(ngramDist_Dt[:, 1:]))
-    fig, ax = pT.fancyClrBarPl(ngramDist_Dt, vmax, 1, maxN=12, figsize=(5,5),
+    M = ngramDist_Dt
+    fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1, 
+                               maxN=maxN, #figsize=(5,5),
                                clrBarGaps=20, cmap=plt.cm.viridis_r, 
                                yTicks=yt, yL=r'$\tau$', xL = 'k' )
 
@@ -153,9 +150,11 @@ def chunkplots(df, l,
 
     ## calls
     vmax = int(np.max(calls_in_ngramDist_Dt[:, 1:]))
-    fig, ax = pT.fancyClrBarPl(calls_in_ngramDist_Dt, vmax, 1, maxN=12,
-                               clrBarGaps=20, cmap=plt.cm.viridis_r, yTicks=yt, 
-                               yL=r'$\tau$', xL = 'k' )
+    M = calls_in_ngramDist_Dt
+    fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1, 
+                               maxN=maxN, #figsize=(5,5),
+                               clrBarGaps=20, cmap=plt.cm.viridis_r, 
+                               yTicks=yt, yL=r'$\tau$', xL = 'k' )
 
     oFig = os.path.join(oFigDir, '{}-callinNgrams_vs_Dt{}-{}.png'.format(l, T0, Tf) )                               
     fig.savefig(oFig)
@@ -167,7 +166,7 @@ def chunkplots(df, l,
     X = calls_in_ngramDist_Dt[Dtvec_ix]
     y = ["{:.2f}".format(item) for item in Dtvec[Dtvec_ix] ]
     dist = 1 - cosine_similarity(X)
-    oFig = os.path.join(oFigDir, '{}-chunk-structure_Dt_{}-{}.png'.format(l, y[0], y[-1]))
+    oFig = os.path.join(oFigDir, '{}-cosSim-chunk-structure_Dt.png'.format(l))#, y[0], y[-1]))
     pT.plImshowLabels(dist, y, y, clrMap = plt.cm.viridis, figsize=(5,5),
                       norm=colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
                       plTitle='{}'.format(l),  outFig=oFig)
@@ -177,33 +176,34 @@ def chunkplots(df, l,
     cusu = np.cumsum(X[:,::-1]/Ncalls, axis=1)[:,::-1]
     y = ["{:.2f}".format(item) for item in Dtvec[Dtvec_ix] ]
     dist = 1 - cosine_similarity(cusu)
-    oFig = os.path.join(oFigDir, '{}-cusu-chunk-structure_Dt_{}-{}.png'.format(l, y[0], y[-1]))
+    oFig = os.path.join(oFigDir, '{}-cosSim-cusu-chunk-structure_Dt.png'.format(l))#, y[0], y[-1]))
     pT.plImshowLabels(dist, y, y, clrMap = plt.cm.viridis, figsize=(5,5),
                       norm=colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
                       plTitle='{}'.format(l),  outFig=oFig)
 
     ### integral: P(k')
+    n = 5
     A = []
     Asu = []
-    for i in np.arange(len(Dtvec_ix)):
+    for i in ixtimesteps:#np.arange(len(Dtvec_ix)):
         h = np.cumsum(calls_in_ngramDist_Dt[i,::-1]/Ncalls)[::-1]
         #a = simps(cusu[i])
         #print("{:.2f} {:.2f}".format(Dtvec[i], a))
-        Asu.append(np.sum(h))
-        A.append(simps(h))
+        Asu.append(np.sum(h[:n]))
+        A.append(simps(h[:n]))
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
 
-    oFig = os.path.join(oFigDir, '{}-areaSum_Dt_{}-{}.png'.format(l, y[0], y[-1]))
-    ax1.plot(Dtvec[Dtvec_ix], Asu, 'bo')
+    oFig = os.path.join(oFigDir, '{}-areaSum_Dt_n{}.png'.format(l, n))#, y[0], y[-1]))
+    ax1.plot(Dtvec[ixtimesteps], Asu, 'bo')
     ax1.set_xlabel('r$\tau (s)$')
     ax1.set_ylabel(r'A($\tau $)')
     fig1.savefig(oFig)
     
-    oFig = os.path.join(oFigDir, '{}-areaInt_Dt_{}-{}.png'.format(l, y[0], y[-1]))    
-    ax2.plot(Dtvec[Dtvec_ix], A, 'bo')
-    ax2.set_xlabel('r$\tau (s)$')
-    ax2.set_ylabel(r'A($\tau $)')
+    oFig = os.path.join(oFigDir, '{}-areaInt_Dt_n{}.png'.format(l, n))#, y[0], y[-1]))    
+    ax2.plot(Dtvec[ixtimesteps], A, 'bo')
+    ax2.set_xlabel('r$\tau$(s)')
+    ax2.set_ylabel(r'A($\tau$)')
     fig2.savefig(oFig)
 
 

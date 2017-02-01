@@ -133,7 +133,7 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
             
             
 def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
-    '''elementwise diff of proportions test between X and Y, H0: X=Y
+    """elementwise diff of proportions test between X and Y, H0: X=Y
     Parameters
     ----------
     X: observed frequencies [2-dim-numpy array]
@@ -145,7 +145,7 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     -------
         {-1, 0, 1} - numpy array with the outcome of H0
         -1 reject, 1 cannot reject H0, 0 cannot apply test
-    '''
+    """
     XYtest = np.full(np.shape(X), 0)    
     nr, nc = np.shape(X)
     nx = X.sum(axis = 1)*1.

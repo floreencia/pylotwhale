@@ -149,7 +149,7 @@ def pl_nx_propertie(G, nx_property, pltitle=None, oFig=None):
     labs = np.array(labs)
     fig, ax = pT.stackedBarPlot(h, labs)
     if pltitle: ax.set_title(pltitle)
-    if oFig: fig.savefig(oFig)
+    if oFig: fig.savefig(oFig, bbox_inches='tight')
 
     return( fig, ax)
     
