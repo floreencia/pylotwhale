@@ -55,7 +55,7 @@ except OSError: pass
 def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2):
 
     #df = df0[df0[subsetLabel] == l].reset_index(drop=True)
-    ict = df[timeLabel].values # df0.ict.values
+    ict = df[timeLabel].values  # df0.ict.values
     ict = ict[~np.isnan(ict)]
     N_tapeSamples = len(ict)
 
