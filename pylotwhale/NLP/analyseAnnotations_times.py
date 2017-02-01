@@ -119,8 +119,10 @@ def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2
     topBigrams = daT.removeElementWith(topBigrams0, l_ignore=['_ini', '_end'])
 
     ## plot log(ict) with coloured bins for bigrams
+
+
+if False:
     if N_tapeSamples > 20:
-        
         ## coloured ict histograms
         #rg=(np.log10(0.1), np.log10(10))
         
