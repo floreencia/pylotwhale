@@ -144,7 +144,7 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     Returns
     -------
         {-1, 0, 1} - numpy array with the outcome of H0
-        -1 reject, 1 cannot reject H0, 0 cannot apply test
+        1 reject, -1 cannot reject H0, 0 cannot apply test
     """
     XYtest = np.full(np.shape(X), 0)    
     nr, nc = np.shape(X)
@@ -163,3 +163,20 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
                 
     return XYtest
                 
+
+
+# continuous distributions
+
+def KSsimilarity(feature_arr):
+    """~similarity between sets of continuous distributions given as rows
+    of feature_arr (2darray)
+    Similarity is measured as the p-values of the KS-test
+    p=1 distributions were drawn from the same pdf,
+    the closes p is to zero the more different are the distributions"""
+    
+    dist = np.zeros((len(feature_arr), len(feature_arr)))
+    for i in np.arange(len(feature_arr)):
+        for j in np.arange(i+1, len(feature_arr)): # np.arange(len(feature_arr)):
+            #print(i, j)
+            dist[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
+    return dist
