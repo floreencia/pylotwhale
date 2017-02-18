@@ -5,12 +5,18 @@ from __future__ import print_function, division
 import numpy as np
 import scipy as sp
 import scipy.stats
+import nltk
+import random
 
 #import pylab as pl
 #import sys
 #import time 
 #import itertools as it
 import scipy.stats as st
+
+import pylotwhale.NLP.annotations_analyser as aa
+import pylotwhale.NLP.ngramO_beta as ngr
+
 
 #import sequencesO_beta as seqs
 #sys.path.append('/home/florencia/whales/scripts/')
@@ -25,6 +31,78 @@ import scipy.stats as st
 #################################################################################
 ##############################    FUNCTIONS    ##################################
 #################################################################################
+
+
+##### randomisations test for bigrams ######
+
+def teStat_proportions_diff(p1):
+    """test statistic for differnce of proportions p1-p2"""
+    return p1#2*p1-1
+
+def plDist_with_obsValue(i, j, distsM, obsM, plTitle=None, **kwargs):
+    """plot randomised distribution (distsM) with observable"""
+    fig, ax =  plt.subplots(figsize=None)
+    if plTitle: ax.set_title(plTitle)
+    ax.hist(distsM[:,i,j], **kwargs)
+    ax.axvline(obsTest[i,j], color='r', lw=2.5)
+    return fig, ax
+    
+def shuffleSeries(dataFr, shuffleCol='timeSs'):
+    """
+    shuffles a series (shuffleCol) from a data frame:
+    > data frame
+    > name a of the column ti shuffle
+    """
+    x = dataFr[shuffleCol].values.copy()  # select series
+    random.shuffle(x)  #shuffle
+    shuffledRecs = dataFr.copy()  # new series
+    shuffledRecs[shuffleCol] = x # set shuffled series
+    return shuffledRecs # data frames and labels
+
+def shuffled_cfd(df, Dtint, label='call'):
+    """returns the conditional frequencies of the bigrams in a df after shuffling <label>"""
+    sh_df = shuffleSeries(df, shuffleCol=label) # shuffle the calls
+    sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label)) # define the sequeces
+    my_bigrams = nltk.bigrams(sequences) # detect bigrams
+    cfd_nsh = ngr.bigrams2Dict(my_bigrams) # count bigrams
+    return cfd_nsh
+    
+    
+
+def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, label='call'):
+    """randomisation test for bigrams
+    Parameters
+    ----------
+    df_dict: dict
+        dictionary of dataframes (tapes)
+    Dt: tuple 
+        (None, Dt)
+    obsTest: float
+        observed stat
+    Nsh: int
+    condLi, sampLi: list
+    Returns
+    -------
+    p_values: ndarray
+    shuffle_test: ndarray
+        shuffled test distributions
+    """
+    nr, nc = np.shape(obsTest)
+    shuffle_tests = np.zeros((Nsh, nr, nc))
+    N_values = np.zeros_like(obsTest)
+    for i in range(Nsh):  ## shuffle iter-loop
+        cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
+        for t in df_dict.keys(): # for each tape
+            thisdf = df_dict[t]
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label='call') # counts
+        Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh, condsLi, sampsLi) # normalised matrix
+        shTest_i = teStat_proportions_diff(Mp_sh) # compute satat variable
+        shuffle_tests[i] = shTest_i # save distribution for later
+        N_values[shTest_i > obsTest] += 1 # test?
+    return 1.0*N_values/Nsh, shuffle_tests
+
+    
+##### othe oler functions #####    
 
 def mean_confidence_interval(data, confidence=0.95):
     """
@@ -169,12 +247,13 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
 
 def KSsimilarity(feature_arr):
     """~similarity between sets of continuous distributions given as rows
-    of feature_arr (2darray)
+    of feature_arr (2darray) 
     Similarity is measured as the p-values of the KS-test
     p=1 distributions were drawn from the same pdf,
-    the closes p is to zero the more different are the distributions"""
+    the closer p is to zero the more different are the distributions
+    returns only the lower triangle, upper traingle is set up to nan"""
     
-    dist = np.zeros((len(feature_arr), len(feature_arr)))
+    dist = np.zeros((len(feature_arr), len(feature_arr)))+np.nan
     for i in np.arange(len(feature_arr)):
         for j in np.arange(i+1, len(feature_arr)): # np.arange(len(feature_arr)):
             #print(i, j)
