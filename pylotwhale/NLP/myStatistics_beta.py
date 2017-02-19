@@ -7,6 +7,7 @@ import scipy as sp
 import scipy.stats
 import nltk
 import random
+from matplotlib import pyplot as plt
 
 #import pylab as pl
 #import sys
@@ -39,12 +40,12 @@ def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
     return p1#2*p1-1
 
-def plDist_with_obsValue(i, j, distsM, obsM, plTitle=None, **kwargs):
+def plDist_with_obsValue(i, j, shuffledDistsM, obsM, plTitle=None, **kwargs):
     """plot randomised distribution (distsM) with observable"""
     fig, ax =  plt.subplots(figsize=None)
     if plTitle: ax.set_title(plTitle)
-    ax.hist(distsM[:,i,j], **kwargs)
-    ax.axvline(obsTest[i,j], color='r', lw=2.5)
+    ax.hist(shuffledDistsM[:,i,j], **kwargs)
+    ax.axvline(obsM[i,j], color='r', lw=2.5)
     return fig, ax
     
 def shuffleSeries(dataFr, shuffleCol='timeSs'):
@@ -90,7 +91,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, l
     nr, nc = np.shape(obsTest)
     shuffle_tests = np.zeros((Nsh, nr, nc))
     N_values = np.zeros_like(obsTest)
-    for i in range(Nsh):  ## shuffle iter-loop
+    for i in range(Nsh):  ## shuffle ith-loop
         cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
         for t in df_dict.keys(): # for each tape
             thisdf = df_dict[t]
