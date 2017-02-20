@@ -70,7 +70,8 @@ def shuffled_cfd(df, Dtint, label='call'):
     
     
 
-def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, label='call'):
+def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
+                               label='call', testStat=teStat_proportions_diff):
     """randomisation test for bigrams
     Parameters
     ----------
@@ -82,6 +83,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, l
         observed stat
     Nsh: int
     condLi, sampLi: list
+    testStat: callable
     Returns
     -------
     p_values: ndarray
@@ -97,7 +99,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, l
             thisdf = df_dict[t]
             cfd_sh += shuffled_cfd(thisdf, Dtint, label='call') # counts
         Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh, condsLi, sampsLi) # normalised matrix
-        shTest_i = teStat_proportions_diff(Mp_sh) # compute satat variable
+        shTest_i = testStat(Mp_sh) # compute satat variable
         shuffle_tests[i] = shTest_i # save distribution for later
         N_values[shTest_i > obsTest] += 1 # test?
     return 1.0*N_values/Nsh, shuffle_tests
