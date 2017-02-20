@@ -21,7 +21,7 @@ tools for the preparation of annotated files
 """
 
 def y_histogram(y, range=(0,1.5), Nbins=None, oFig=None, figsize=None,
-                 plTitle=None, xl=r"$\tau _{ict}$ (s)"):
+                 plTitle=None, xl=r"$\tau _{ict}$ (s)",  max_xticks = None):
     ## remove nans and infs
     y = y[~np.logical_or(np.isnan(y), np.isinf(y))]
     ## define number of bins
@@ -31,10 +31,19 @@ def y_histogram(y, range=(0,1.5), Nbins=None, oFig=None, figsize=None,
     #plt.figure(figsize=figsize)
     ax.hist(y, range=range, bins=Nbins)
     ax.set_xlabel(xl)  # in ({}, {}) s".format(rg[0], rg[1]))
-    if isinstance(plTitle, str): ax.set_title(plTitle)
+    if isinstance(plTitle, str): # title
+        ax.set_title(plTitle)
+    if isinstance(range, tuple): # delimit plot
+        ax.set_xlim(range)
+    
+    if max_xticks > 1:    
+        xloc = plt.MaxNLocator(max_xticks)
+        ax.xaxis.set_major_locator(xloc)
+
+    
     ## savefig
     if isinstance(oFig, str): fig.savefig(oFig, bbox_inches='tight')
-    print(oFig)
+    #print(oFig)
     return fig, ax
     
     
@@ -80,8 +89,8 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
     plt.savefig(oFig, bbox_inches='tight')
 
 
-def pl_calling_rate(df, t_interval=10, t0='t0', xL='time (s)', yL=r'$\lambda$',
-                    plTitle=None, oFig=None):
+def pl_calling_rate(df, t_interval=10, t0='t0', xL='time, [s]', yL=r'$\lambda$',
+                    max_xticks = None, plTitle=None, oFig=None):
     """plots the calling rate: # calls/t_interval for one tape dataframe"""
     call_t = df[t0].values
     ti = 0
@@ -98,6 +107,11 @@ def pl_calling_rate(df, t_interval=10, t0='t0', xL='time (s)', yL=r'$\lambda$',
     ax.set_xlabel(xL)
     ax.set_ylabel(yL)
     plt.autoscale()
+    
+    if max_xticks > 1:
+        xloc = plt.MaxNLocator(max_xticks)
+        ax.xaxis.set_major_locator(xloc)
+
     if plTitle: 
         ax.set_title(plTitle)
 
@@ -105,7 +119,7 @@ def pl_calling_rate(df, t_interval=10, t0='t0', xL='time (s)', yL=r'$\lambda$',
         fig.savefig(oFig, bbox_inches='tight')#, bbox_inches='tight')    
                 
 def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None, 
-                      xL=r'$\tau _{ict} (s)$', oFig=None):
+                      xL=r'$\tau _{ict}, [s]$', oFig=None):
         """
         Parameters:
         -----------

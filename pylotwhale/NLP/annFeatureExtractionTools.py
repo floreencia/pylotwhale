@@ -14,7 +14,7 @@ import pylotwhale.utils.dataTools as daT
 """
 
 
-def df2X_stry(df, groupingKey='tape', call='note', sep='\s'):
+def df2X_stry(df, groupingKey='tape', call='note', sep=' '):
     """returns the feature list from a dataframe grouping
     the value of the grouping key
     Parameteres
@@ -39,7 +39,7 @@ def df2X_stry(df, groupingKey='tape', call='note', sep='\s'):
     return X_str, y
 
 
-def df2Xy(df, groupingKey='tape', call='note', sep='\s',
+def df2Xy(df, groupingKey='tape', call='note', sep=' ',
           token_pattern=u'(?u)\\b\\w+\\b' ):
     """extracts bag of features from data frame grouping them
     X: array (n_instances, n_features)

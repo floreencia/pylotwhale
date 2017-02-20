@@ -87,6 +87,13 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
 ###### ultilities ######
         
 def display_numbers(fig, ax, M, fontSz, format=int, condition=lambda x: True):
+    """
+    add text to imshow matrix
+    Parameters:
+    ----------
+    condition: must be satisfied in order to show the numbers
+        eg. lambda x : x > 0
+    """
         
     r,c = np.shape(M)
     
@@ -159,15 +166,18 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
 
 
 def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
-              plTitle='', clrMap = 'winter_r', cbarAxSize=2, 
-              cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
-              cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
-              figsize=None,
+                   plTitle='', 
+                   clrMap=plt.cm.viridis_r, cbarAxSize=2, 
+                   cbarLim=None, cbarOrientation='vertical', Nclrs=11, 
+                   cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
+                   figsize=None,
                    underClr = 'white', badClr='gray', **kwarg):
     """
-    plot a matrix with ticks
-    fraction=0.0
-        axsize : colorbar tickness
+    plot a matrix with ticks labels
+    Parameters
+    ----------
+        **kwargs:
+    norm=matplotlib.colors.Normalize(vmin=1e-14, vmax=1, clip = False)
     """
    
     fig, ax = plt.subplots(figsize=figsize)
@@ -206,12 +216,12 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
 ### Clustering plots
 
-def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu,
-                         NcbarTicks=4, cbarAxis=None):
+def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
+                         NcbarTicks=4, cbarAxis=None, oFig=None):
     
     Y = linkage_matrix = sch.ward(distM)
     
-    fig = pylab.figure(figsize=(8,8))
+    fig = plt.figure(figsize=figsize)
 
     # FIRST DENDROGRAM
     ax1 = fig.add_axes([0.09,0.1,0.2,0.6]) # left
@@ -235,11 +245,11 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu,
     im = axmatrix.matshow(D, aspect='auto', cmap=cmap, origin='lower')
     
     # Distance matrix tick labels
-    axmatrix.set_xticks(range(len(idx1)))
+    axmatrix.set_xticks(np.arange(len(idx1)))
     axmatrix.set_xticklabels(labels[idx1], minor=False)
     axmatrix.xaxis.set_label_position('bottom')
     axmatrix.xaxis.tick_bottom()
-    pylab.xticks(rotation=-90)#, fontsize=8)
+    plt.xticks(rotation=-90)#, fontsize=8)
     
     # image ticks
     axmatrix.set_yticks((range(len(idx2))))
@@ -253,7 +263,9 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu,
     cbar = fig.colorbar(im, cax = axcolor)#
     tick_locator = ticker.MaxNLocator(nbins=NcbarTicks)
     cbar.locator = tick_locator
-    cbar.update_ticks() 
+    cbar.update_ticks()
+
+    if oFig: fig.savefig(oFig, bbox_inches='tight')
     
 #### spectrogrms
 

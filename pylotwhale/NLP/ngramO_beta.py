@@ -197,9 +197,11 @@ def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None)
     df = twoDimDict2DataFrame(bigramsDict)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
     
-def bigrams2countsMatrix(bigrams_tu, conditionsList=None, sampleList=None):
+def bigrams2countsMatrix(bigrams_tu, conditionsList=None, samplesList=None):
     '''bigrams --> bigrams matrix'''
-    return bigramsDict2countsMatrix((bigrams2Dict(bigrams_tu)))
+    return bigramsDict2countsMatrix((bigrams2Dict(bigrams_tu)),
+                                     conditionsList=conditionsList, 
+                                     samplesList=samplesList)
     
 
 ### + CONDITIONAL PROBABILITIES
@@ -221,7 +223,10 @@ def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
 
 def condProbDict2matrix(cpd, conditions, samples):
     '''
-    return the matrix of consitional probabilities
+    return the matrix of conditional probabilities
+    Parameters
+    ----------
+    cpd: nltk.conditional_probability_distribution
     M, x_tick_labels, y_tick_labels
     '''
     return bigramsdf2bigramsMatrix(twoDimDict2DataFrame(cpd), 
@@ -230,6 +235,9 @@ def condProbDict2matrix(cpd, conditions, samples):
 def condFreqDict2condProbMatrix(cfd, conditions, samples): 
     '''
     return the matrix of conditional probabilities
+    Parameters
+    ----------
+    cfd: nltk.conditional_frequency_distribution
     > M, x_tick_labels, y_tick_labels
     '''
     cpd = condFreqDictC2condProbDict(cfd)

@@ -20,8 +20,6 @@ import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
 import pylotwhale.NLP.tempoTools as tT
 
-
-
 ### SETTINGS
 oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/images/test/'
 #'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/data/not_curated/images'
@@ -72,7 +70,8 @@ def bigramPlots(df, l, callLabel, timeLabel, Dtint, oFigDir, minCalls=0,
     rmNodes = list(set(df.call) - set(calls) ) # nodes to remove from network
     
     ## separate data by tape
-    df_dict = { str(l) : df}
+    #df_dict = { str(l) : df}
+    df_dict = daT.dictOfGroupedDataFrames(df, groupingKey='tape') # calls must be separated by tape
     
     #### PLOT call frequencies
     oFile = os.path.join(oFigDir, "calls", 
@@ -104,10 +103,10 @@ def bigramPlots(df, l, callLabel, timeLabel, Dtint, oFigDir, minCalls=0,
     oFile = os.path.join(oFigDir, "bigrams",
                          "{}-bigramProbs_minCll{}-dt{}.png".format(l, minCalls, Dt))
     fig, ax = pT.plImshowLabels( Mp, samps, conds, cbarLim=(0.001, None), cbarAxSize=5, 
-                  xLabel='$c_i$', yLabel='$c_{i-1}$', 
-                  plTitle = "{}, $\Delta t$={} s".format(l, Dt))
+                                xLabel='$c_i$', yLabel='$c_{i-1}$', 
+                                plTitle = "{}, $\Delta t$={} s".format(l, Dt))
                   
-    fig, ax = pT.display_numbers(fig, ax, M, 12, condition=lambda x:x>0)
+    fig, ax = pT.display_numbers(fig, ax, M, 12, condition=lambda x : (x>0 and x<100))
     fig.savefig(oFile)
     plt.clf()
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+ #!/usr/bin/python
 from __future__ import print_function, division
 import numpy as np
 import matplotlib
@@ -52,6 +52,7 @@ try: os.mkdir(os.path.join(oFigDir))
 except OSError: pass
 
 
+
 def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2):
 
     #df = df0[df0[subsetLabel] == l].reset_index(drop=True)
@@ -60,16 +61,18 @@ def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2
     N_tapeSamples = len(ict)
 
     #### plot ict histogram
+    ## log scale
     Nbins = int(NbinsFrac*N_tapeSamples)
-    pltitle = "tape: {}".format(l)  # in ({}, {}) s".format(rg[0], rg[1]))
+    pltitle = None#"tape: {}".format(l)  # in ({}, {}) s".format(rg[0], rg[1]))
     oFig = os.path.join(oFigDir, 'log10ict-{}hist-{}.png'.format(Nbins, l))
     tT.y_histogram(np.log10(ict), range=None, Nbins=Nbins,
-                   xl=r'$\log _{10}( \tau _{ict})$', oFig=oFig, plTitle=pltitle)
+                   xl=r'$\log _{10}( \tau _{ICI})$', max_xticks = 4,
+                   oFig=oFig, plTitle=pltitle)
     plt.close()
-
+    ## in range
     oFig = os.path.join(oFigDir, 'ict-{}hist-{}.png'.format(Nbins, l))
-    rg = (np.nanmin(ict), 1)
-    tT.y_histogram(ict, range=rg, Nbins=Nbins, oFig=oFig, plTitle=pltitle)
+    rg = (np.nanmin(ict), ict_max)
+    tT.y_histogram(ict, range=rg, Nbins=Nbins, xl=r'$\tau _{ICI}, [s]$', oFig=oFig, plTitle=pltitle)
     plt.close()
 
     #### fraction of calls with ict smaller than x
@@ -79,10 +82,14 @@ def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2
 
     fig, ax = plt.subplots()
     ax.plot(x, y, 'bo')
-    ax.set_xlabel("t' (s)")
+    ax.set_xlabel("t', [s]")
     ax.set_ylabel('fraction of calls')
     ax.set_xlim((x[0], x[int(0.75*len(x))]))
-    ax.set_title(pltitle)
+    ### ticks
+    max_xticks = 5
+    xloc = plt.MaxNLocator(max_xticks)
+    ax.xaxis.set_major_locator(xloc)
+    #ax.set_title(pltitle)
     oFig = os.path.join(oFigDir, 'ictSorted_ict0-ict3of4-{}.png'.format(l))
     fig.savefig(oFig, bbox_inches='tight')
     plt.close()
@@ -93,7 +100,7 @@ def timing_plots(df, l, timeLabel, callLabel, t_interval, oFigDir, NbinsFrac=0.2
     cl_max = np.max(cl)
     oFig = os.path.join(oFigDir, 'cl-{}hist-{}.png'.format(Nbins, l))
     tT.y_histogram(cl, range=(0, cl_max), Nbins=Nbins, oFig=oFig,
-                   xl='call length [s]', plTitle=pltitle)
+                   xl='call length, [s]', plTitle=pltitle)
     plt.close()
 
     #### calling rate

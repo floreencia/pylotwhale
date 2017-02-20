@@ -28,12 +28,12 @@ matplotlib.rcParams.update({'font.size': 14})
 ### SETTINGS
 subsetLabel ='tape'
 timeLabel = 'ict_end_start'
-callLabel = 'call' #'note'
+callLabel = 'call'  #'note'
 t0 = 0
 tf = 2
 n_time_steps = 300
 Dtvec = np.linspace(t0, tf, n_time_steps)
-ixtimesteps = np.arange(len(Dtvec))[:200:20] # select the time intervals
+ixtimesteps = np.arange(len(Dtvec))[:200:20]  # select the time intervals
 
 df0 = pd.read_csv(cfile)
 
@@ -44,47 +44,47 @@ labelList = [item[0] for item in sorted(Counter(df0[subsetLabel]).items(),
 try: os.mkdir(os.path.join(oFigDir))
 except OSError: pass
 
-def chunkplots(df, l, 
+def chunkplots(df, l, oFigDir,
                timeLabel=timeLabel, callLabel=callLabel,
-               Dtvec=Dtvec, ixtimesteps=ixtimesteps): #  ["all"]:#
-    
+               Dtvec=Dtvec, ixtimesteps=ixtimesteps):  #  ["all"]:#
+
     tapesdf = daT.dictOfGroupedDataFrames(df)
 
     ####### ngrams distribution
-    ngramDist_Dt = aa.Ngrams_distributionDt_ndarray( tapesdf, Dtvec,
+    ngramDist_Dt = aa.Ngrams_distributionDt_ndarray(tapesdf, Dtvec,
                                                     seqLabel=callLabel,
                                                     time_param=timeLabel)
 
     #### plot : n grmas DISTRIBUTION AND INV CUMSUM
-    fig1, ax1 = plt.subplots(1,1, figsize=(8,5))
-    fig2, ax2 = plt.subplots(1,1, figsize=(8,5))
+    fig1, ax1 = plt.subplots(1, 1, figsize=(8, 5))
+    fig2, ax2 = plt.subplots(1, 1, figsize=(8, 5))
 
-    color = iter(plt.cm.hsv(np.linspace(0.3,1, len(ixtimesteps))))
+    color = iter(plt.cm.hsv(np.linspace(0.3, 1, len(ixtimesteps))))
 
     for i in ixtimesteps:
         c = next(color)
         ngramDist_Dt_norm = ngramDist_Dt[i, :]/np.sum(ngramDist_Dt[i, :])
         cusu = np.cumsum(ngramDist_Dt_norm[::-1])[::-1]
-        ax1.plot(np.arange(1, len(cusu)+1), cusu, 
-                 label ="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
-        ax2.plot(np.arange(1, len(ngramDist_Dt[i,:])+1), ngramDist_Dt[i,:], 
-                 label ="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6 )
+        ax1.plot(np.arange(1, len(cusu)+1), cusu,
+                 label="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
+        ax2.plot(np.arange(1, len(ngramDist_Dt[i, :]) + 1), ngramDist_Dt[i, :],
+                 label="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
 
     ax1.set_title('{}'.format(l))
     ax1.set_ylabel(r"$\pi$ (k')")
     ax2.set_ylabel(r"#sequences (k)")
     #ax2.set_title('# seqs of size k')
     for cax in [ax1, ax2]:
-        cax.set_xlim(0,10)
+        cax.set_xlim(0, 10)
         #cax.set_ylim(0,20)
-        cax.legend() 
+        cax.legend()
         cax.set_xlabel('k')
-        
-    oFig = os.path.join(oFigDir, 
+
+    oFig = os.path.join(oFigDir,
                         '{}-ngramDist_invCumSumNgrams.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig1.savefig(oFig)
-    oFig = os.path.join(oFigDir, 
-                        '{}-ngramDistCounts.png'.format(l))#, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
+    oFig = os.path.join(oFigDir,
+                        '{}-ngramDistCounts.png'.format(l)) #, int(1000*Dtvec[ixtimesteps[0]]), int(1000*Dtvec[ixtimesteps[-1]])))
     fig2.savefig(oFig)
 
     print(oFig)
@@ -143,7 +143,7 @@ def chunkplots(df, l,
     fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1, 
                                maxN=maxN, #figsize=(5,5),
                                clrBarGaps=20, cmap=plt.cm.viridis_r, 
-                               yTicks=yt, yL=r'$\tau$', xL = 'k' )
+                               yTicks=yt, yL=r'$\tau \, [s]$', xL = 'k' )
 
     oFig = os.path.join(oFigDir, '{}-numNgrams_vs_Dt{}-{}.png'.format(l, T0, Tf) )                               
     fig.savefig(oFig)
@@ -154,7 +154,7 @@ def chunkplots(df, l,
     fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1, 
                                maxN=maxN, #figsize=(5,5),
                                clrBarGaps=20, cmap=plt.cm.viridis_r, 
-                               yTicks=yt, yL=r'$\tau$', xL = 'k' )
+                               yTicks=yt, yL=r'$\tau  \, [s] $', xL = 'k' )
 
     oFig = os.path.join(oFigDir, '{}-callinNgrams_vs_Dt{}-{}.png'.format(l, T0, Tf) )                               
     fig.savefig(oFig)
@@ -185,8 +185,9 @@ def chunkplots(df, l,
     n = 5
     A = []
     Asu = []
-    for i in ixtimesteps:#np.arange(len(Dtvec_ix)):
-        h = np.cumsum(calls_in_ngramDist_Dt[i,::-1]/Ncalls)[::-1]
+    tvec_ix = np.arange(len(Dtvec))[:] #ixtimesteps: #
+    for i in tvec_ix: 
+        h = np.cumsum(calls_in_ngramDist_Dt[i, ::-1]/Ncalls)[::-1]
         #a = simps(cusu[i])
         #print("{:.2f} {:.2f}".format(Dtvec[i], a))
         Asu.append(np.sum(h[:n]))
@@ -194,17 +195,17 @@ def chunkplots(df, l,
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
 
-    oFig = os.path.join(oFigDir, '{}-areaSum_Dt_n{}.png'.format(l, n))#, y[0], y[-1]))
-    ax1.plot(Dtvec[ixtimesteps], Asu, 'bo')
-    ax1.set_xlabel('r$\tau (s)$')
-    ax1.set_ylabel(r'A($\tau $)')
-    fig1.savefig(oFig)
-    
+    oFig = os.path.join(oFigDir, '{}-areaSum_Dt_n{}=Dt{:.1f}-{:.1f}.png'.format(l, n, Dtvec[tvec_ix[0]], Dtvec[tvec_ix[-1]]))#, y[0], y[-1]))
+    ax1.plot(Dtvec[tvec_ix], Asu, 'bo')
+    ax1.set_xlabel(r'$ \tau \, [s]$')
+    ax1.set_ylabel(r'$ A ( \tau )$')
+    fig1.savefig(oFig, bbox_inches='tight')
+
     oFig = os.path.join(oFigDir, '{}-areaInt_Dt_n{}.png'.format(l, n))#, y[0], y[-1]))    
-    ax2.plot(Dtvec[ixtimesteps], A, 'bo')
-    ax2.set_xlabel('r$\tau$(s)')
-    ax2.set_ylabel(r'A($\tau$)')
-    fig2.savefig(oFig)
+    ax2.plot(Dtvec[tvec_ix], A, 'bo')
+    ax2.set_xlabel(r'$ \tau \, [s]$')
+    ax2.set_ylabel(r'$A ( \tau $)')
+    fig2.savefig(oFig, bbox_inches='tight')
 
 
 

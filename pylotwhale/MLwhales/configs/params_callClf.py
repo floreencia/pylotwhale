@@ -67,14 +67,16 @@ callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
 ## INPUT -> collection files
 filesDi = {}
 #collFi_train 
-filesDi['train'] = '/home/florencia/whales/data/orchive/flo/data/wavLabelColl-call-catalog-xsilence.txt'
-#'/home/florencia/whales/MLwhales/callClassification/data/collections/Vocal-repertoire-catalogue-Pilot-whales-Norway-callsL10.txt'
+filesDi['train'] ='/home/florencia/whales/MLwhales/callClassification/data/collections/Vocal-repertoire-catalogue-Pilot-whales-Norway-callsL10.txt'
+# '/home/florencia/whales/data/orchive/flo/data/wavLabelColl-call-catalog-xsilence.txt'
+#
 
 ## OUTPUT -> DIR
 #oDir = 
 import pylotwhale.MLwhales.featureExtraction as fex
 settings_str = fex.makeTransformationsPipeline(T_settings).string + clf_settings.clf_name
-filesDi['outDir'] = '/home/florencia/whales/data/orchive/flo/data/experiments/{}'.format(settings_str)
+filesDi['outDir'] = '/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
+# '/home/florencia/whales/data/orchive/flo/data/experiments/{}'.format(settings_str)
 #'/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
 
 

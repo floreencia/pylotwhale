@@ -13,7 +13,7 @@ import pandas as pd
 
 from analyseAnnotations_times import timing_plots
 
-matplotlib.rcParams.update({'font.size': 18})
+matplotlib.rcParams.update({'font.size': 28})
 
 ### SETTINGS
 subsetLabel = 'tape'
@@ -21,7 +21,7 @@ callLabel = 'call'  # 'note'
 t_interval = 10  # calling rate
 timeLabel = 'ict_end_start'
 
-oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/images/times/tapes/trash'
+oFigDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/images/times/tapes'#/trash'
 #'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/images/times'
 cfile = '/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/not_curated/groupB/groupB_tapes_ict.csv'
 #'/home/florencia/profesjonell/bioacoustics/heike/NPW/vocalSequences/NPW/data/curated/groupB_0111_001_ict.csv'
