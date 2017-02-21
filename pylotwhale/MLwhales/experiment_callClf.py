@@ -76,15 +76,40 @@ test_coll = np.genfromtxt(collFi_test, dtype=object)
 lt = myML.labelTransformer(clf_labs)
 """
 
-wavColl = fex.readCols(filesDi['train'], (0,1))
-labels = [l[1] for l in wavColl]
-lt = myML.labelTransformer(labels)
+#wavColl = fex.readCols(filesDi['train'], (0,1))
+#labels = [l[1] for l in wavColl]
+#lt = myML.labelTransformer(labels)
 
+def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi, 
+                        lt, call_labels, fileName="scores.txt"):
+    oDir = os.path.join(outDir, iterParam)
+
+    try:
+        os.makedirs(oDir)
+    except OSError:
+        pass
+    out_fN = os.path.join(oDir, fileName)
+
+    Tpipe = fex.makeTransformationsPipeline(T_settings)
+    
+    ## write in out file
+    with open(out_fN, 'a') as out_file: # print details about the dataset into status file
+        out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
+        out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
+        #out_file.write("#{}\n".format(lt.classes_))
+        out_file.write("#" + settingsStr+'\n')
+        ### dateset info
+        out_file.write("# {}\n".format( trainFi))
+        out_file.write("# label_transformer: {}\n".format(lt.targetNumNomDict()))
+        out_file.write("# classes ({}): {}\n# data {}\n".format(len(lt.classes_),
+                                                               "', '".join(lt.classes_),
+                                                              Counter(call_labels)))                                                  
+    return out_fN
 
 
 def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
                          cv, pipe_estimators, gs_grid, 
-                         filterClfClasses=lt.classes_, scoring=None,
+                         filterClfClasses, scoring=None,
                          param=None):
     """Runs clf experiments
     Parameters
@@ -99,7 +124,7 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
             for pipline
         gs_grid: list
         filterClfClasses: list
-            default, use all classes in label transformer
+            can use lt.classes_
         out_fN: str
         returnClfs: dict, Flase => clfs are not stored
         predictionsDir: str
@@ -136,7 +161,7 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
     with open(out_fN, 'a') as out_file:
         ### cv score
         cv_sc = cross_val_score(clf_best, X_test, y_test, scoring=scoring)
-        out_file.write("{:2.2f}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
+        out_file.write("{:}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
                                                             100*2*np.std(cv_sc)))
                                                             
         P, R, f1, _ = mt.precision_recall_fscore_support(y_test, y_pred, average='macro') # average of the scores for the call classes
