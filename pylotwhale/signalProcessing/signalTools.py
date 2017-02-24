@@ -231,17 +231,17 @@ def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
     if title : fig.suptitle(title)
     if outFig : fig.savefig(outFig, bbox_inches='tight')
 
-def wav2waveform(wavF, sr=None, **kwargs):
-    """reads wave file and returns (waveform, sr)
+def wav2waveform(wavF, fs=None, **kwargs):
+    """reads wave file and returns (waveform, fs)
     for **kwargs, see librosa.core.load"""
-    return _wav2waveform(wavF, sr=sr, **kwargs)
+    return _wav2waveform(wavF, sr=fs, **kwargs)
 
 
 def _wav2waveform(wavF, **kwargs):
-    "read wavfile and return sRate, waveform"
+    "read wavfile and return fs, waveform"
     try:
         y, sr = librosa.core.load(wavF, **kwargs)
-        #sRate, waveform = wavfile.read(wavF)
+        #fs, waveform = wavfile.read(wavF)
     except IOError, TypeError:
         print( "Oops!  Couldn't read:\n %s "%wavF)
         return IOError
@@ -255,10 +255,10 @@ def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):
     wavFi : path to wav file
     * spec_factor, 0 = nothing, 1 = all
     """
-    waveform, sRate = wav2waveform(wavFi, normalize=normalize)
+    waveform, fs = wav2waveform(wavFi, normalize=normalize)
 
-    tf = 1.0*(len(waveform)-0.1)/sRate
-    #print "sampling rate:", sRate
+    tf = 1.0*(len(waveform)-0.1)/fs
+    #print "sampling rate:", fs
     fig, ax =  plt.subplots(figsize=figsize)
 
     ax.plot(np.linspace(0, tf, len(waveform)), waveform)
@@ -397,15 +397,15 @@ def specgramWav(wav_fileN, NFFT=2**9, overlap=0.5, saveData=False): #, max_freq 
     > paramStr :  string with the used parameters
     """
     # read wav file
-    sRate, waveform = wavfile.read(wav_fileN)
-    return spectralRep(waveform, sRate, NFFT=2**10, overlap=0.5, outF=saveData), paramStr
+    fs, waveform = wavfile.read(wav_fileN)
+    return spectralRep(waveform, fs, NFFT=2**10, overlap=0.5, outF=saveData), paramStr
 
-def spectral(waveform, sRate, NFFT=2**9, overlap=0.5,
+def spectral(waveform, fs, NFFT=2**9, overlap=0.5,
                 winN='hanning', outF=None, logSpec=True):
     """
     Extracts the power spectral features from a waveform
     < waveform :  numpy array
-    < sRate : samplig rate
+    < fs : samplig rate
     < powerOfWinLen : exponent of the fft window lenght in base 2
     < overlap : [0,1)
     < winN : win
@@ -421,7 +421,7 @@ def spectral(waveform, sRate, NFFT=2**9, overlap=0.5,
     win = sig.get_window(winN, NFFT) #plt.mlab.window_hanning
 
     # SPECTROGRAM
-    specM, s2f, s2t = mlab.specgram(waveform, NFFT=NFFT, Fs=sRate, window=win,
+    specM, s2f, s2t = mlab.specgram(waveform, NFFT=NFFT, Fs=fs, window=win,
                                     noverlap=int(NFFT*overlap))
 																																				
     paramStr = 'NFFT%d-OV%d'%(NFFT, overlap*100)
@@ -430,7 +430,7 @@ def spectral(waveform, sRate, NFFT=2**9, overlap=0.5,
     return specM.T # transpose the matrix to have the (m x n) form
 
 
-def spectral_nDelta(waveform, sRate, NFFT=2**9, overlap=0.5, winN='hanning',
+def spectral_nDelta(waveform, fs, NFFT=2**9, overlap=0.5, winN='hanning',
                 order=1, logSc=True):
     # settings
     win = sig.get_window(winN, NFFT) #plt.mlab.window_hanning\
@@ -438,7 +438,7 @@ def spectral_nDelta(waveform, sRate, NFFT=2**9, overlap=0.5, winN='hanning',
     order=int(order)
 
     ## SPECTROGRAM
-    specM, featureNames, s2t, x = plt.specgram(waveform, NFFT=NFFT, Fs=sRate, window=win,
+    specM, featureNames, s2t, x = plt.specgram(waveform, NFFT=NFFT, Fs=fs, window=win,
                                     noverlap=int(NFFT*overlap))
     featureNames=list(featureNames)
     Mspec_log = np.log(specM)
@@ -457,14 +457,14 @@ def spectral_nDelta(waveform, sRate, NFFT=2**9, overlap=0.5, winN='hanning',
 #####                 cepstrograms                    #####
 ###########################################################
 
-def cepstral(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
+def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
              **kwargs):
     """
     Extracts the spectral features from a waveform
     Parameters:
     ----------
     < waveform : numpy array
-    < sRate : samplig rate
+    < fs : samplig rate
     < NFFT : fft window lenght
     < overlap : [0,1)
     < Nceps : number of cepstral coefficients
@@ -477,10 +477,10 @@ def cepstral(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_
     """
     ## settings																
 
-    return cepstral_nDdelta(waveform, sRate, NFFT=NFFT, overlap=overlap, Nceps=Nceps,
+    return cepstral_nDdelta(waveform, fs, NFFT=NFFT, overlap=overlap, Nceps=Nceps,
                 logSc=logSc, order=0, n_mels=n_mels, **kwargs)
 
-def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
+def cepstral_nDdelta(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True, n_mels=128, **kwargs):
 
     """
@@ -488,7 +488,7 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
     Parameters:
     ------------
         < waveform : numpy array
-        < sRate : samplig rate
+        < fs : samplig rate
         < NFFT : fft window lenght in base 2
         < overlap : [0,1)
         < Nceps : int,
@@ -508,7 +508,7 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
     Nceps = int(Nceps)
     paramStr = '-Nceps%d'%(Nceps)
     ## CEPSTROGRAM
-    M0 = librosa.feature.mfcc(waveform, sr=sRate, n_mels=n_mels, n_mfcc=Nceps, 
+    M0 = librosa.feature.mfcc(waveform, sr=fs, n_mels=n_mels, n_mfcc=Nceps, 
                          n_fft=NFFT, hop_length=hopSz, **kwargs)#, hop_length=hopSz)
     m = np.shape(M0)[1]
     M=np.zeros((Nceps*(order+1), m))
@@ -519,12 +519,12 @@ def cepstral_nDdelta(waveform, sRate, NFFT=2**9, overlap=0.5, Nceps=2**4,
         M[Nceps*dO:Nceps*(dO+1), :] = delta(M0, order=dO)
 
     M=M.T
-    tf = 1.*len(waveform) / sRate
+    tf = 1.*len(waveform) / fs
 
     return M
 
 
-def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
+def melSpectral_nDelta(waveform, fs, NFFT=2**10, overlap=0.5, n_mels=2**4,
                        order=1, logSc=True, **kwargs):
 
     """
@@ -532,7 +532,7 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
     Parameters:
     -----------
         < waveform : numpy array
-        < sRate : samplig rate
+        < fs : samplig rate
         < NFFT : fft window lenght in base 2
         < overlap : [0,1)
         < n_mels : number of mel filterbanks
@@ -551,7 +551,7 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
     n_mels = int(n_mels)			
 
     ## CEPSTROGRAM
-    Mc = librosa.feature.melspectrogram(waveform, sr=sRate, n_mels=n_mels,
+    Mc = librosa.feature.melspectrogram(waveform, sr=fs, n_mels=n_mels,
                                    n_fft=NFFT, hop_length=hopSz, **kwargs)
     Mc_log = np.log(Mc)
     M = Mc.copy()
@@ -564,7 +564,7 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
 
 
     M = M.T
-    tf = 1.*len(waveform) / sRate
+    tf = 1.*len(waveform) / fs
 
     return M
 
@@ -574,14 +574,14 @@ def melSpectral_nDelta(waveform, sRate, NFFT=2**10, overlap=0.5, n_mels=2**4,
 #####                   chroma                        #####
 ###########################################################
 
-def chromogram(waveform, sRate, C=None, hop_length=512, fmin=None,
+def chromogram(waveform, fs, C=None, hop_length=512, fmin=None,
 			threshold=0.0, tuning=None, n_chroma=12, n_octaves=7,
 			window=None, bins_per_octave=None, mode='full'):
 														
     """
     Extracts the spectral features from a waveform
     < waveform : numpy array
-    < sRate : samplig rate
+    < fs : samplig rate
     < NFTTpow : exponent of the fft window lenght in base 2
     < overlap : [0,1)
     < Nceps : number of cepstral coefficients
@@ -595,7 +595,7 @@ def chromogram(waveform, sRate, C=None, hop_length=512, fmin=None,
     ## settings
 								
     #y_harmonic, y_percussive = librosa.effects.hpss(y)
-    C = librosa.feature.chroma_cqt(y=waveform, sr=sRate, C=C, hop_length=hop_length,
+    C = librosa.feature.chroma_cqt(y=waveform, sr=fs, C=C, hop_length=hop_length,
 			fmin=fmin, threshold=threshold, tuning=tuning,
 			n_chroma=n_chroma, n_octaves=n_octaves, window=window,
 			bins_per_octave=bins_per_octave, mode=mode)
