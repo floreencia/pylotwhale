@@ -205,7 +205,7 @@ def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
     
     return XyDict
     
-def wavLCollection2datXy(wavLabelCollection, featExtFun=None):
+def wavLCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
     """
     returns the data object of a collection of labeled wavs
 
@@ -227,7 +227,7 @@ def wavLCollection2datXy(wavLabelCollection, featExtFun=None):
     datO = myML.dataXy_names() #inicialize data object    
 
     for wavF, l in wavLabelCollection:
-        waveForm, fs = wav2waveform(wavF)#, normalize=False)
+        waveForm, fs = wav2waveform(wavF, fs=fs)#, normalize=False)
         M = featExtFun(waveForm)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])
         
@@ -385,12 +385,6 @@ def extractFeaturesWDataAugmentation(sampSpace, feExFun, n_instances = 10, **ens
                                                      n_instances=n_art_instances, **ensSettings)
         datO.addInstances(datArt.X, datArt.y_names)
     return datO
-
-    
-
-
-
-    
     
 ####### TRANSFORMERS
 ##### Feature extraction classes
@@ -426,6 +420,7 @@ class Transformation():
         self.settingsDict = settings_di
         self.string = self.set_transformationStr(self.settingsDict, self.name)
         self.fun = self.set_transformationFun(self.name, self.settingsDict)
+        self.define_attrs_form_dict(self.settingsDict)
 
     def set_transformationStr(self, di, settStr=''):
         """defines a string with transformation's intructions"""
@@ -436,6 +431,10 @@ class Transformation():
                               transformationFun=get_transformationFun):
         """returns the feature extraction callable, ready to use!"""
         return functools.partial(transformationFun(Tname), **settings)
+        
+    def define_attrs_form_dict(self, di):
+        for k, v in di.items():
+            setattr(self, k, v)
 
 
 class TransformationsPipeline():
@@ -446,17 +445,21 @@ class TransformationsPipeline():
         self.transformationsList = transformationsList
         self.string = ''
         self.fun = lambda x: x
+
         for (step, trO) in self.transformationsList:
             #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
             self.string = self.appendString(step, trO)
             self.fun = self.composeTransformation(trO.fun)
+            setattr(self, step, trO)
+            #self.define_attrs_form_dict
 
     def appendString(self, step_name, trOb):
         return self.string + "-{}-{}".format(step_name, trOb.string)
 
     def composeTransformation(self, fun):
         return compose2(fun, self.fun)
-        
+
+
 def makeTransformationsPipeline(settings):
     """creates a transformations pipeline
     settings: list
@@ -675,7 +678,7 @@ def wavAnnCollection2Xy_ensemble(wavAnnColl, featExtFun=None, wavPreprocessingT=
     return datO
 
     
-def wavCollection2datXy(wavLabelCollection, featExtFun=None):
+def wavCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
     """
     returns the data object of a collection of annotated wavs.
 
@@ -701,7 +704,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     datO = myML.dataXy_names() #inicialize data object    
 
     for wavF, l in wavLabelCollection:
-        waveForm, fs = wav2waveform(wavF)#, normalize=False)
+        waveForm, fs = wav2waveform(wavF, fs)#, normalize=False)
         M = featExtFun(waveForm, fs)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])  
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
