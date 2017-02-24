@@ -227,7 +227,7 @@ def wavLCollection2datXy(wavLabelCollection, featExtFun=None):
     datO = myML.dataXy_names() #inicialize data object    
 
     for wavF, l in wavLabelCollection:
-        waveForm, fs = wav2waveform(wavF, normalize=False)
+        waveForm, fs = wav2waveform(wavF)#, normalize=False)
         M = featExtFun(waveForm)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])
         
@@ -701,7 +701,7 @@ def wavCollection2datXy(wavLabelCollection, featExtFun=None):
     datO = myML.dataXy_names() #inicialize data object    
 
     for wavF, l in wavLabelCollection:
-        waveForm, fs = wav2waveform(wavF, normalize=False)
+        waveForm, fs = wav2waveform(wavF)#, normalize=False)
         M = featExtFun(waveForm, fs)
         datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])  
         #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))

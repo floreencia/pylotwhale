@@ -231,20 +231,22 @@ def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
     if title : fig.suptitle(title)
     if outFig : fig.savefig(outFig, bbox_inches='tight')
 
-def wav2waveform(wavF, normalize=False):
-    """reads wave file and returns (waveform, sr)"""
-    return _wav2waveform(wavF, normalize=normalize)
+def wav2waveform(wavF, sr=None, **kwargs):
+    """reads wave file and returns (waveform, sr)
+    for **kwargs, see librosa.core.load"""
+    return _wav2waveform(wavF, sr=sr, **kwargs)
 
 
-def _wav2waveform(wavF, normalize=False):
+def _wav2waveform(wavF, **kwargs):
     "read wavfile and return sRate, waveform"
     try:
-        sRate, waveform = wavfile.read(wavF)
+        y, sr = librosa.core.load(wavF, **kwargs)
+        #sRate, waveform = wavfile.read(wavF)
     except IOError, TypeError:
         print( "Oops!  Couldn't read:\n %s "%wavF)
         return IOError
-    if normalize : waveform = normalizeWF(waveform)
-    return waveform, sRate
+    #if normalize : waveform = normalizeWF(waveform)
+    return y, sr
 
 
 def plWave(wavFi, dirN='', outFig='', title='', figsize=None, normalize=True):
