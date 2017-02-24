@@ -82,6 +82,7 @@ lt = myML.labelTransformer(clf_labs)
 
 def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi, 
                         lt, call_labels, fileName="scores.txt"):
+    """prints the experiment settings"""
     oDir = os.path.join(outDir, iterParam)
 
     try:
@@ -160,7 +161,7 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
     ## clf scores over test set
     with open(out_fN, 'a') as out_file:
         ### cv score
-        cv_sc = cross_val_score(clf_best, X_test, y_test, scoring=scoring)
+        cv_sc = cross_val_score(clf_best, X_train, y_train, scoring=scoring)
         out_file.write("{:}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
                                                             100*2*np.std(cv_sc)))
                                                             

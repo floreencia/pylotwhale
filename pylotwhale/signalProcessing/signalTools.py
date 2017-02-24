@@ -36,6 +36,7 @@ import librosa  # Librosa for audio
 def waveformPreprocessingFun(funName=None):
     '''
     Dictionary of feature extracting functions
+    maps method_name --> estimator (callable)
     returns a callable
     ------
     > feature names (if None)

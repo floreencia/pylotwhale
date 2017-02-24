@@ -39,7 +39,7 @@ overlap = 0.5; auD["overlap"] = overlap
 #Nslices = 4; auD["Nslices"] = Nslices
 #audioF='spectral'#; auD["featExtrFun"]= featExtract
 #n_mels = 64; auD["n_mels"]= n_mels; audioF='melspectro'; 
-Nceps=2**5; auD["Nceps"]= Nceps; audioF='cepstral'
+Nceps=2**4; auD["Nceps"]= Nceps; audioF='cepstral'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 summDict = {'Nslices': 4, 'normalise': True}
@@ -48,8 +48,8 @@ T_settings.append(('summ', (summType, summDict)))
 
 ##### clf
 testFrac = 0.2
-metric='accuracy'
-cv = 10
+metric='f1_macro'#'accuracy'
+cv = 5
 
 ## clf settings
 ### inicialise Clf settings
@@ -61,7 +61,7 @@ paramsDi.update(clf_settings.grid_params_di)
 gs_grid = [paramsDi] # clfSettings.grid_params #
 
 #### Classes                
-callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
+#callSet = ['126i', '130', '127', '129', '128i', '131i', '093ii']
 
 ##### FILES
 ## INPUT -> collection files
@@ -74,12 +74,7 @@ filesDi['train'] ='/home/florencia/whales/MLwhales/callClassification/data/colle
 ## OUTPUT -> DIR
 #oDir = 
 import pylotwhale.MLwhales.featureExtraction as fex
-settings_str = fex.makeTransformationsPipeline(T_settings).string + clf_settings.clf_name
+settings_str = fex.makeTransformationsPipeline(T_settings).string + clf_settings.clf_name + '-'+ metric
 filesDi['outDir'] = '/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
 # '/home/florencia/whales/data/orchive/flo/data/experiments/{}'.format(settings_str)
 #'/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
-
-
-
-
-

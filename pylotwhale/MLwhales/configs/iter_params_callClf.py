@@ -26,6 +26,7 @@ def experimentsControlParams(iterParam):
                          "Nceps": NcepsO,
                          "NFFT": NFFTO,
                          "n_mels" : NmelsO,
+                         "n_mels_4ceps": NmelsO4Ceps
                          #"trainCollection": trainCollO
                          }
     assert iterParam in controlParamsDict.keys(), '{} is not a valid control parameter\nValid: {}'.format(iterParam, ', '.join(controlParamsDict.keys()))
@@ -150,6 +151,26 @@ NmelsO = exT.controlVariable(parameterName=parameter,
                          paramDict=paramDict,
                          #updateParamInDict=updateParamInDict_NFFT,
                          settingsStr="{}_{}".format(parameter, '{}_{}'.format(N0,N))
+                         )
+
+
+
+### N mels for cepstrogram, 
+# compression occurs when computing the cepstral coefficients, 
+# we need larger values values of n_mels
+parameter = 'n_mels'
+N0=64
+Nf=300
+Nmels = np.array([N0, 80, 100, 128, 150, 200, 256, Nf]) #np.arange(N0, N, Ndelta)  # np.linspace(a0, a, n_amps) 
+paramDict = auD
+
+
+NmelsO4Ceps = exT.controlVariable(parameterName=parameter,
+                         controlParams=Nmels,
+                         updateTestSet=True,
+                         paramDict=paramDict,
+                         #updateParamInDict=updateParamInDict_NFFT,
+                             settingsStr="{}_{}".format('Nmels4ceps', '{}_{}'.format(N0,Nf))
                          )
                          
                          

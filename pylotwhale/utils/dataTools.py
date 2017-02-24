@@ -4,10 +4,10 @@ Created on Fri Apr 29 15:34:06 2016
 
 @author: florencia
 
-Various handy functions (sorting, spliting, searching) for working with data
+Various handy functions (sorting, splitting, searching) for manipulating with data
     - pandas dataframes
     - dictionaries
-    - lisits
+    - lists
 """
 
 import numpy as np

@@ -30,7 +30,6 @@ from pylotwhale.utils.dataTools import stringiseDict
 ### Extract features
 ### hierarchical annotations (WALKING)
 
-            
 def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     """
     extracts features and its labels (ground truth) from wavF and annF files
@@ -399,6 +398,7 @@ def extractFeaturesWDataAugmentation(sampSpace, feExFun, n_instances = 10, **ens
 def get_transformationFun(funName=None):
     '''
     Dictionary of transformations
+    maps method name (str) --> estimator (callable)
     '''
     D = {}
     ## waveform --> waveform

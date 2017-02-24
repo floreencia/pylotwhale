@@ -46,7 +46,7 @@ updateTestSet = controlParamO.updateTestSet
 expSettingsStr = controlParamO.settingsStr
 
 ## more settings
-wavColl = fex.readCols(filesDi['train'], (0,1))[:]
+wavColl = fex.readCols(filesDi['train'], (0,1))[:100]
 call_labels = [l[1] for l in wavColl]
 lt = myML.labelTransformer(call_labels)
 
