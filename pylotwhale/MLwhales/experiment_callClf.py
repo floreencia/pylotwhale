@@ -136,9 +136,10 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
 
     Tpipe = fex.makeTransformationsPipeline(T_settings)
     feExFun = Tpipe.fun
+    fs=Tpipe.Audio_features.fs
     #### prepare DATA: collections --> X y
     ## compute features
-    datO = fex.wavLCollection2datXy( wavColl, featExtFun=feExFun )
+    datO = fex.wavLCollection2datXy( wavColl, fs=fs, featExtFun=feExFun )
     X, y_names = datO.filterInstances(filterClfClasses)
     y = lt.nom2num(y_names)
 

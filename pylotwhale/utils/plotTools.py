@@ -269,40 +269,42 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
     
 #### spectrogrms
 
-def plspectro(waveform, sRate, outF='', N = 2**9, v0_cut = 1000,
-              vf_cut = 20*1000, overFrac = 0.5, winN = 'hanning',
+def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None, 
+              overFrac = 0.5, winN = 'hanning',
               spec_fac=0.99999, plTitle='', plTitleFontSz=0, cmN='bone_r',
               figsize=None):
     """
     plots spectrogram
     Parameters
     ----------
-    v0_cut: float
-    frequency threshold
-    vf_cut: 20*1000, 
+    v_cut: tuple
+        frequency range, None sets to full spectrum (0, fs/2).
+        (1000, 20*1000) works nicely for the whales
     overFrac: float [0,1)
+        cuts off the powerspectrum 0 max cutting, 1 doesn't do anything
     NFFT overlap
     spec_fac: 
     thresould all with variations smaller than
     """
 
-
+    if v_cut is None:
+        v_cut=(0, sRate/2)
     #tf = float(N)/sRate
     tf = 1.0*(len(waveform)) /sRate
     #ff = sRate/2.0
-    N=int(N)
+    N = int(N)
     win = get_window(winN, N)
     noverlap = int(overFrac*N)
     A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, window = win)[0]
 
     # Spectro edditing
-    A = selectBand(A0, fr_f = sRate/2, v0_cut=v0_cut, vf_cut=vf_cut) # band filter
-    A = reeScale_E(A, spec_factor=spec_fac) # zero the the spectral energy smaller than 0.001% of <E>
+    A = selectBand(A0, fr_f = sRate/2, v_cut=v_cut) # band filter
+    A = reScale_E(A, spec_factor=spec_fac) # zeros the the spectral energy smaller than 0.001% of <E>
 
     plt.clf()
     fig, ax = plt.subplots(figsize=figsize)#figsize=(max([3,int(tf/0.3)]), ff/8000))
 
-    cax = ax.imshow(np.log(A), extent=[ 0, tf, v0_cut/1000, vf_cut/1000],
+    cax = ax.imshow(np.log(A), extent=[ 0, tf, v_cut[0]/1000, v_cut[1]/1000],
                     origin='lower', aspect = 'auto', cmap=plt.cm.get_cmap(cmN))#, interpolation = 'nearest')
 
     #labels
@@ -325,9 +327,11 @@ def plspectro(waveform, sRate, outF='', N = 2**9, v0_cut = 1000,
     if outF:
         print( "out:", outF )
         fig.savefig(outF, bbox_inches='tight')
+    
+    return fig, ax
 
 
-def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000):
+def selectBand(M, fr_0 = 0, fr_f = 24000, v_cut = (1.0*1000, 20.0*1000)):
     """
     selects a band on frquencies from the matrix M
     fr_0, initial frequency of the matrix
@@ -337,13 +341,13 @@ def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000)
     vf_cut
     """
     ny, nx = np.shape(M)
-    n0_cut = int( ny*v0_cut/( fr_f - fr_0 ) )
-    nf_cut = int( ny*vf_cut/( fr_f - fr_0 ) )
+    n0_cut = int( ny*v_cut[0]/( fr_f - fr_0 ) )
+    nf_cut = int( ny*v_cut[1]/( fr_f - fr_0 ) )
     #print n0_cut, nf_cut, nx, ny
     return M[ n0_cut:nf_cut, : ]
 
 
-def reeScale_E(M, spec_factor = 1.0/3.0):
+def reScale_E(M, spec_factor = 1.0/3.0):
     """
     Zeroes the noise by taking only the part of the spectrum with the higest energy.
     - spec_factor \in [0,1],
@@ -355,10 +359,7 @@ def reeScale_E(M, spec_factor = 1.0/3.0):
     assert(spec_factor >= 0 and spec_factor <= 1)
     cutE = (np.min(M) - np.max(M))*spec_factor + np.max(M)
     nx, ny = np.shape(M)
-    M_tr = np.copy(M)
-
-    for i in range(nx):
-        for j in range(ny):
-            if M_tr[i,j] < cutE: M_tr[i, j] = cutE
+    M_tr = np.array(M)
+    M_tr[M < cutE] = cutE
 
     return M_tr

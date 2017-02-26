@@ -9,7 +9,7 @@ Created on Fri Nov 27 18:05:03 2015
 from __future__ import print_function, division
 import numpy as np
 import pylotwhale.MLwhales.experimentTools as exT
-from pylotwhale.MLwhales.configs.params_callClf import auD, summDict, filesDi
+from pylotwhale.MLwhales.configs.params_callClf import *#auD, summDict, filesDi
 
 
 ### Control parameter mapping to settings object

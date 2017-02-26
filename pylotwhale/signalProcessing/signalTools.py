@@ -26,7 +26,7 @@ import librosa  # Librosa for audio
 
 """
     Tools for manipulating audio signals
-    Module for the preprocessing of features
+    Module for manipulating audio files
     florencia @ 06.09.14
 """
 
@@ -230,6 +230,8 @@ def wavs2spectros(files, dirN='', outFig = '', title = '', winPow = 9,
 
     if title : fig.suptitle(title)
     if outFig : fig.savefig(outFig, bbox_inches='tight')
+
+##### WAVFILE LOADING ######        
 
 def wav2waveform(wavF, fs=None, **kwargs):
     """reads wave file and returns (waveform, fs)

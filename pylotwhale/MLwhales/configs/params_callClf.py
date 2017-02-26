@@ -18,8 +18,8 @@ runExperiment_prototypeCallType-clf.py
 ##############################
 
 #### Feature extraction 
-#fs = 48000
-fs = 44100 # orchive
+fs = 48000 # Heike's
+#fs = 44100 # orchive
 T_settings = []
 
 ## preprocessing
@@ -33,7 +33,7 @@ T_settings.append(('normaliseWF', (prepro, preproDict)))
 
 #### features dictionary
 auD = {}
-auD["sRate"] = fs
+auD["fs"] = fs
 NFFTpow = 8; auD["NFFT"] = 2**NFFTpow
 overlap = 0.5; auD["overlap"] = overlap
 #Nslices = 4; auD["Nslices"] = Nslices
@@ -73,8 +73,8 @@ filesDi['train'] ='/home/florencia/whales/MLwhales/callClassification/data/colle
 
 ## OUTPUT -> DIR
 #oDir = 
-import pylotwhale.MLwhales.featureExtraction as fex
-settings_str = fex.makeTransformationsPipeline(T_settings).string + clf_settings.clf_name + '-'+ metric
-filesDi['outDir'] = '/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
+from pylotwhale.MLwhales.featureExtraction import makeTransformationsPipeline
+settings_str = makeTransformationsPipeline(T_settings).string + clf_settings.clf_name + '-'+ metric
+filesDi['outDir'] = '/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/f1_macro_16ceps/{}'.format(settings_str)
 # '/home/florencia/whales/data/orchive/flo/data/experiments/{}'.format(settings_str)
 #'/home/florencia/whales/MLwhales/callClassification/data/experiments/fullRep-cutWavs/{}'.format(settings_str)
