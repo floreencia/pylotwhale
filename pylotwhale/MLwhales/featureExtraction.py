@@ -414,8 +414,8 @@ class Transformation():
     and the callable
     """
     def __init__(self, transformation_name, settings_di):
-        assert transformation_name in get_transformationFun().keys(), "trans\
-        formation not recognised"
+        assert transformation_name in get_transformationFun().keys(), "trans"\
+        "formation not recognised\n {}".format(get_transformationFun().keys()) 
         self.name = transformation_name
         self.settingsDict = settings_di
         self.string = self.set_transformationStr(self.settingsDict, self.name)
@@ -445,11 +445,13 @@ class TransformationsPipeline():
         self.transformationsList = transformationsList
         self.string = ''
         self.fun = lambda x: x
+        self.steps=[]
 
         for (step, trO) in self.transformationsList:
             #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
             self.string = self.appendString(step, trO)
             self.fun = self.composeTransformation(trO.fun)
+            self.steps.append(step)
             setattr(self, step, trO)
             #self.define_attrs_form_dict
 

@@ -31,7 +31,7 @@ T_settings.append(('normaliseWF', (prepro, preproDict)))
 
 #### audio features
 auD = {}
-auD["sRate"] = fs
+auD["fs"] = fs
 NFFTpow = 9; auD["NFFT"] = 2**NFFTpow
 overlap = 0; auD["overlap"] = overlap
 n_mels = 12; auD["n_mels"]= n_mels;
