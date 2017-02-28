@@ -270,7 +270,7 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
 #### spectrogrms
 
 def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None, 
-              overFrac = 0.5, winN = 'hanning',
+              overlap = 0.5, winN = 'hanning',
               spec_fac=0.99999, plTitle='', plTitleFontSz=0, cmN='bone_r',
               figsize=None):
     """
@@ -280,10 +280,11 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     v_cut: tuple
         frequency range, None sets to full spectrum (0, fs/2).
         (1000, 20*1000) works nicely for the whales
-    overFrac: float [0,1)
-        cuts off the powerspectrum 0 max cutting, 1 doesn't do anything
+    overlap: float [0,1)
+        FFT overlap
     NFFT overlap
     spec_fac: 
+        cuts off the powerspectrum 0 max cutting, 1 doesn't do anything
     thresould all with variations smaller than
     """
 
@@ -294,7 +295,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     #ff = sRate/2.0
     N = int(N)
     win = get_window(winN, N)
-    noverlap = int(overFrac*N)
+    noverlap = int(overlap*N)
     A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, window = win)[0]
 
     # Spectro edditing
@@ -309,7 +310,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
 
     #labels
     ax.set_xlabel('time [s]')#, fontsize=16)
-    ax.set_ylabel('frequency [KHz]')#, fontsize=16)
+    ax.set_ylabel('frequency [kHz]')#, fontsize=16)
     if plTitleFontSz: ax.set_title(plTitle, fontsize=plTitleFontSz)
 
     if tf<1:

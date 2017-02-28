@@ -17,12 +17,12 @@ uses:
 Toolboxes
 =========
 
-The code is organised in modules:
+Code is organised into the following modules:
 
 utils
 -----
 
-Tools for plotting handling text, paths, collections, general to diverse contexts, not only ML or bioacoustics.
+Plotting handling text, paths, collections, general to diverse contexts, not only ML or bioacoustics.
 
 #### whaleFileProcessing
 * file name processing, time stamp interpreting
@@ -49,9 +49,9 @@ convention
 * plotting tools
 
 
-signalProcessing
+SignalProcessing
 ----------------
-diverse tools fro working with signals (1dim time series)
+diverse tools for working with signals (1dim time series)
 
 #### signaltools_beta
 code
@@ -72,7 +72,7 @@ code
 MLwhales
 --------
 
-diverse tools for supervisedly detecting and classifying sounds. Using wave files and annotations.
+diverse tools for supervisedly detecting and classifying sounds using wave files and annotations.
 
 #### MLtools_beta
 code
@@ -110,12 +110,11 @@ code
 	* call lengths
 	* plot tape
 * plotAnnotatedSpectro
-	* visualize annotations plotting them together / the spectrogram
+	* visualise annotations plotting them together / the spectrogram
 
 #### sequencesO_beta
 code
 * csv → df → bigrams dict
-	* normalize
 * plot tape
 
 #### myStatistics_beta

@@ -105,7 +105,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     return 1.0*N_values/Nsh, shuffle_tests
 
     
-##### othe oler functions #####    
+##### othe older functions #####    
 
 def mean_confidence_interval(data, confidence=0.95):
     """
@@ -173,7 +173,7 @@ def Gstatistics(O, E):
     
     
     
-    
+### DISTANCES AND COMPARISONS
     
 def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
@@ -190,7 +190,7 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     y[1]: z- value
     y[2]: z-critical value correspondent to the given pc-avlue
     """
-    assert(test=='two') # TODO: EXTEND TO RIGHT AND LEFT TESTS!
+    assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
     assert(np.logical_and( p1 <= 1, p2 <= 1))
     
     if(not np.logical_and( n1 >= 30, n2 >= 30)):
@@ -210,9 +210,8 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
         else:
             #print("H0 cannot be rejected!")
             return(-1, z, zc)
-            
-            
-            
+
+
 def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     """elementwise diff of proportions test between X and Y, H0: X=Y
     Parameters
@@ -262,3 +261,6 @@ def KSsimilarity(feature_arr):
             #print(i, j)
             dist[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return dist
+    
+
+    
