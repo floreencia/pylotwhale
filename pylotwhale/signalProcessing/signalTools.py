@@ -26,7 +26,6 @@ import librosa  # Librosa for audio
 
 """
     Tools for manipulating audio signals
-    Module for manipulating audio files
     florencia @ 06.09.14
 """
 
@@ -50,6 +49,7 @@ def waveformPreprocessingFun(funName=None):
         'band_pass_filter': butter_bandpass_filter,
         'scale' : scale2range,
         'maxabs_scale':maxAbsScale,
+        'median_scale': None,
         'whiten': whiten        
         }
 
@@ -74,9 +74,10 @@ def audioFeaturesFun(funName=None):
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
         'spectral' : spectral,
         'spectralDelta' : spectral_nDelta,
-        'cepstral' : cepstral,
-        'cepsDelta' : functools.partial(cepstral_nDdelta, order=1), # MFCC and delta-MFCC
-        'cepsDeltaDelta' : functools.partial(cepstral_nDdelta, order=2),
+        'cepstrum' : cepstral,
+        'MFCC' : mfcepstral,
+        'MFcepsDelta' : functools.partial(mfcepstral_nDdelta, order=1), # MFCC and delta-MFCC
+        'MFcepsDeltaDelta' : functools.partial(mfcepstral_nDdelta, order=2),
         'chroma' : chromogram,
         'melspectroDelta' : melSpectral_nDelta,
         'melspectro' : functools.partial(melSpectral_nDelta, order=0),
@@ -327,7 +328,7 @@ def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000)
 
 def allPositive_andNormal(M):
     """
-    normalizes the matrices, so that all it's values lay in (0,1)
+    normalises the matrices, so that all it's values lay in (0,1)
     """
     if np.min(M) < 0:
         M = M - np.min(M)
@@ -408,7 +409,7 @@ def spectral(waveform, fs, NFFT=2**9, overlap=0.5,
     Extracts the power spectral features from a waveform
     < waveform :  numpy array
     < fs : samplig rate
-    < powerOfWinLen : exponent of the fft window lenght in base 2
+    < powerOfWinLen : exponent of the fft window length in base 2
     < overlap : [0,1)
     < winN : win
     < logSpec : power spectrum in logarithmic scale
@@ -459,47 +460,79 @@ def spectral_nDelta(waveform, fs, NFFT=2**9, overlap=0.5, winN='hanning',
 #####                 cepstrograms                    #####
 ###########################################################
 
-def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
+def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True,
              **kwargs):
     """
-    Extracts the spectral features from a waveform
+    Extracts the cepstral features from a waveform
+    Parameters
+    ----------
+    < waveform : numpy array
+    < fs : samplig rate
+    < NFFT : fft window length
+    < overlap : [0,1)
+    < Nceps : number of mfcc coefficients
+    < logSc : return features in logarithmic scale
+    Returns    
+    ---
+    > specM : spectral matrix (numpy array, ( m_instances x n_features ) )
+    
+    See also
+    --------
+        mfcepstral : cepstrogram
+    """
+    ## settings
+
+    log_spec_y = librosa.core.logamplitude( librosa.core.spectrum._spectrogram(waveform, n_fft=NFFT, 
+                                              hop_length=int(NFFT*(1-overlap), **kwargs))[0])
+
+    dct_filt = librosa.filters.dct( Nceps, len(log_spec_y))
+    cepsRep = np.dot(dct_filt, log_spec_y).T
+    if logSc:
+        cepsRep = librosa.core.logamplitude(cepsRep)
+    return cepsRep
+
+def mfcepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
+             **kwargs):
+    """
+    Extracts the Mel-cepstral features from a waveform
     Parameters:
     ----------
     < waveform : numpy array
     < fs : samplig rate
-    < NFFT : fft window lenght
+    < NFFT : fft window length
     < overlap : [0,1)
-    < Nceps : number of cepstral coefficients
-    < logSc : retunrn features in logarithmic scale
+    < Nceps : number of mfcc coefficients
+    < logSc : return features in logarithmic scale
     --->
     > specM : spectral matrix (numpy array, ( m_instances x n_features ) )
-    > featureNames : names of the features. Central frequency of the bin (n,)
-    > tf : final time (s2t[-1])
-    > paramStr :  string with the used parameters
+    
+    See also
+    --------
+        cepstral : Mel-frequency cepstrogram
     """
     ## settings																
 
-    return cepstral_nDdelta(waveform, fs, NFFT=NFFT, overlap=overlap, Nceps=Nceps,
+    return mfcepstral_nDdelta(waveform, fs, NFFT=NFFT, overlap=overlap, Nceps=Nceps,
                 logSc=logSc, order=0, n_mels=n_mels, **kwargs)
 
-def cepstral_nDdelta(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4,
+def mfcepstral_nDdelta(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True, n_mels=128, **kwargs):
 
     """
-    cepstral feature matrix and the delta orders horizontaly appended
+    mfcc feature matrix and the delta orders horizontaly appended
     Parameters:
     ------------
         < waveform : numpy array
         < fs : samplig rate
-        < NFFT : fft window lenght in base 2
+        < NFFT : fft window length in base 2
         < overlap : [0,1)
         < Nceps : int,
-            number of cepstral coefficients (n_mfcc) melspectral filters
-        < logSc : retunrn features in logarithmic scale
+            number of MFcepstral coefficients (n_mfcc) melspectral filters
+        < logSc : return features in logarithmic scale
         < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
     Returns:
     -------
-        > M : cepstral feature matrix ( m_instances x n_features )
+        > M : mfcepstral feature matrix ( m_instances x n_features )
         > featureNames : list
         > tf : final time [s]
         > paramStr : settings string
@@ -535,14 +568,14 @@ def melSpectral_nDelta(waveform, fs, NFFT=2**10, overlap=0.5, n_mels=2**4,
     -----------
         < waveform : numpy array
         < fs : samplig rate
-        < NFFT : fft window lenght in base 2
+        < NFFT : fft window length in base 2
         < overlap : [0,1)
         < n_mels : number of mel filterbanks
-        < logSc : retunrn features in logarithmic scale
+        < logSc : return features in logarithmic scale
         < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
     Returns:
     --------
-        > M : cepstral feature matrix ( m_instances x n_features )
+        > M : mfcepstral feature matrix ( m_instances x n_features )
         > featureNames : list
         > tf : final time [s]
         > paramStr : settings string
@@ -584,10 +617,10 @@ def chromogram(waveform, fs, C=None, hop_length=512, fmin=None,
     Extracts the spectral features from a waveform
     < waveform : numpy array
     < fs : samplig rate
-    < NFTTpow : exponent of the fft window lenght in base 2
+    < NFTTpow : exponent of the fft window length in base 2
     < overlap : [0,1)
     < Nceps : number of cepstral coefficients
-    < logSc : retunrn features in logarithmic scale
+    < logSc : return features in logarithmic scale
     --->
     > specM : spectral matrix (numpy array, n x m)
     > featureNames : names of the features. Central frequency of the bin (n,)
