@@ -495,6 +495,13 @@ class TransformationsPipeline():
         for (step, trO) in T_list:
             s.append(step)
         return s
+        
+    def processing_steps(self):
+        s=''
+        for k in self.step_sequence:
+            s += "{}, {}, {}\n".format(k, self.steps[k].name, 
+                                       self.steps[k].settingsDict)
+        return s
 
 
 def makeTransformationsPipeline(settings):

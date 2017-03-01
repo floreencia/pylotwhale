@@ -108,6 +108,73 @@ def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi,
     return out_fN
 
 
+
+def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
+                         cv, pipe_estimators, gs_grid, 
+                         filterClfClasses, scoring=None,
+                         param=None):
+    """Runs clf experiments
+    Parameters
+    ----------
+        train_coll: list
+        test_coll: list
+        lt: ML.labelTransformer
+        T_settings: list of tuples
+        labelsHierachy: list of strings
+        cv: cv folds
+        estimators: list
+            for pipline
+        gs_grid: list
+        filterClfClasses: list
+            can use lt.classes_
+        out_fN: str
+        returnClfs: dict, Flase => clfs are not stored
+        predictionsDir: str
+        scoring: string or sklearn.metrics.scorer
+        param: float
+            value of the param in experimet, for printing
+    """
+
+    #Tpipe = fex.makeTransformationsPipeline(T_settings)
+    feExFun = Tpipe.fun
+    fs=Tpipe.Audio_features.fs
+    #### prepare DATA: collections --> X y
+    ## compute features
+    datO = fex.wavLCollection2datXy( wavColl, fs=fs, featExtFun=feExFun )
+    X, y_names = datO.filterInstances(filterClfClasses)
+    y = lt.nom2num(y_names)
+
+    X_train, X_test, y_train, y_test = train_test_split(X,
+                                                        y, test_size=testFrac, 
+                                                        random_state=0)
+
+    #### CLF
+    pipe = Pipeline(pipe_estimators)
+    gs = GridSearchCV(estimator=pipe,
+                      param_grid=gs_grid,
+                      scoring=scoring,
+                      cv=cv,
+                      n_jobs=-1)
+
+    gs = gs.fit(X_train, y_train)
+    clf_best = gs.best_estimator_
+    y_pred = clf_best.predict(X_test)
+
+    ## clf scores over test set
+    with open(out_fN, 'a') as out_file:
+        ### cv score
+        cv_sc = cross_val_score(clf_best, X_train, y_train, scoring=scoring)
+        out_file.write("{:}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
+                                                            100*2*np.std(cv_sc)))
+                                                            
+        P, R, f1, _ = mt.precision_recall_fscore_support(y_test, y_pred, average='macro') # average of the scores for the call classes
+        acc = mt.accuracy_score(y_test, y_pred)
+        out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}\n".format(acc*100, P*100, R*100, f1*100))
+
+    return clf_best.fit(X, y)
+
+
+
 def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
                          cv, pipe_estimators, gs_grid, 
                          filterClfClasses, scoring=None,
