@@ -409,21 +409,28 @@ def get_transformationFun(funName=None):
         
 
 class Transformation():
-    """creates a transformation from a settings dictionary 
-    and the name of the transformation bonding: the dictionary, a string 
-    and the callable
+    """creates a transformation from a tranformation_name and a settings dictionary 
+    A Transformation has a callable (fun) and a settings string 
     """
     def __init__(self, transformation_name, settings_di):
         assert transformation_name in get_transformationFun().keys(), "trans"\
         "formation not recognised\n {}".format(get_transformationFun().keys()) 
         self.name = transformation_name
         self.settingsDict = settings_di
-        self.string = self.set_transformationStr(self.settingsDict, self.name)
-        self.fun = self.set_transformationFun(self.name, self.settingsDict)
-        self.define_attrs_form_dict(self.settingsDict)
+        #self.string = self.get_string()
+        #self.fun = self.set_transformationFun(self.name, self.settingsDict)
+        #self.define_attrs_form_dict(self.settingsDict)
+     
+    @property # turns the method into an attr
+    def string(self):
+        return self.set_transformationStr(self.settingsDict, self.name)
 
+    @property
+    def fun(self):
+        return self.set_transformationFun(self.name, self.settingsDict)
+        
     def set_transformationStr(self, di, settStr=''):
-        """defines a string with transformation's intructions"""
+        """defines a string with transformation's instructions"""
         settStr += stringiseDict(di, '')
         return settStr
 
@@ -431,10 +438,10 @@ class Transformation():
                               transformationFun=get_transformationFun):
         """returns the feature extraction callable, ready to use!"""
         return functools.partial(transformationFun(Tname), **settings)
-        
-    def define_attrs_form_dict(self, di):
-        for k, v in di.items():
-            setattr(self, k, v)
+
+    def define_attrs_form_dict(self):
+        for k, v in self.settingsDict.items():
+            setattr(self, '__{}'.format(k), v)
 
 
 class TransformationsPipeline():
@@ -452,7 +459,7 @@ class TransformationsPipeline():
             self.string = self.appendString(step, trO)
             self.fun = self.composeTransformation(trO.fun)
             self.steps.append(step)
-            setattr(self, step, trO)
+            setattr(self, '__{}'.format(step), trO)
             #self.define_attrs_form_dict
 
     def appendString(self, step_name, trOb):
