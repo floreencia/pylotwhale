@@ -409,26 +409,23 @@ def get_transformationFun(funName=None):
         
 
 class Transformation():
-    """creates a transformation from a tranformation_name and a settings dictionary 
-    A Transformation has a callable (fun) and a settings string 
+    """creates a transformation from a tranformation_name and a settings dictionary
+    A Transformation has a callable (fun) and a settings string
     """
     def __init__(self, transformation_name, settings_di):
         assert transformation_name in get_transformationFun().keys(), "trans"\
-        "formation not recognised\n {}".format(get_transformationFun().keys()) 
+        "formation not recognised\n {}".format(get_transformationFun().keys())
         self.name = transformation_name
         self.settingsDict = settings_di
-        #self.string = self.get_string()
-        #self.fun = self.set_transformationFun(self.name, self.settingsDict)
-        #self.define_attrs_form_dict(self.settingsDict)
-     
-    @property # turns the method into an attr
+
+    @property  # turns the method into an attr
     def string(self):
         return self.set_transformationStr(self.settingsDict, self.name)
 
     @property
     def fun(self):
         return self.set_transformationFun(self.name, self.settingsDict)
-        
+
     def set_transformationStr(self, di, settStr=''):
         """defines a string with transformation's instructions"""
         settStr += stringiseDict(di, '')
@@ -446,27 +443,58 @@ class Transformation():
 
 class TransformationsPipeline():
     """pipeline of Transformations
+    Parameters
+    ---------
+    transformationsList: list
+        [(<processing_step>, Transformation), ...]
     """
-
     def __init__(self, transformationsList):
         self.transformationsList = transformationsList
-        self.string = ''
-        self.fun = lambda x: x
-        self.steps=[]
 
-        for (step, trO) in self.transformationsList:
-            #assert isinstance(trO, Transformation), "must be a Transformation {}".format(trO)
-            self.string = self.appendString(step, trO)
-            self.fun = self.composeTransformation(trO.fun)
-            self.steps.append(step)
-            setattr(self, '__{}'.format(step), trO)
-            #self.define_attrs_form_dict
+    @property
+    def string(self):
+        return self.set_string(self.transformationsList)
 
-    def appendString(self, step_name, trOb):
-        return self.string + "-{}-{}".format(step_name, trOb.string)
+    @property
+    def fun(self):
+        return self.set_fun(self.transformationsList)
 
-    def composeTransformation(self, fun):
-        return compose2(fun, self.fun)
+    @property
+    def step_sequence(self):
+        """list with the sequence of processing steps"""
+        return self.set_step_sequence(self.transformationsList)
+
+    @property
+    def steps(self):
+        """dictionary, maps processing_step to Transformation"""
+        return self.set_steps(self.transformationsList)
+
+    def set_string(self, T_list):
+        s = ''
+        for (step, trO) in T_list:
+            s += "-{}-{}".format(step, trO.string)
+        return s
+
+    def set_fun(self, T_list):
+        f = lambda x: x
+        for (step, trO) in T_list:
+            f = self.composeTransformation(trO.fun, f)
+        return f
+
+    def composeTransformation(self, fun2, fun1):
+        return compose2(fun2, fun1)
+
+    def set_steps(self, T_list):
+        s = {}
+        for (step, trO) in T_list:
+            s[step] = trO
+        return s
+
+    def set_step_sequence(self, T_list):
+        s = []
+        for (step, trO) in T_list:
+            s.append(step)
+        return s
 
 
 def makeTransformationsPipeline(settings):
@@ -480,7 +508,6 @@ def makeTransformationsPipeline(settings):
     for s, (tn, sD) in settings:
         transformationsList.append((s, Transformation(tn, sD)))
     return TransformationsPipeline(transformationsList)
-
 
 
 
