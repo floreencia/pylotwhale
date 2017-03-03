@@ -150,8 +150,51 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 
         return fig, ax
 
+### FOURIER
 
 
+def window_times(onset_times, t0, tf):
+    """windows a onset_times between t0 and tf"""
+    return onset_times[np.logical_and(onset_times >=t0, onset_times<=tf)]
+
+def binary_time_series(onset_times, Dt=0.1):
+    """converts oneset times into a time-continuous binary array
+    having the time stamp of the last element as length of the time vector
+    Parameters
+    ----------
+    ev_times: ndarray
+        onset times
+    Dt: int
+        time samplig interval, 1/sampling rate
+    t_end: float
+    Returns
+    -------
+    t_vec: ndarray
+        times aray
+    IO: ndarray
+        a binary array with ones at the onset positions
+    Fs: float
+        sampling rate
+    """
+    t_vec = np.arange(0, onset_times[-1] + Dt, Dt)
+    IO = np.zeros_like(t_vec)
+
+    for ct in onset_times:
+        IO[np.argmin(np.abs(t_vec - ct))]=1
+
+    Fs = int(1./Dt) #int(len(t_vec)/t_vec[-1]) # =
+    return t_vec, IO, Fs
+
+
+def binarise_times_in_window(times, t0, tf, Dt=0.1):
+    """Windows a signal with onset times and binarises it with ones at the onset times"""
+    winL = tf-t0
+    win_times = window_times(times, t0, tf) - t0
+    t0_vec, IO_0, Fs = binary_time_series( win_times, Dt=Dt)
+    t_vec = np.arange( 0, tf + Dt, Dt)
+    IO = np.zeros_like( t_vec)
+    IO[:len(IO_0)] = IO_0
+    return t_vec, IO
 
 
 

@@ -137,7 +137,8 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
 
     #Tpipe = fex.makeTransformationsPipeline(T_settings)
     feExFun = Tpipe.fun
-    fs=Tpipe.Audio_features.fs
+    
+    fs=Tpipe.steps['Audio_features'].settingsDict['fs']
     #### prepare DATA: collections --> X y
     ## compute features
     datO = fex.wavLCollection2datXy( wavColl, fs=fs, featExtFun=feExFun )

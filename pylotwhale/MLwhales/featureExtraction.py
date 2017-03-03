@@ -495,7 +495,7 @@ class TransformationsPipeline():
         for (step, trO) in T_list:
             s.append(step)
         return s
-        
+
     def processing_steps(self):
         s=''
         for k in self.step_sequence:

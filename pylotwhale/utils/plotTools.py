@@ -216,8 +216,9 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
 ### Clustering plots
 
+
 def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
-                         NcbarTicks=4, cbarAxis=None, oFig=None):
+                         NcbarTicks=4, cbarAxis=None, oFig=None, **kwargs):
     
     Y = linkage_matrix = sch.ward(distM)
     
@@ -242,7 +243,7 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
     idx2 = Z2['leaves']
     D = distM[idx1,:][:,idx2]
     #D = distM[:,idx2]
-    im = axmatrix.matshow(D, aspect='auto', cmap=cmap, origin='lower')
+    im = axmatrix.matshow(D, aspect='auto', cmap=cmap, origin='lower', **kwargs)
     
     # Distance matrix tick labels
     axmatrix.set_xticks(np.arange(len(idx1)))

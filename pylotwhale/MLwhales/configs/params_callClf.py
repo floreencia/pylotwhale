@@ -38,8 +38,8 @@ NFFTpow = 9; auD["NFFT"] = 2**NFFTpow
 overlap = 0.5; auD["overlap"] = overlap
 #Nslices = 4; auD["Nslices"] = Nslices
 #audioF='spectral'#; auD["featExtrFun"]= featExtract
-n_mels = 128/2/2; auD["n_mels"]= n_mels; audioF='melspectro'; 
-#Nceps=2**4; auD["Nceps"]= Nceps; audioF='MFCC'
+n_mels = 128/2; auD["n_mels"]= n_mels; audioF='melspectro'; 
+Nceps=2**4; auD["Nceps"]= Nceps; audioF='cepstrum'
 T_settings.append(('Audio_features', (audioF, auD)))
 
 summDict = {'Nslices': 4, 'normalise': True}
