@@ -5,8 +5,9 @@ from __future__ import print_function, division
 import numpy as np
 #import os
 from collections import Counter
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
+
 import pylotwhale.utils.dataTools as daT
 
 #import pylotwhale.NLP.ngramO_beta as ngr
@@ -191,13 +192,21 @@ def binarise_times_in_window(times, t0, tf, Dt=0.1):
     winL = tf-t0
     win_times = window_times(times, t0, tf) - t0
     t0_vec, IO_0, Fs = binary_time_series( win_times, Dt=Dt)
-    t_vec = np.arange( 0, tf + Dt, Dt)
+    t_vec = np.arange( 0, tf -t0 + Dt, Dt)
     IO = np.zeros_like( t_vec)
     IO[:len(IO_0)] = IO_0
     return t_vec, IO
 
 
-
+def KLdivergence(feature_arr):
+    """KL-divergence"""
+    
+    dist = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
+    
+    for i in np.arange(len(feature_arr)):
+        for j in np.arange(len(feature_arr)): # np.arange(len(feature_arr)):
+            dist[i,j] = entropy(feature_arr[i], feature_arr[j])
+    return dist
 
 
 
