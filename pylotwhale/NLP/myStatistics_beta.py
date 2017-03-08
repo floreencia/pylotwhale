@@ -244,23 +244,28 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     return XYtest
                 
 
-
 # continuous distributions
 
-def KSsimilarity(feature_arr):
-    """~similarity between sets of continuous distributions given as rows
+def KSsimilarity(feature_arr, i_diag=1):
+    """~similarity matrix between sets of continuous distributions given as rows
     of feature_arr (2darray) 
     Similarity is measured as the p-values of the KS-test
     p=1 distributions were drawn from the same pdf,
     the closer p is to zero the more different are the distributions
-    returns only the lower triangle, upper traingle is set up to nan"""
+    returns only the lower traingle, upper traingle is set up to nan
+    Parameters
+    ----------
+    feature_arr: list
+    i_diag: int
+         deviation from diagonal, = 0 include diagonal   
+    """
     
-    dist = np.zeros((len(feature_arr), len(feature_arr)))+np.nan
+    p = np.zeros((len(feature_arr), len(feature_arr)))+np.nan
     for i in np.arange(len(feature_arr)):
-        for j in np.arange(i+1, len(feature_arr)): # np.arange(len(feature_arr)):
+        for j in np.arange(i+i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
             #print(i, j)
-            dist[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
-    return dist
+            p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
+    return p
     
 
     

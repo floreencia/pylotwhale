@@ -80,7 +80,7 @@ lt = myML.labelTransformer(clf_labs)
 #labels = [l[1] for l in wavColl]
 #lt = myML.labelTransformer(labels)
 
-def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi, 
+def prepare_output_file(outDir, expSettingsStr, settingsStr, trainFi, 
                         lt, call_labels, fileName="scores.txt"):
     """prints the experiment settings"""
     oDir = os.path.join(outDir, iterParam)
@@ -90,8 +90,17 @@ def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi,
     except OSError:
         pass
     out_fN = os.path.join(oDir, fileName)
+    
+    ## write in out file
+    print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi, 
+                           lt, call_labels)
+                                              
+    return out_fN
 
-    Tpipe = fex.makeTransformationsPipeline(T_settings)
+
+def print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi, 
+                        lt, call_labels):
+    """prints the experiment settings"""
     
     ## write in out file
     with open(out_fN, 'a') as out_file: # print details about the dataset into status file
@@ -106,7 +115,6 @@ def prepare_output_file(outDir, iterParam, expSettingsStr, settingsStr, trainFi,
                                                                "', '".join(lt.classes_),
                                                               Counter(call_labels)))                                                  
     return out_fN
-
 
 
 def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,

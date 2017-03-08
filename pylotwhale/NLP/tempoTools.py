@@ -9,6 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 import pylotwhale.utils.dataTools as daT
+from scipy.stats import entropy
 
 #import pylotwhale.NLP.ngramO_beta as ngr
 
@@ -199,7 +200,7 @@ def binarise_times_in_window(times, t0, tf, Dt=0.1):
 
 
 def KLdivergence(feature_arr):
-    """KL-divergence"""
+    """KL-divergence matrix between all the elements of the feature_arr"""
     
     dist = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
     
