@@ -416,7 +416,7 @@ class Transformation():
         assert transformation_name in get_transformationFun().keys(), "trans"\
         "formation not recognised\n {}".format(get_transformationFun().keys())
         self.name = transformation_name
-        self.settingsDict = settings_di
+        self.settingsDict = dict(settings_di) # make copy of the dictionary
 
     @property  # turns the method into an attr
     def string(self):
