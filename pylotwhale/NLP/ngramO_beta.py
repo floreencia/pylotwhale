@@ -163,7 +163,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     df: conditional data frame (output of twoDimDict2DataFrame)
     conditionsList: list/np.array of conditions to read (None reads all)
     samplesList: list/np.array of samples to read (None reads all)
-    Return:
+    Return
     -------
     M: matrix representations of the df values
     samps: labels of the columns of the matrix
