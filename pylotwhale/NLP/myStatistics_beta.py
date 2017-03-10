@@ -104,6 +104,12 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
         N_values[shTest_i > obsTest] += 1 # test?
     return 1.0*N_values/Nsh, shuffle_tests
 
+
+def onesided2twosided_p_value(p):
+    X = np.array(p_values[p_values>0.5])
+    p_values[p_values>0.5] = 1-X
+    p[ p > 0.5 ] = 1 - p[ p > 0.5 ]
+    return p
     
 ##### othe older functions #####    
 
