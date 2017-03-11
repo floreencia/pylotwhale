@@ -98,28 +98,45 @@ def prepare_output_file(outDir, expSettingsStr, settingsStr, trainFi,
     return out_fN
 
 
-def print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi, 
-                        lt, call_labels):
+def print_exeriment_header(out_fN, experiment_setup_str, configuration_str, trainFi, 
+                           lt, call_labels, exp_header_str):
     """prints the experiment settings"""
     
     ## write in out file
     with open(out_fN, 'a') as out_file: # print details about the dataset into status file
-        out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
+        out_file.write("# call-clf experiment {}\n".format(experiment_setup_str))
         out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
-        #out_file.write("#{}\n".format(lt.classes_))
-        out_file.write("#" + settingsStr+'\n')
+        # out_file.write("#{}\n".format(lt.classes_))
+        out_file.write("#" + configuration_str+'\n')
         ### dateset info
         out_file.write("# {}\n".format( trainFi))
         out_file.write("# label_transformer: {}\n".format(lt.targetNumNomDict()))
         out_file.write("# classes ({}): {}\n# data {}\n".format(len(lt.classes_),
                                                                "', '".join(lt.classes_),
-                                                              Counter(call_labels)))                                                  
+                                                              Counter(call_labels)))        
+        ### exp header
+        out_file.write("{}\n".format(exp_header_str))
+
     return out_fN
 
+def scores_header_li(metric='metric'):
+    return ['{}_CV'.format(metric), '{}_CV_std'.format(metric), 
+            'ACC', 'PRE', 'REC', 'F1']
+
+def scores_header_str(header_li=None, metric='metric', sep=','):
+    if header_li is None: 
+        header_li = scores_header_li(metric)
+    exp_header_str = header_li[0]
+    for item in header_li[1:]:
+        exp_header_str += "{}{}".format(sep, item)
+
+    return exp_header_str
 
 def Tpipe_settings_and_header(Tpipe, sep=", "):
     """returns two strings with the instructions in Tpipe (pipeline of Transformations)
     header_str, settings_str"""
+    header=[]
+    values=[]
     for step in Tpipe.step_sequence:
         header.append( step)
         values.append(Tpipe.steps[step].name)
@@ -194,7 +211,7 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
         ### test: ACC, P, R, f1
         P, R, f1, _ = mt.precision_recall_fscore_support(y_test, y_pred, average='macro') # average of the scores for the call classes
         acc = mt.accuracy_score(y_test, y_pred)
-        out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}".format(acc*100, P*100, R*100, f1*100))
+        out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}, ".format(acc*100, P*100, R*100, f1*100))
         
         ### settings
         out_file.write("{}\n".format(settings_str))
