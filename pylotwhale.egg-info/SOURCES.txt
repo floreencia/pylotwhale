@@ -28,9 +28,15 @@ pylotwhale/MLwhales/runExperiments_WSD1.py
 pylotwhale/MLwhales/runExperiments_callClf-cutWavs-testColl.py
 pylotwhale/MLwhales/runExperiments_callClf-cutWavs.py
 pylotwhale/NLP/__init__.py
+pylotwhale/NLP/analyseAnnotations-chunks-iter.py
+pylotwhale/NLP/analyseAnnotations-diversityCombos.py
 pylotwhale/NLP/analyseAnnotations-shuffle.py
-pylotwhale/NLP/analyseAnnotations-times.py
 pylotwhale/NLP/analyseAnnotations.py
+pylotwhale/NLP/analyseAnnotations_chunks.py
+pylotwhale/NLP/analyseAnnotations_diversityCombos-iter.py
+pylotwhale/NLP/analyseAnnotations_diversityCombos.py
+pylotwhale/NLP/analyseAnnotations_times-iter.py
+pylotwhale/NLP/analyseAnnotations_times.py
 pylotwhale/NLP/annFeatureExtractionTools.py
 pylotwhale/NLP/annotations_analyser.py
 pylotwhale/NLP/csvDatFr-ict.py
@@ -45,6 +51,7 @@ pylotwhale/NLP/myStatistics_beta.py
 pylotwhale/NLP/ngramO_beta.py
 pylotwhale/NLP/sequencesO_beta.py
 pylotwhale/NLP/statMechT_beta.py
+pylotwhale/NLP/tempoTools.py
 pylotwhale/sequences/tempoTools.py
 pylotwhale/signalProcessing/__init__.py
 pylotwhale/signalProcessing/audioFeatures.py
