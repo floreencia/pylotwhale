@@ -104,8 +104,8 @@ def print_exeriment_header(out_fN, experiment_setup_str, configuration_str, trai
     
     ## write in out file
     with open(out_fN, 'a') as out_file: # print details about the dataset into status file
-        out_file.write("# call-clf experiment {}\n".format(experiment_setup_str))
         out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
+        out_file.write("# Experiment: {}\n".format(experiment_setup_str))
         # out_file.write("#{}\n".format(lt.classes_))
         out_file.write("#" + configuration_str+'\n')
         ### dateset info
@@ -206,7 +206,7 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
     with open(out_fN, 'a') as out_file:
         ### cv scores
         cv_sc = cross_val_score(clf_best, X_train, y_train, scoring=scoring)
-        out_file.write("{:}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
+        out_file.write("{:2.2f}, {:.2f}, ".format( 100*np.mean(cv_sc),
                                                             100*2*np.std(cv_sc)))
         ### test: ACC, P, R, f1
         P, R, f1, _ = mt.precision_recall_fscore_support(y_test, y_pred, average='macro') # average of the scores for the call classes
