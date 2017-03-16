@@ -92,7 +92,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     """
     nr, nc = np.shape(obsTest)
     shuffle_tests = np.zeros((Nsh, nr, nc))
-    N_values = np.zeros_like(obsTest)
+    N_values_r = np.zeros_like(obsTest)
     for i in range(Nsh):  ## shuffle ith-loop
         cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
         for t in df_dict.keys(): # for each tape
@@ -101,13 +101,15 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
         Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh, condsLi, sampsLi) # normalised matrix
         shTest_i = testStat(Mp_sh) # compute satat variable
         shuffle_tests[i] = shTest_i # save distribution for later
-        N_values[shTest_i > obsTest] += 1 # test?
-    return 1.0*N_values/Nsh, shuffle_tests
+        N_values_r[shTest_i >= obsTest] += 1 # test right
+        #N_values_l[shTest_i < obsTest] += 1 # test left 
+        p_r = 1.0*N_values_r/Nsh
+    return p_r, shuffle_tests
 
 
 def onesided2twosided_p_value(p):
-    X = np.array(p_values[p_values>0.5])
-    p_values[p_values>0.5] = 1-X
+    X = np.array(p_values[p_values > 0.5])
+    p_values[p_values > 0.5] = 1 - X
     p[ p > 0.5 ] = 1 - p[ p > 0.5 ]
     return p
     
