@@ -265,7 +265,7 @@ def NgramsDist2callsInNgramsDist(ngrams_dist):
 #### sequences
 
 
-def df2listOfSeqs(df, Dt=None, l='call', time_param = 'ict', time_param_dtype = float):
+def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_dtype = float):
     '''
     returns the sequences of <l>, chains of elements separated by the interval Dt
     Parameters:
