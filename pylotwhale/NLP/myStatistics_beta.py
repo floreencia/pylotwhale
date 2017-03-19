@@ -72,17 +72,18 @@ def shuffled_cfd(df, Dtint, label='call'):
 
 def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
                                label='call', testStat=teStat_proportions_diff):
-    """randomisation test for bigrams
+    """randomisation test for each bigram
     Parameters
     ----------
     df_dict: dict
         dictionary of dataframes (tapes)
     Dt: tuple 
         (None, Dt)
-    obsTest: float
-        observed stat
+    obsTest: ndarray
+        observed stat for each bigram
     Nsh: int
     condLi, sampLi: list
+        list of conditions and samples
     testStat: callable
     Returns
     -------
