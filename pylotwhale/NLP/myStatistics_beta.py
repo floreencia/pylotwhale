@@ -104,7 +104,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
         shuffle_tests[i] = shTest_i # save distribution for later
         N_values_r[shTest_i >= obsTest] += 1 # test right
         #N_values_l[shTest_i < obsTest] += 1 # test left 
-        p_r = 1.0*N_values_r/Nsh
+    p_r = 1.0*N_values_r/Nsh
     return p_r, shuffle_tests
 
 
