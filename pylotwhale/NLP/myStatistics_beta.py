@@ -115,8 +115,10 @@ def repsProportion_from_bigramMtx(M):
     return np.sum(np.diag(M))/M.sum()
 
 def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
-                                   label='call', testStat=repsProportion_from_bigramMtx):
+                                   label='call', time_param='ict_end_start',
+                                   testStat=repsProportion_from_bigramMtx):
     """randomisation test for repetitions within the interval Dtint
+    shuffle tapes within a tape, define Dtint-seqeunces and count repetitions
     Parameters
     ----------
     df_dict: dict
@@ -141,7 +143,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, condsLi, sampsL
         cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
         for t in df_dict.keys(): # for each tape
             thisdf = df_dict[t]
-            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label) # counts in current tape
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts in current tape
         Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, condsLi, sampsLi)
         #print(np.sum(Mp_sh))        
         shTest_i = testStat(Mp_sh) # compute satat variable
