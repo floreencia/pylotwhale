@@ -105,7 +105,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
         shTest_i = testStat(Mp_sh) # compute satat variable
         shuffle_tests[i] = shTest_i # save distribution for later
         N_values_r[shTest_i >= obsTest] += 1 # test right
-        #N_values_l[shTest_i < obsTest] += 1 # test left 
+        #N_values_l[shTest_i < obsTest] += 1 # test left
     p_r = 1.0*N_values_r/Nsh
     return p_r, shuffle_tests
 
@@ -114,7 +114,20 @@ def repsProportion_from_bigramMtx(M):
     """proportion of repetitions"""
     return np.sum(np.diag(M))/M.sum()
 
-def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
+
+def repsPropotion_in_listOfSeqs(liOfSeqs, deg=1):
+    """proportion of repetitions in a list of sequeces
+    liOfSeqs: list of lists
+    """
+    Nbigrams = 0
+    Nreps = 0
+    for seql in liOfSeqs:
+        seq = np.array(seql)
+        Nreps += len(seq[seq[deg:] == seq[:-deg]])
+        Nbigrams += len(seq)-1
+    return Nreps, Nbigrams
+
+def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
                                    label='call', time_param='ict_end_start',
                                    testStat=repsProportion_from_bigramMtx):
     """randomisation test for repetitions within the interval Dtint
@@ -128,7 +141,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, condsLi, sampsL
     obsTest: float
         observed stat for each bigram
     Nsh: int
-    condLi, sampLi: list
+    callsLi: list
         list of conditions and samples
     testStat: callable
     Returns
@@ -144,12 +157,12 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, condsLi, sampsL
         for t in df_dict.keys(): # for each tape
             thisdf = df_dict[t]
             cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts in current tape
-        Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, condsLi, sampsLi)
+        Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, callsLi, callsLi)
         #print(np.sum(Mp_sh))        
         shTest_i = testStat(Mp_sh) # compute satat variable
         shuff_dist[i] = shTest_i
         if shTest_i >= obsTest:
-            N_values+= 1 #
+            N_values += 1 #
             
     p = 1.0*N_values/Nsh
     return p, shuff_dist
