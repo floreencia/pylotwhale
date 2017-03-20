@@ -237,7 +237,7 @@ def Gstatistics(O, E):
     
 ### DISTANCES AND COMPARISONS
     
-def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
+def stat_testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
     z-test for the difference of proportions
     tests the null hypothesis
@@ -252,7 +252,7 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     y[1]: z- value
     y[2]: z-critical value correspondent to the given pc-avlue
     """
-    assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
+    #assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
     assert(np.logical_and( p1 <= 1, p2 <= 1))
     
     if(not np.logical_and( n1 >= 30, n2 >= 30)):
