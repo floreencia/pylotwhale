@@ -10,6 +10,6 @@ from pylotwhale.NLP.myStatistics_beta import *
 
 
 def test_binary_time_series():
-    s = [['c', 'c', 'c', 'c', 'b']]
-    assert repsPropotion_in_listOfSeqs(s) == (3,4)
+    s = [['c', 'c', 'c', 'c', 'b', 'b']]
+    assert repsPropotion_in_listOfSeqs(s) == (4,5)
     
