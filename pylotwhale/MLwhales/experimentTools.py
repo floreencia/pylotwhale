@@ -22,6 +22,60 @@ from sklearn import svm
 import time
 
 
+########
+
+
+def Tpipe_settings_and_header(Tpipe, sep=", "):
+    """returns two strings with the instructions in Tpipe (pipeline of Transformations)
+    header_str, settings_str"""
+    header = []
+    values = []
+    for step in Tpipe.step_sequence:
+        header.append(step)
+        values.append(Tpipe.steps[step].name)
+        for ky in Tpipe.steps[step].settingsDict.keys():
+            header.append(ky)
+            values.append(Tpipe.steps[step].settingsDict[ky])
+
+    header_str = ("{}".format(sep).join(header))
+    settings_str = "{}".format(sep).join(["{}".format(item) for item in values])
+    return header_str, settings_str
+
+
+
+
+
+
+
+
+
+
+
+#########
+
+
+def print_exeriment_header(out_fN, experiment_setup_str, configuration_str, trainFi, 
+                           lt, call_labels, exp_header_str):
+    """prints the experiment settings"""
+    
+    ## write in out file
+    with open(out_fN, 'a') as out_file: # print details about the dataset into status file
+        out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
+        out_file.write("# Experiment: {}\n".format(experiment_setup_str))
+        # out_file.write("#{}\n".format(lt.classes_))
+        out_file.write("#" + configuration_str+'\n')
+        ### dateset info
+        out_file.write("# {}\n".format( trainFi))
+        out_file.write("# label_transformer: {}\n".format(lt.targetNumNomDict()))
+        out_file.write("# classes ({}): {}\n# data {}\n".format(len(lt.classes_),
+                                                               "', '".join(lt.classes_),
+                                                              Counter(call_labels)))        
+        ### exp header
+        out_file.write("{}\n".format(exp_header_str))
+
+    return out_fN
+
+
 ###### Iter parameters
 
 class controlVariable():
@@ -84,9 +138,9 @@ def featureExtractionInstructions2Xy(wavAnnColl, lt, TpipeSettings, labelSet=Non
     X_train, y_train_labels = datO.filterInstances(labelSet)
     y_train = lt.nom2num(y_train_labels)
     return X_train, y_train
-        
+
 def clf_experiment(clf_settings, **feExInstructionsDict):
-    '''train clf : (1) take params, the ensemble generating params, 
+    '''train clf : (1) take params, the ensemble generating params,
     (2) generate data from collection according to feExFun,
     (3) filter instances and (4) train clf
     Parameters:
@@ -122,7 +176,7 @@ class clf_experimentO():
             predictionsDict = {}
             for li in XyDict.keys():
                 X, y = XyDict[li]
-                predictionsDict[li]={}
+                predictionsDict[li] = {}
                 for i in range(len(y)):
                     predictionsDict[li][i, y[i].item()] = []
                 #                            np.zeros((len(y), len(callSet)))))

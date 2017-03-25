@@ -60,10 +60,11 @@ def shuffleSeries(dataFr, shuffleCol='timeSs'):
     shuffledRecs[shuffleCol] = x # set shuffled series
     return shuffledRecs # data frames and labels
 
-def shuffled_cfd(df, Dtint, label='call'):
+def shuffled_cfd(df, Dtint, label='call', time_param='ict_end_start'):
     """returns the conditional frequencies of the bigrams in a df after shuffling <label>"""
     sh_df = shuffleSeries(df, shuffleCol=label) # shuffle the calls
-    sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label)) # define the sequeces
+    sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label,
+                                                        time_param=time_param)) # define the sequeces
     my_bigrams = nltk.bigrams(sequences) # detect bigrams
     cfd_nsh = ngr.bigrams2Dict(my_bigrams) # count bigrams
     return cfd_nsh
@@ -71,18 +72,20 @@ def shuffled_cfd(df, Dtint, label='call'):
     
 
 def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
-                               label='call', testStat=teStat_proportions_diff):
-    """randomisation test for bigrams
+                               label='call', time_param='ict_end_start', 
+                               testStat=teStat_proportions_diff):
+    """randomisation test for each bigram conditional probability
     Parameters
     ----------
     df_dict: dict
         dictionary of dataframes (tapes)
     Dt: tuple 
         (None, Dt)
-    obsTest: float
-        observed stat
+    obsTest: ndarray
+        observed stat for each bigram
     Nsh: int
     condLi, sampLi: list
+        list of conditions and samples
     testStat: callable
     Returns
     -------
@@ -92,24 +95,77 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     """
     nr, nc = np.shape(obsTest)
     shuffle_tests = np.zeros((Nsh, nr, nc))
-    N_values = np.zeros_like(obsTest)
+    N_values_r = np.zeros_like(obsTest)
     for i in range(Nsh):  ## shuffle ith-loop
         cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
         for t in df_dict.keys(): # for each tape
             thisdf = df_dict[t]
-            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label) # counts
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts
         Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh, condsLi, sampsLi) # normalised matrix
         shTest_i = testStat(Mp_sh) # compute satat variable
         shuffle_tests[i] = shTest_i # save distribution for later
-        N_values[shTest_i > obsTest] += 1 # test?
-    return 1.0*N_values/Nsh, shuffle_tests
+        N_values_r[shTest_i >= obsTest] += 1 # test right
+        #N_values_l[shTest_i < obsTest] += 1 # test left
+    p_r = 1.0*N_values_r/Nsh
+    return p_r, shuffle_tests
 
 
-def onesided2twosided_p_value(p):
-    X = np.array(p_values[p_values>0.5])
-    p_values[p_values>0.5] = 1-X
-    p[ p > 0.5 ] = 1 - p[ p > 0.5 ]
-    return p
+def repsProportion_from_bigramMtx(M):
+    """proportion of repetitions"""
+    return np.sum(np.diag(M))/M.sum()
+
+
+def repsPropotion_in_listOfSeqs(liOfSeqs, deg=1):
+    """proportion of repetitions in a list of sequeces
+    liOfSeqs: list of lists
+    """
+    Nbigrams = 0
+    Nreps = 0
+    for seql in liOfSeqs:
+        seq = np.array(seql)
+        Nreps += len(seq[seq[deg:] == seq[:-deg]])
+        Nbigrams += len(seq)-1
+    return Nreps, Nbigrams
+
+def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
+                                   label='call', time_param='ict_end_start',
+                                   testStat=repsProportion_from_bigramMtx):
+    """randomisation test for repetitions within the interval Dtint
+    shuffle tapes within a tape, define Dtint-seqeunces and count repetitions
+    Parameters
+    ----------
+    df_dict: dict
+        dictionary of dataframes (tapes)
+    Dtint: tuple 
+        (None, Dt)
+    obsTest: float
+        observed stat for each bigram
+    Nsh: int
+    callsLi: list
+        list of conditions and samples
+    testStat: callable
+    Returns
+    -------
+    p_values: ndarray
+    shuffle_test: ndarray
+        shuffled test distributions
+    """
+    N_values=0
+    shuff_dist=np.zeros(Nsh)
+    for i in range(Nsh):  ## shuffle ith-loop
+        cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
+        for t in df_dict.keys(): # for each tape
+            thisdf = df_dict[t]
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts in current tape
+        Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, callsLi, callsLi)
+        #print(np.sum(Mp_sh))        
+        shTest_i = testStat(Mp_sh) # compute satat variable
+        shuff_dist[i] = shTest_i
+        if shTest_i >= obsTest:
+            N_values += 1 #
+            
+    p = 1.0*N_values/Nsh
+    return p, shuff_dist
     
 ##### othe older functions #####    
 
@@ -181,7 +237,7 @@ def Gstatistics(O, E):
     
 ### DISTANCES AND COMPARISONS
     
-def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
+def stat_testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
     z-test for the difference of proportions
     tests the null hypothesis
@@ -196,7 +252,7 @@ def testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     y[1]: z- value
     y[2]: z-critical value correspondent to the given pc-avlue
     """
-    assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
+    #assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
     assert(np.logical_and( p1 <= 1, p2 <= 1))
     
     if(not np.logical_and( n1 >= 30, n2 >= 30)):

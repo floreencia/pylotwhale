@@ -8,6 +8,7 @@ Runs call classification experiments generating artificial data and trying
 different parameters
 """
 from __future__ import print_function
+import time
 import os
 import argparse
 import sys
@@ -27,6 +28,8 @@ from sklearn.externals import joblib
 import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.MLwhales.predictionTools as pT
+import pylotwhale.MLwhales.experimentTools as expT
+
 
 #import pylotwhale.MLwhales.experimentTools as exT
 from pylotwhale.MLwhales import MLEvalTools as MLvl
@@ -72,6 +75,219 @@ lt = myML.labelTransformer(clf_labs)
 """
 
 
+def Tpipe_settings_and_header(Tpipe, sep=", "):
+    """returns two strings with the instructions in Tpipe (pipeline of Transformations)
+    header_str, settings_str"""
+    header=[]
+    values=[]
+    for step in Tpipe.step_sequence:
+        header.append( step)
+        values.append(Tpipe.steps[step].name)
+        for ky in Tpipe.steps[step].settingsDict.keys():
+            header.append( ky)
+            values.append( Tpipe.steps[step].settingsDict[ky] )
+            
+    header_str = ("{}".format(sep).join(header))
+    settings_str = "{}".format(sep).join(["{}".format(item) for item in values])
+    return header_str, settings_str
+
+
+class experiment():
+    def __init__(self, out_file):
+        self.out_file = out_file
+
+    @property
+    def time(self):
+        return time.strftime("%Y.%m.%d\t\t%H:%M:%S")
+
+    def print_in_out_file(self, string):#, oFile=self.out_file):
+        with open(self.out_file, 'a') as f:
+            f.write(string)
+
+
+class WSD_experiment(experiment):
+    """class for WSD experiments, bounds out_file with experiment callable"""
+    def __init__(self, train_coll, test_coll,
+                lt, labsHierarchy, 
+                cv, clf_pipe, clf_grid, out_file, scoring=None):
+
+        self.train_coll = train_coll
+        self.test_coll = test_coll
+        self.lt = lt
+        self.labsHierarchy = labsHierarchy
+
+        experiment.__init__(self, out_file=out_file)
+        self.cv = cv
+        self.clf_pipe = clf_pipe
+        self.clf_grid = clf_grid
+        self.clf_classes = lt.classes_
+        self.scoring = scoring
+        
+    def print_comments(self, start='\n', end='\n'):
+        s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
+        s += '\n# Labels H: {}'.format(self.labsHierarchy)
+        self.print_in_out_file(start + s + end)
+
+    def print_experiment_header(self, sep=', ', end='\n'):
+        s = set_WSD_experiment_header(self.clf_classes, str(self.scoring), sep=sep) + end
+        self.print_in_out_file(s)
+
+    def run_experiment(self, Tpipe, **kwargs):
+        return run_experiment_WSD(Tpipe=Tpipe, 
+                                  train_coll=self.train_coll, test_coll=self.test_coll,
+                                  lt=self.lt, labsHierarchy=self.labsHierarchy,
+                                  out_fN=self.out_file,
+                                  cv=self.cv,
+                                  clf_pipe=self.clf_pipe, gs_grid=self.clf_grid, 
+                                  scoring=self.scoring, **kwargs)
+
+
+
+
+def set_WSD_experiment_header(clf_class_names, metric='score', sep=', '):
+    """String for the WSD experiment"""
+
+    ## n_classes
+    n_classes=[];P_classes=[];R_classes=[];f1_classes=[];sup_classes=[]
+    for item in clf_class_names:
+        n_classes += ["n_" + item]
+        P_classes += [item + "_pre"]
+        R_classes += [item + "_rec"]
+        f1_classes += [item + "_f1"]
+        sup_classes += [item + "_sup"]
+
+    ## train & test sets
+    scores_li = ['n_train', 'n_test']
+    scores_li += [metric + '_CV_train_mean', metric + '_CV_train_2*std',
+                  metric + '_CV_test_mean', metric + '_CV_test_2*std']
+
+    header_li = n_classes + scores_li + P_classes + R_classes + f1_classes + sup_classes
+
+    return sep.join(header_li)
+
+
+
+
+
+def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
+                       cv, clf_pipe, gs_grid, scoring=None,
+                       predictionsDir=None):
+    """Runs clf experiments
+    Parameters
+    ----------
+        train_coll: list
+        test_coll: list
+        lt: ML.labelTransformer
+        T_settings: list of tuples
+        labelsHierachy: list of strings
+        cv: cv folds
+        extimators: list
+            for pipline
+        gs_grid: list
+                    
+        out_fN: str
+        returnClfs: dict, Flase => clfs are not stored
+        predictionsDir: str
+        scoring: string or sklearn.metrics.scorer
+    """
+
+    feExFun = Tpipe.fun
+    #### prepare DATA: collections --> X y
+    ## compute features
+    dataO = fex.wavAnnCollection2datXy(train_coll, feExFun, labsHierarchy)
+    ## prepare X y data
+    X0, y0_names = dataO.filterInstances(lt.classes_)  # filter for clf_labs
+    X, y_names = X0, y0_names #myML.balanceToClass(X0, y0_names, 'c')  # balance classes X0, y0_names#
+    y = lt.nom2num(y_names)
+    labsD = lt.targetNumNomDict()
+    ## scores header
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                        test_size=testFrac,
+                                                        random_state=0)
+
+    #### CLF
+    pipe = Pipeline(clf_pipe)
+    gs = GridSearchCV(estimator=pipe,
+                      param_grid=gs_grid,
+                      scoring=scoring,
+                      cv=cv,
+                      n_jobs=-1)
+
+    gs = gs.fit(X_train, y_train)
+    
+    ### PRINT
+    with open(out_fN, 'a') as out_file: # print details about the dataset into status file
+        #out_file.write("# {} ({})\n".format( collFi_train, len(train_coll)))
+        ## samples per class
+        out_file.write(", ".join([str(list(y_names).count(item)) for item in lt.classes_]))
+        ## sizes of the test/train sets
+        out_file.write(", {}, {}".format(len(X_train), len(X_test)))
+
+    ## best clf scores
+    with open(out_fN, 'a') as out_file:
+        out_file.write('')#", {}".format(str(gs.best_params_).replace('\n', ', '), 
+                         #                                     gs.best_score_))
+    clf_best = gs.best_estimator_
+
+    ## clf scores over test set
+    with open(out_fN, 'a') as out_file:
+        ### cv score
+        cv_sc = cross_val_score(clf_best, X_test, y_test, scoring=scoring)
+        out_file.write(", {:2.2f}, {:.2f}".format(100*np.mean(cv_sc),
+                                                            100*2*np.std(cv_sc)))
+        ### cv accuracy
+        cv_acc = cross_val_score(clf_best, X_test, y_test)
+        out_file.write( ", {:2.2f}, {:.2f}, ".format(100*np.mean(cv_acc),
+                                                   100*2*np.std(cv_acc)))
+
+    ## print R, P an f1 for each class
+    y_true, y_pred = y_test, clf_best.predict(X_test)                                                         
+    MLvl.print_precision_recall_fscore_support(y_true, y_pred, out_fN)
+    
+    ### Tpipe -- feature extraction params
+    with open(out_fN, 'a') as out_file:
+        settings_str = expT.Tpipe_settings_and_header(Tpipe)[1]
+        out_file.write(", " + settings_str+'\n')
+    
+     ### settings
+    #settings_str = Tpipe_settings_and_header(Tpipe)[1]
+    #out_file.write(", {}\n".format(settings_str))
+    """
+    #### TEST collection
+    ### train classifier with whole dataset
+    clf = skb.clone(gs.best_estimator_) # clone to create a new classifier with the same parameters
+    clf.fit(X,y)
+    ### print scores
+    callIx = lt.nom2num('c')
+    for wavF, annF in test_coll[:]:
+        A, a_names = fex.getXy_fromWavFAnnF(wavF, annF, feExFun, labsHierarchy,
+                                            filter_classes=lt.classes_)
+        a_true = lt.nom2num(a_names)
+        a_pred = clf.predict(A)
+        P = mt.precision_score(a_true, a_pred, average=None)[callIx]
+        R = mt.recall_score(a_true, a_pred, average=None)[callIx]
+        f1 = mt.f1_score(a_true, a_pred, average=None)[callIx]
+        with open(out_fN, 'a') as out_file:
+            out_file.write(", {:2.2f}, {:2.2f}, {:2.2f}".format(100*f1,
+                                                                100*P, 100*R))
+        if predictionsDir:
+            bN = os.path.basename(annF)
+            annFile_predict = os.path.join(predictionsDir,
+                                           "{}_{}".format(int(f1*100),
+                                                             bN))
+            pT.predictSoundSections(wavF, clf,  lt, feExFun, annSections=labsHierarchy, 
+                                    outF=annFile_predict)
+
+    """
+
+               
+    #return clf
+
+
+
+
+
 def runExperiment(train_coll, test_coll, lt, T_settings, labsHierarchy, out_fN,
                   cv, pipe_estimators, gs_grid, scoring=None,
                   param=None, predictionsDir=None):
@@ -93,6 +309,7 @@ def runExperiment(train_coll, test_coll, lt, T_settings, labsHierarchy, out_fN,
         predictionsDir: str
         scoring: string or sklearn.metrics.scorer
     """
+    
 
     Tpipe = fex.makeTransformationsPipeline(T_settings)
     feExFun = Tpipe.fun

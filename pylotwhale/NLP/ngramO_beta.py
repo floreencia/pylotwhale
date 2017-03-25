@@ -181,14 +181,14 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     '''2dim bigram counts dict --> bigrams matrix
-    Parameters:
-    -----------
+    Parameters
+    ----------
     bigramsDict : nltk.ConditionalFreqDist
         two entry dict,  eg. D[a][b]
     conditionsList : list/np.array of conditions to read (None reads all)
     samplesList : list/np.array of samples to read (None reads all)
     Return
-    -------
+    -------\
     M : matrix representations of the frequency values, with:
             conditions as the rows and the samples as columns
     samps : labels of the columns of the matrix
@@ -300,6 +300,49 @@ def selectBigramsAround_dt(ictDict, dt=None, minCts=10):
         if ict_mean[ky] > dt[0] and ict_mean[ky] < dt[1]:
             collector.append(ky)
     return(collector)    
+
+
+
+def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ict_end_stop', callLabel='call',
+                            startTag='_ini', endTag='_end',
+                            return_values='probs', minCalls=1):
+    """Bigrams counts/probs as matrix from DataFrame
+    Parameters
+    ----------
+    df_dict: DataFrame
+    Dtint: tuple
+    timeLabel: str
+    callLabel: str
+    return_values: str
+        {probs, counts}
+    Returns
+    -------
+    (matrix, sampsLi, condsLi)
+    """
+    cfd = nltk.ConditionalFreqDist() # initialise cond freq dist.
+    calls0 = []
+    for t in df_dict.keys(): # for reach tape
+        thisdf = df_dict[t]
+        sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs( thisdf, Dt=Dtint, 
+                                                          l=callLabel, time_param=timeLabel),
+                                                          ini=startTag, end=endTag) # define the sequeces
+        my_bigrams = nltk.bigrams(sequences) # tag bigrams
+        cfd += bigrams2Dict(my_bigrams) # count bigrams
+        calls0 += list(thisdf[callLabel].values)
+
+    calls = [item[0] for item in sorted(Counter(calls0).items(),
+                                    key = lambda x : x[1], reverse=True)
+                                     if item[1] > minCalls] # order calls
+    samplesLi = calls[:] + [endTag] #None #[ 'A', 'B', 'C', 'E', '_ini','_end']
+    condsLi = calls[:] + [startTag]
+
+    if return_values == 'counts':
+        return bigramsDict2countsMatrix( cfd, condsLi, samplesLi)
+
+    if return_values == 'probs':
+        cpd = condFreqDictC2condProbDict(cfd)#, condsLi, samplesLi)
+        return  condProbDict2matrix(cpd, condsLi, samplesLi)
+
 
 
 
