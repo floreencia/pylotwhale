@@ -129,7 +129,8 @@ class WSD_experiment(experiment):
         self.print_in_out_file(start + s + end)
 
     def print_experiment_header(self, sep=', ', end='\n'):
-        s = set_WSD_experiment_header(self.clf_classes, str(self.metric), sep=sep) + end
+        s = set_WSD_experiment_header(self.clf_classes, 
+                                      metric=str(self.metric), sep=sep) + end
         self.print_in_out_file(s)
 
     def run_experiment(self, Tpipe, **kwargs):
