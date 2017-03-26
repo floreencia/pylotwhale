@@ -109,7 +109,7 @@ class WSD_experiment(experiment):
     """class for WSD experiments, bounds out_file with experiment callable"""
     def __init__(self, train_coll, test_coll,
                 lt, labsHierarchy, 
-                cv, clf_pipe, clf_grid, out_file, scoring=None):
+                cv, clf_pipe, clf_grid, out_file, metric=None):
 
         self.train_coll = train_coll
         self.test_coll = test_coll
@@ -121,7 +121,7 @@ class WSD_experiment(experiment):
         self.clf_pipe = clf_pipe
         self.clf_grid = clf_grid
         self.clf_classes = lt.classes_
-        self.scoring = scoring
+        self.metric = metric
         
     def print_comments(self, start='\n', end='\n'):
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
@@ -129,7 +129,8 @@ class WSD_experiment(experiment):
         self.print_in_out_file(start + s + end)
 
     def print_experiment_header(self, sep=', ', end='\n'):
-        s = set_WSD_experiment_header(self.clf_classes, str(self.scoring), sep=sep) + end
+        s = set_WSD_experiment_header(self.clf_classes, 
+                                      metric=str(self.metric), sep=sep) + end
         self.print_in_out_file(s)
 
     def run_experiment(self, Tpipe, **kwargs):
@@ -139,7 +140,7 @@ class WSD_experiment(experiment):
                                   out_fN=self.out_file,
                                   cv=self.cv,
                                   clf_pipe=self.clf_pipe, gs_grid=self.clf_grid, 
-                                  scoring=self.scoring, **kwargs)
+                                  metric=self.metric, **kwargs)
 
 
 
@@ -170,7 +171,7 @@ def set_WSD_experiment_header(clf_class_names, metric='score', sep=', '):
 
 
 def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
-                       cv, clf_pipe, gs_grid, scoring=None,
+                       cv, clf_pipe, gs_grid, metric=None,
                        predictionsDir=None):
     """Runs clf experiments
     Parameters
@@ -188,7 +189,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
         out_fN: str
         returnClfs: dict, Flase => clfs are not stored
         predictionsDir: str
-        scoring: string or sklearn.metrics.scorer
+        metric: string or sklearn.metrics.scorer
     """
 
     feExFun = Tpipe.fun
@@ -207,6 +208,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
                                                         random_state=0)
 
     #### CLF
+    scoring = MLvl.get_scorer(metric)
     pipe = Pipeline(clf_pipe)
     gs = GridSearchCV(estimator=pipe,
                       param_grid=gs_grid,

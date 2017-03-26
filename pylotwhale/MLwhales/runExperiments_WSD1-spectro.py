@@ -44,8 +44,8 @@ auD = {}
 auD["fs"] = fs
 NFFTpow = 8; auD["NFFT"] = 2**NFFTpow
 overlap = 0; auD["overlap"] = overlap
-#audioF='spectral'#; auD["featExtrFun"]= featExtract
-n_mels = 128/4; auD["n_mels"]= n_mels; audioF='melspectro'; 
+audioF='spectral'#; auD["featExtrFun"]= featExtract
+#n_mels = 128/4; auD["n_mels"]= n_mels; audioF='melspectro'; 
 #Nceps=2**4; auD["Nceps"]= Nceps; audioF='MFCC'
 T_settings.append(('Audio_features', (audioF, auD)))
 
@@ -81,7 +81,7 @@ gs_grid = [paramsDi] # clfSettings.grid_params #
 
 
 #### output file
-oDit = os.path.join(oDir, audioF)
+oDir = os.path.join(oDir, audioF)
 try:
     os.makedirs(oDir)
 except OSError:
@@ -96,11 +96,11 @@ exp = wsd.WSD_experiment(train_coll, test_coll, lt,
                          metric=metric)
 
 #### experiment grid
-param_grid = {'NFFT': [2**9, 2**9, 2**10], 
+param_grid = {'NFFT': [2**6, 2**7, 2**8, 2**9, 2**10, 2**11], 
               #'n_mels' : np.arange(1, 100, 5), 
               #'n_mels' : [2**8, 2**8, 2**9, 2**10], # ceps
               #'Nceps' :  np.arange(1, 40, 2),
-              'n_textWS': np.arange(1, 50, 5)}
+              'n_textWS': np.arange(1, 50, 2)}
 
 grid = ParameterGrid(param_grid)
 expSettingsStr = "{} {}".format(len(grid), str(param_grid))
@@ -125,5 +125,8 @@ for p in grid:
     Tpipe.steps['summ'].settingsDict['n_textWS'] = p['n_textWS']
     print(p)
     
-    #try:
-    exp.run_experiment(Tpipe)
+    try:
+        exp.run_experiment(Tpipe)
+        
+    except ValueError:
+        print('Error!', p)
