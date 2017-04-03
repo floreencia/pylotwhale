@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 25 17:13:27 2015
+Created on Mon Apr 03 11:13:27 2017
 
 @author: florencia
 """
 
 from __future__ import print_function, division  # py3 compatibility
-#import numpy as np
-import matplotlib.pyplot as plt
 import numpy as np
-import os
-#import sys
-import featureExtraction as fex
-import pylotwhale.signalProcessing.signalTools as sT
-import pylotwhale.utils.annotationTools as annT
-import pylotwhale.MLwhales.MLtools_beta as myML
-import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.utils.annotationTools as annT
 
 ### WSD
 
@@ -31,7 +21,8 @@ labelsMapping = {'n_mels': '# Mel-filters',
                  'PRE': 'P',
                  'REC': 'R',
                  'F1': r'$F_1$'
-                } 
+                }
+
 
 def featureVariation_ix(df, score, param_col_indices=None):
     """stats of the score for each of the params indicated with param_col_indices"""
