@@ -21,16 +21,16 @@ import pylotwhale.utils.annotationTools as annT
 ### WSD
 
 
-labelsMapping={'n_mels' : '# Mel-filters',
-              'NFFT' : '# FFT samples', 
-              'overlap' : 'overlap', 
-              'Nslices' : '# slices',
-              'f1_macro_CV' : r'$<F_1>_m$',
-              'f1_macro_CV_std' : r'$\sigma (F_1)$',
-              'ACC' : 'A',
-              'PRE' : 'P',
-              'REC' : 'R',
-              'F1' : r'$F_1$'
+labelsMapping = {'n_mels': '# Mel-filters',
+                 'NFFT': '# FFT samples',
+                 'overlap': 'overlap',
+                 'Nslices': '# slices',
+                 'f1_macro_CV': r'$<F_1>_m$',
+                 'f1_macro_CV_std': r'$\sigma (F_1)$',
+                 'ACC': 'A',
+                 'PRE': 'P',
+                 'REC': 'R',
+                 'F1': r'$F_1$'
                 } 
 
 def featureVariation_ix(df, score, param_col_indices=None):
