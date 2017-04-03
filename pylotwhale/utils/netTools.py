@@ -6,8 +6,9 @@ Created on Fri May 27 22:12:01 2016
 
 @author: florencia
 """
-
 from __future__ import print_function
+from collections import defaultdict
+
 import networkx as nx
 #import pygraphviz as pgv
 import numpy as np
@@ -92,6 +93,7 @@ def drawNetwCbar(G, pos, nodeAttr='callFreq', edgeAttr='cpd',
 #### gatherer functions
 
 class dict2network():
+    """network object"""
     def __init__(self, twoDimDict, rmEdge='default', rmNodes=None):
         if rmEdge is 'default': rmEdge = '_end', '_ini'
 
@@ -108,15 +110,14 @@ class dict2network():
         self.A = conceptualiseNodes( nx.to_agraph(self.G), invisibleNodes )
         drawGraphviz(self.A, dot_file, fig_file)
     
-def dict2nxGraph(twoDimDict, rmEdge='default', invisibleNodes='default', rmNodes=None):
+def dict2nxGraph(twoDimDict, rmEdge='default', rmNodes=None):
     """2dim dictionary to graphviz network
     Parameters
     ----------
     twoDimDict : two dim dictionary to define the network
     rmEdge : default removes the edge ('_end', '_ini')
     """
-
-    if invisibleNodes == 'default': invisibleNodes = ['_ini', '_end']
+    #if invisibleNodes == 'default': invisibleNodes = ['_ini', '_end']
     if rmEdge is 'default': rmEdge = '_end', '_ini'
     
     G = nx.DiGraph(twoDimDict)
@@ -124,6 +125,14 @@ def dict2nxGraph(twoDimDict, rmEdge='default', invisibleNodes='default', rmNodes
     try: G.remove_nodes_from(rmNodes)
     except TypeError: 'cannot remove nodes'
     return G
+
+def cfd2nxDiGraph(cfd, rmNodes='default'):
+    if rmNodes == 'default':
+        rmNodes = ['_ini', '_end']
+    G0 = nx.DiGraph(cfd)
+    for n in rmNodes:
+        G0.remove_node(n)
+    return G0
 
    
 def add_edge_attr(G, attr_name, edge_dict):
@@ -203,15 +212,7 @@ def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
     
 ### network properties  
     
-def cfd2nxDiGraph(cfd, rmNodes='default'):
-    if rmNodes == 'default':
-        rmNodes = ['_ini', '_end']
-    G0 = nx.DiGraph(cfd)
-    for n in rmNodes:
-        G0.remove_node(n)
-    return G0
   
-    
 def pl_nx_propertie(G, nx_property, pltitle=None, oFig=None):
     
     deg_di = dict(nx_property(G).items())
@@ -238,3 +239,34 @@ def pl_betweenness_centrality(G, pltitle='betweenness centrality',
                               oFig=None):
     return pl_nx_propertie(G, nx_property=nx.betweenness_centrality,
                            pltitle=pltitle, oFig=oFig)  
+                           
+                           
+### dictionary formating for graph drawing
+                           
+def format_cpd(edgeLabelDict, labelDecimals=2, treshold=0.1):
+    """takes a nested dict (cpd) and reformats its values"""
+    cpf_f = defaultdict(dict)
+    for x in edgeLabelDict.iterkeys():
+        for y in edgeLabelDict[x]:
+            if edgeLabelDict[x][y] < treshold:
+                continue               
+            
+            cpf_f[x][y] = "{0:.{1}f}".format(edgeLabelDict[x][y], labelDecimals)
+    return cpf_f
+
+def format_cpd_width(edgeLabelDict, m=2, b=0):
+    """takes a nested dict (cpd) and reformats its values"""
+    cpf_f = defaultdict(dict)
+    for x in edgeLabelDict.iterkeys():
+        for y in edgeLabelDict[x]:
+            cpf_f[x][y] = m*edgeLabelDict[x][y] + b
+    return cpf_f
+
+def format_cfd_width(edgeLabelDict, m=1, b=0):
+    """takes a nested dict (cpd) and reformats its values"""
+    N=edgeLabelDict.N()
+    cpf_f = defaultdict(dict)
+    for x in edgeLabelDict.iterkeys():
+        for y in edgeLabelDict[x]:
+            cpf_f[x][y] = m*edgeLabelDict[x][y]/N + b
+    return cpf_f
