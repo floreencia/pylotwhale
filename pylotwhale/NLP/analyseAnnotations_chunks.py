@@ -44,9 +44,10 @@ labelList = [item[0] for item in sorted(Counter(df0[subsetLabel]).items(),
 try: os.mkdir(os.path.join(oFigDir))
 except OSError: pass
 
+
 def chunkplots(df, l, oFigDir,
                timeLabel=timeLabel, callLabel=callLabel,
-               Dtvec=Dtvec, ixtimesteps=ixtimesteps):  #  ["all"]:#
+               Dtvec=Dtvec, ixtimesteps=ixtimesteps):  #  ["all"]:
 
     tapesdf = daT.dictOfGroupedDataFrames(df)
 
@@ -101,14 +102,14 @@ def chunkplots(df, l, oFigDir,
     color=iter(plt.cm.hsv(np.linspace(0.2,1, len(ixtimesteps))))
     
     for i in ixtimesteps:
-        c=next(color)
+        c = next(color)
         P_calls_ngram = calls_in_ngramDist_Dt[i, :]/Ncalls
         cusu = np.cumsum(P_calls_ngram[::-1])[::-1]
-        ax1.plot(np.arange(1, len(cusu)+1), cusu, 
-                 label ="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
-        ax2.plot(np.arange(1, len(P_calls_ngram)+1), P_calls_ngram, 
-                 label ="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6 )
-    
+        ax1.plot(np.arange(1, len(cusu)+1), cusu,
+                 label="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
+        ax2.plot(np.arange(1, len(P_calls_ngram)+1), P_calls_ngram,
+                 label="{:3.2} s".format(Dtvec[i]), c=c, lw=4, alpha=0.6)
+
     #ax1.set_title('inv cum')
     ax1.set_ylabel("p(k')")
     ax2.set_ylabel("p(k)")
@@ -128,21 +129,21 @@ def chunkplots(df, l, oFigDir,
     fig2.savefig(oFig)
     print(oFig)    
 
-    ## density plots chunks vd tau
+    ## density plots chunks vs tau
     Tf = Dtvec[-1]; T0 = Dtvec[0]
     nT, nN = np.shape(ngramDist_Dt)
     n_ticks = 8
     yT0 = np.linspace(0, nT, n_ticks)
-    maxN=10
+    maxN = 10
     #xt = np.arange(1, maxN+1)
     yt = (yT0, ['{:2.2}'.format(item) for item in np.linspace(T0, Tf, len(yT0))])
 
     ## ngrams dist
     vmax = int(np.max(ngramDist_Dt[:, 1:]))
     M = ngramDist_Dt
-    fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1, 
+    fig, ax = pT.fancyClrBarPl(np.hstack((np.zeros((len(M),1)), M)), vmax, 1,
                                maxN=maxN, #figsize=(5,5),
-                               clrBarGaps=20, cmap=plt.cm.viridis_r, 
+                               clrBarGaps=20, cmap=plt.cm.viridis_r,
                                yTicks=yt, yL=r'$\tau \, [s]$', xL = 'k' )
 
     oFig = os.path.join(oFigDir, '{}-numNgrams_vs_Dt{}-{}.png'.format(l, T0, Tf) )                               
