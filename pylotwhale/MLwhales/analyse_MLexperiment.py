@@ -14,6 +14,8 @@ import numpy as np
 labelsMapping = {'n_mels': '# Mel-filters',
                  'NFFT': '# FFT samples',
                  'overlap': 'overlap',
+                 'Nceps': 'quefrency',
+                 'MFCC': 'MFCC',
                  'Nslices': '# slices',
                  'f1_macro_CV': r'$<F_1>_m$',
                  'f1_macro_CV_std': r'$\sigma (F_1)$',
