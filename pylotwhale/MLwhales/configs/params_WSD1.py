@@ -68,12 +68,13 @@ gs_grid = [paramsDi] # clfSettings.grid_params #
 
 ##### FILES
 ## INPUT -> collection files
-collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
+collFi_train = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-tapes.txt'
+#'/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB.txt'
 collFi_test = '/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 ## OUTPUT -> DIR
 import pylotwhale.MLwhales.featureExtraction as fex
 settings_str = fex.makeTransformationsPipeline(T_settings).string + clf_settings.clf_name
-oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/experiments/'\
+oDir = '/home/florencia/profesjonell/bioacoustics/heike/NPW/data/WSD_experiments/'\
 		'WSD1/linearModelSVC/clf_{}/{}/{}/{}/'.format(''.join(clf_labs), audioF, metric, settings_str)#, auD["NFFT"])
 oDir = '~/Desktop/TEST'
 predictionsDir=False 
