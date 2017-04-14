@@ -9,15 +9,15 @@ different parameters
 """
 from __future__ import print_function
 import os
-import argparse
-import sys
+#import argparse
+#import sys
 import numpy as np
 import time
-import pdb
+#import pdb
 from collections import Counter
 
 #from sklearn.svc import SVC
-import sklearn.base as skb
+#import sklearn.base as skb
 import sklearn.metrics as mt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV, cross_val_score
@@ -28,7 +28,7 @@ from sklearn.pipeline import Pipeline
 
 import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.MLwhales.MLtools_beta as myML
-import pylotwhale.MLwhales.predictionTools as pT
+#import pylotwhale.MLwhales.predictionTools as pT
 
 #import pylotwhale.MLwhales.experimentTools as exT
 from pylotwhale.MLwhales import MLEvalTools as MLvl
