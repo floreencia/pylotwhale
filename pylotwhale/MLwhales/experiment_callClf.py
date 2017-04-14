@@ -98,24 +98,55 @@ def prepare_output_file(outDir, expSettingsStr, settingsStr, trainFi,
     return out_fN
 
 
-def print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi, 
-                        lt, call_labels):
+def print_exeriment_header(out_fN, experiment_setup_str, configuration_str, trainFi, 
+                           lt, call_labels, exp_header_str):
     """prints the experiment settings"""
     
     ## write in out file
     with open(out_fN, 'a') as out_file: # print details about the dataset into status file
-        out_file.write("# call-clf experiment {}\n".format(expSettingsStr))
         out_file.write("###---------   {}   ---------###\n".format(time.strftime("%Y.%m.%d\t\t%H:%M:%S")))
-        #out_file.write("#{}\n".format(lt.classes_))
-        out_file.write("#" + settingsStr+'\n')
+        out_file.write("# Experiment: {}\n".format(experiment_setup_str))
+        # out_file.write("#{}\n".format(lt.classes_))
+        out_file.write("#" + configuration_str+'\n')
         ### dateset info
         out_file.write("# {}\n".format( trainFi))
         out_file.write("# label_transformer: {}\n".format(lt.targetNumNomDict()))
         out_file.write("# classes ({}): {}\n# data {}\n".format(len(lt.classes_),
                                                                "', '".join(lt.classes_),
-                                                              Counter(call_labels)))                                                  
+                                                              Counter(call_labels)))        
+        ### exp header
+        out_file.write("{}\n".format(exp_header_str))
+
     return out_fN
 
+def scores_header_li(metric='metric'):
+    return ['{}_CV'.format(metric), '{}_CV_std'.format(metric), 
+            'ACC', 'PRE', 'REC', 'F1']
+
+def scores_header_str(header_li=None, metric='metric', sep=','):
+    if header_li is None: 
+        header_li = scores_header_li(metric)
+    exp_header_str = header_li[0]
+    for item in header_li[1:]:
+        exp_header_str += "{}{}".format(sep, item)
+
+    return exp_header_str
+
+def Tpipe_settings_and_header(Tpipe, sep=", "):
+    """returns two strings with the instructions in Tpipe (pipeline of Transformations)
+    header_str, settings_str"""
+    header=[]
+    values=[]
+    for step in Tpipe.step_sequence:
+        header.append( step)
+        values.append(Tpipe.steps[step].name)
+        for ky in Tpipe.steps[step].settingsDict.keys():
+            header.append( ky)
+            values.append( Tpipe.steps[step].settingsDict[ky] )
+            
+    header_str = ("{}".format(sep).join(header))
+    settings_str = "{}".format(sep).join(["{}".format(item) for item in values])
+    return header_str, settings_str
 
 def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
                          cv, pipe_estimators, gs_grid, 
@@ -146,7 +177,7 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
     #Tpipe = fex.makeTransformationsPipeline(T_settings)
     feExFun = Tpipe.fun
     
-    fs=Tpipe.steps['Audio_features'].settingsDict['fs']
+    fs = Tpipe.steps['Audio_features'].settingsDict['fs']
     #### prepare DATA: collections --> X y
     ## compute features
     datO = fex.wavLCollection2datXy( wavColl, fs=fs, featExtFun=feExFun )
@@ -170,16 +201,21 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
     y_pred = clf_best.predict(X_test)
 
     ## clf scores over test set
+
+    settings_str = Tpipe_settings_and_header(Tpipe)[1]
     with open(out_fN, 'a') as out_file:
-        ### cv score
+        ### cv scores
         cv_sc = cross_val_score(clf_best, X_train, y_train, scoring=scoring)
-        out_file.write("{:}, {:2.2f}, {:.2f}, ".format(param, 100*np.mean(cv_sc),
+        out_file.write("{:2.2f}, {:.2f}, ".format( 100*np.mean(cv_sc),
                                                             100*2*np.std(cv_sc)))
-                                                            
+        ### test: ACC, P, R, f1
         P, R, f1, _ = mt.precision_recall_fscore_support(y_test, y_pred, average='macro') # average of the scores for the call classes
         acc = mt.accuracy_score(y_test, y_pred)
-        out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}\n".format(acc*100, P*100, R*100, f1*100))
-
+        out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}, ".format(acc*100, P*100, R*100, f1*100))
+        
+        ### settings
+        out_file.write("{}\n".format(settings_str))
+        
     return clf_best.fit(X, y)
 
 
