@@ -46,7 +46,7 @@ import featureExtraction as fex
 """
 
 #warnings.simplefilter('always', DeprecationWarning)
-DEPRECATION_MSG = ("use MLEvalTools")
+#DEPRECATION_MSG = ("use MLEvalTools")
 
 #################################################################################
 ##############################    FEATURES    ##################################
@@ -339,34 +339,59 @@ def correctBextractLabelMess(X, y, m_cut=None, N_sections=1):
     
 
 
-### X, y data objects
+### Operations over X, y data objects
 
 def selectData(X, y, label):
     """Returns the data with the specified labels
     label: list like object"""
     ix = y == label
-    return X[ix,:], y[ix]
+    return  np.array(X[ix,:]), np.array(y[ix])
 
-def resample(X, y, n_samples, random_state=1):
-    """sample without replasement"""
-    return sku.resample(X, y, random_state=random_state, n_samples = n_samples)
+def resample(X, y, random_state=1, **options):
+    """Sample with replacement (bootstrap)
+       **options: 
+        n_samples, int; replace, bool"""
+    return sku.resample(X, y, random_state=random_state, **options)
 
-def balanceToClass(X, y, class_label, random_state=1):
-    """balances data Xy to a given class, 
-    classes with less data are left the same """
+def shuffle(X, y, random_state=1, **options):
+    """Shuffle arrays (permute)
+    sample without replacement"""
+    return sku.shuffle(X, y, random_state=random_state, **options)
+
+def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
+    """Balances data Xy to a given class, 
+    classes with less data then class_label are left the same
+    Parameters
+    ----------
+    class_label: str
+    random_stateL int
+        this is used twice: (1) for sampling the labels data and
+        (2) for shuffling the arrays X, y before being returned when shuffle_samples is True
+    shuffle_samples: bool
+        arrays are stacked, having them arranged by label.  
+        If True, arrays are shuffle before being returned
+    """
     ## class data
     balX, baly = selectData(X, y, class_label)
     n_balclass = len(baly)
     ## labels of the rest of the classes
     balance_labels = set(y) - set(class_label)
 
-    for l in balance_labels:
-        thisX, thisy = selectData(X, y, l)
+    for l in balance_labels:  # for each of the other classes
+        thisX, thisy = selectData(X, y, l)  # get class data
         class_n_samples = np.min((n_balclass, len(thisy)))
-        sX, sy = resample(thisX, thisy, class_n_samples)
+        ## select class samples randomly
+        sX, sy = resample(thisX, thisy, random_state=random_state,
+                          n_samples=class_n_samples, replace=False)
+        ## stack
         balX = np.vstack((balX, sX))
         baly = np.hstack((baly, sy))
-    return np.array(balX), np.array(baly)
+
+    ## shuffle again not to have X, y stacked by class
+    if shuffle_samples is True:
+        balX, baly = shuffle(balX, baly, random_state=random_state, replace=False)
+
+    return balX, baly #np.array(balX), np.array(baly)
 
 
 ################# classes
