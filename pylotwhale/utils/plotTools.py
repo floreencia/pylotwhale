@@ -7,7 +7,7 @@ Created on Thu Apr 28 16:56:58 2016
 
 from __future__ import print_function
 #import sys
-#import seaborn as sns
+import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
@@ -110,7 +110,8 @@ def display_numbers(fig, ax, M, fontSz, format=int, condition=lambda x: True):
 def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15, 
                   xTicks=None, yTicks=None, figsize=None,
                   tickLabsDict='', outplN='', plTitle='', xL='N', yL=r'$\tau$ (s)',
-                  figureScale=(), extendCbar='both', extent=None):
+                  figureScale=(), extendCbar='both', xextent=None, yextent=None,
+                  under_clr="light grey", over_clr="neon pink"):
     
     '''
     draws a beautiful color plot
@@ -126,25 +127,35 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
         yTicks : (<tick_location>, <tick_names>), 
             <tick_location> array with the tick locations
             <tick_names>, array with the labels of the previous array
+        xextent: len 2 list like
+        yextent: len 2 list like
+        under_clr, over_clt: str
+            https://xkcd.com/color/rgb/
     '''
     fig, ax = plt.subplots(figsize=figsize)
 
     #colors setting
     #cmap = plt.cm.get_cmap('jet', clrBarGaps)    # discrete colors
-    cmap.set_under((0.9, 0.9, 0.8)) #min
-    cmap.set_over((1, 0.6, 0.6)) #max
+    cmap.set_under(sns.xkcd_palette([under_clr])[0]) #min
+    cmap.set_over(sns.xkcd_palette([over_clr])[0]) #max
     #cmap.set_nan((1, 0.6, 0.6)) #nan
+    
+    extent=[0, len(X.T), len(X), 0]
+    if xextent:
+        extent[:2] = xextent
+    if yextent:
+        extent[2:] = yextent
 
     #plot
     cax=ax.imshow(X[:,:maxN], aspect ='auto', interpolation='nearest', 
                   norm = colors.Normalize(vmin=vmin, vmax=vmax, clip = False),
                   cmap=cmap, extent=extent)
-    #labels
+    ### labels
     ax.set_xlabel(xL)
     ax.set_ylabel(yL)
     if plTitle: ax.set_title(plTitle)
-    
-    # axis ticks
+
+    ### axis ticks
     if xTicks is not None: plt.xticks(xTicks)
     if yTicks is not None: plt.yticks(*yTicks)
 
@@ -157,12 +168,12 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
     cbar.set_ticklabels(tickLabsDict.keys())
     
     #figScale
-    if len(figureScale)==2: fig.set_size_inches(figureScale)        
+    if len(figureScale) == 2: fig.set_size_inches(figureScale)        
     
     if outplN: fig.savefig(outplN, bbox_inches='tight')   
 
-    return fig, ax     
-    
+    return fig, ax
+
 
 
 def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,

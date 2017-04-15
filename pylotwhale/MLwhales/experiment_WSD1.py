@@ -106,7 +106,12 @@ class experiment():
 
 
 class WSD_experiment(experiment):
-    """class for WSD experiments, bounds out_file with experiment callable"""
+    """class for WSD experiments, bounds out_file with experiment callable
+    Parameters
+    ----------
+    train_coll: list
+        2 entry list; path/to/wav.wav path/to/ann.txt
+        """
     def __init__(self, train_coll, test_coll,
                 lt, labsHierarchy, 
                 cv, clf_pipe, clf_grid, out_file, metric=None):
