@@ -81,20 +81,20 @@ lt = myML.labelTransformer(clf_labs)
 #lt = myML.labelTransformer(labels)
 
 def prepare_output_file(outDir, expSettingsStr, settingsStr, trainFi, 
-                        lt, call_labels, fileName="scores.txt"):
+                        lt, call_labels,
+                        exp_header_str='', fileName="scores.txt"):
     """prints the experiment settings"""
-    oDir = os.path.join(outDir, iterParam)
+    #oDir = os.path.join(outDir, iterParam)
 
     try:
-        os.makedirs(oDir)
+        os.makedirs(outDir)
     except OSError:
         pass
-    out_fN = os.path.join(oDir, fileName)
-    
+    out_fN = os.path.join(outDir, fileName)
+
     ## write in out file
-    print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi, 
-                           lt, call_labels)
-                                              
+    print_exeriment_header(out_fN, expSettingsStr, settingsStr, trainFi,
+                           lt, call_labels, exp_header_str)
     return out_fN
 
 
@@ -120,11 +120,11 @@ def print_exeriment_header(out_fN, experiment_setup_str, configuration_str, trai
     return out_fN
 
 def scores_header_li(metric='metric'):
-    return ['{}_CV'.format(metric), '{}_CV_std'.format(metric), 
+    return ['{}_CV'.format(metric), '{}_CV_std'.format(metric),
             'ACC', 'PRE', 'REC', 'F1']
 
 def scores_header_str(header_li=None, metric='metric', sep=','):
-    if header_li is None: 
+    if header_li is None:
         header_li = scores_header_li(metric)
     exp_header_str = header_li[0]
     for item in header_li[1:]:
@@ -224,7 +224,9 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
                          cv, pipe_estimators, gs_grid, 
                          filterClfClasses, scoring=None,
                          param=None):
-    """Runs clf experiments
+    """ . . . . . USE callClfExperiment instead  to be deprecated!!! . . . . .
+    Runs clf experiments in the old way
+    using T_setings instead of Tpipe
     Parameters
     ----------
         train_coll: list
