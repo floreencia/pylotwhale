@@ -24,9 +24,11 @@ import pylotwhale.MLwhales.experiment_WSD1 as wsd
 from pylotwhale.MLwhales.configs.params_WSD1 import *
 
 
+collFi_train = '/home/flo/x1-flo/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-desktop.txt'
+collFi_test = '/home/flo/x1-flo/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 train_coll = fex.readCols(collFi_train, colIndexes = (0,1))
 test_coll = np.genfromtxt(collFi_test, dtype=object)
-oDir = '/home/florencia/whales/MLwhales/whaleSoundDetector/data/experiments/'
+oDir = '/home/flo/x1-flo/whales/MLwhales/whaleSoundDetector/data/experiments/'
 
 lt = myML.labelTransformer(clf_labs)
 
