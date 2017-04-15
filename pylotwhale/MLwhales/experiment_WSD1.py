@@ -139,13 +139,16 @@ class WSD_experiment(experiment):
         self.print_in_out_file(s)
 
     def run_experiment(self, Tpipe, **kwargs):
+	"""runs WSD experiment
+	for kwargs see un_experiment_WSD 
+		e.g. class_balance = class_balance"""
         return run_experiment_WSD(Tpipe=Tpipe, 
                                   train_coll=self.train_coll, test_coll=self.test_coll,
                                   lt=self.lt, labsHierarchy=self.labsHierarchy,
                                   out_fN=self.out_file,
                                   cv=self.cv,
                                   clf_pipe=self.clf_pipe, gs_grid=self.clf_grid, 
-                                  metric=self.metric, **kwargs)
+                                  metric=self.metric, **kwargs) # class_balance='c'
 
 
 
@@ -176,7 +179,7 @@ def set_WSD_experiment_header(clf_class_names, metric='score', sep=', '):
 
 
 def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
-                       cv, clf_pipe, gs_grid, metric=None,
+                       cv, clf_pipe, gs_grid, class_balance=None, metric=None,
                        predictionsDir=None):
     """Runs clf experiments
     Parameters
@@ -194,6 +197,8 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
         out_fN: str
         returnClfs: dict, Flase => clfs are not stored
         predictionsDir: str
+	class_balance: str
+		name of the class to balance for
         metric: string or sklearn.metrics.scorer
     """
 
@@ -203,6 +208,8 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
     dataO = fex.wavAnnCollection2datXy(train_coll, feExFun, labsHierarchy)
     ## prepare X y data
     X0, y0_names = dataO.filterInstances(lt.classes_)  # filter for clf_labs
+    if class_balance:
+	X0, y0_names = myML.balanceToClass(X0, y0_names, class_balance)
     X, y_names = X0, y0_names #myML.balanceToClass(X0, y0_names, 'c')  # balance classes X0, y0_names#
     y = lt.nom2num(y_names)
     labsD = lt.targetNumNomDict()
