@@ -129,12 +129,13 @@ class WSD_experiment(experiment):
         self.metric = metric
         
     def print_comments(self, start='\n', end='\n'):
+	"""time, collections, classes"""
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
         s += '\n# Labels H: {}'.format(self.labsHierarchy)
         self.print_in_out_file(start + s + end)
 
-    def print_experiment_header(self, sep=', ', end='\n'):
-        s = set_WSD_experiment_header(self.clf_classes, 
+    def print_experiment_header(self, sep=', ', start='#', end='\n'):
+        s = start + set_WSD_experiment_header(self.clf_classes, 
                                       metric=str(self.metric), sep=sep) + end
         self.print_in_out_file(s)
 
