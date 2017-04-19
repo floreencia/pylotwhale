@@ -7,6 +7,7 @@ import numpy as np
 from collections import Counter
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import pylotwhale.utils.dataTools as daT
 from scipy.stats import entropy
@@ -152,8 +153,40 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 
         return fig, ax
 
-### FOURIER
+### ICIs
 
+def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log, 
+                     check_isfinite=True):
+
+    ict1, ict2 = get_ici_i(df_dict, timeLabel='ict_end_start', i=i)
+    ## apply fun
+    ict1_log = fun(ict1)
+    ict2_log = fun(ict2)
+
+    if check_isfinite is True:
+        mask = np.logical_and(np.isfinite(ict1_log), np.isfinite(ict2_log))
+        ict1_log = ict1_log[mask]
+        ict2_log = ict2_log[mask]
+    
+    s1 = pd.Series( ict1_log, name=r'$\log (\tau _i)$')
+    s2 = pd.Series( ict2_log, name= r'$\log (\tau _{i+%d})$'%i) 
+       
+    return  s1, s2
+
+def get_ici_i(df_dict, timeLabel='ict_end_start', i=1):
+    """returns ici and ici_i as numpy arrays"""
+    ict1_l=[]; ict2_l=[]
+    for tape in df_dict.keys():
+        ict0 = df_dict[tape][timeLabel].values
+        ict = ict0[np.isfinite(ict0)]
+        ict1_l.extend(ict[i:])
+        ict2_l.extend(ict[:-i])
+    
+    return  np.array(ict1_l), np.array(ict2_l)
+
+
+
+### FOURIER
 
 def window_times(onset_times, t0, tf):
     """windows a onset_times between t0 and tf"""

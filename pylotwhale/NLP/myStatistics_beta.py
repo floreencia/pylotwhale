@@ -340,14 +340,14 @@ def joint_pdf(x, y, grid_size=100j):
     Returns
     -------
     X, Y, KDE(X, Y) : coordinates X, Y, Z"""
-    
+
     assert len(x) == len(y), 'must be same length'
     xmin = np.min(x)
     xmax = np.max(x)
     ymin = np.min(y)
     ymax = np.max(y)
-        
-    X, Y = np.mgrid[xmin : xmax : grid_size, ymin : ymax : grid_size]
+
+    X, Y = np.mgrid[xmin: xmax: grid_size, ymin: ymax: grid_size]
     positions = np.vstack([X.ravel(), Y.ravel()])
     values = np.vstack([x, y])
     kernel = st.gaussian_kde(values)
