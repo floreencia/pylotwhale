@@ -3,8 +3,8 @@
 from __future__ import print_function, division
 
 import numpy as np
-import scipy as sp
-import scipy.stats
+#import scipy as sp
+#import scipy.stats as stats
 import nltk
 import random
 from matplotlib import pyplot as plt
@@ -167,7 +167,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
     p = 1.0*N_values/Nsh
     return p, shuff_dist
     
-##### othe older functions #####    
+##### other older functions #####    
 
 def mean_confidence_interval(data, confidence=0.95):
     """
@@ -179,8 +179,8 @@ def mean_confidence_interval(data, confidence=0.95):
     """
     a = 1.0*np.array(data)
     n = len(a)
-    m, se = np.mean(a), sp.stats.sem(a)
-    h = se * sp.stats.t._ppf((1+confidence)/2., n-1)
+    m, se = np.mean(a), st.sem(a)
+    h = se * st.t._ppf((1+confidence)/2., n-1)
     return m, h
 
 def inORout(x, mu, h):
@@ -330,4 +330,25 @@ def KSsimilarity(feature_arr, i_diag=1):
     return p
     
 
+##### 
+
+def joint_pdf(x, y, grid_size=100j):
+    """joint probability between x and y
+    Parameters
+    ----------
+    x, y: 1d arrays
+    Returns
+    -------
+    X, Y, KDE(X, Y) : coordinates X, Y, Z"""
     
+    assert len(x) == len(y), 'must be same length'
+    xmin = np.min(x)
+    xmax = np.max(x)
+    ymin = np.min(y)
+    ymax = np.max(y)
+        
+    X, Y = np.mgrid[xmin : xmax : grid_size, ymin : ymax : grid_size]
+    positions = np.vstack([X.ravel(), Y.ravel()])
+    values = np.vstack([x, y])
+    kernel = st.gaussian_kde(values)
+    return X, Y, np.reshape(kernel(positions).T, X.shape)
