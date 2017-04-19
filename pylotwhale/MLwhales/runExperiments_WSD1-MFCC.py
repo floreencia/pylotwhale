@@ -137,4 +137,5 @@ for p in grid:
         print(e, '\nError!', p)
 
 
+exp.print_in_out_file("\n#" + exp.time)
 print("OUTPUT:", out_fN)

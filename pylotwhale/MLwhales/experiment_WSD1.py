@@ -128,7 +128,7 @@ class WSD_experiment(experiment):
         self.clf_classes = lt.classes_
         self.metric = metric
         
-    def print_comments(self, start='\n', end='\n'):
+    def print_comments(self, start='', end='\n'):
 	"""time, collections, classes"""
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
         s += '\n# Labels H: {}'.format(self.labsHierarchy)

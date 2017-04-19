@@ -23,14 +23,15 @@ import pylotwhale.MLwhales.MLEvalTools as MLvl
 import pylotwhale.MLwhales.experiment_WSD1 as wsd
 from pylotwhale.MLwhales.configs.params_WSD1 import *
 
-
-collFi_train = '/home/flo/x1-flo/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-tapes-desktop.txt'
+collFi_train ='/home/florencia/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-tapes.txt'
+#'/home/flo/x1-flo/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-tapes-desktop.txt'
 #'/home/flo/x1-flo/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-tapes-desktop.txt'
 #'/home/flo/x1-flo/profesjonell/bioacoustics/heike/NPW/data/collections/wavAnnColl_WSD_grB-desktop.txt'
-collFi_test = '/home/flo/x1-flo/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
+#collFi_test = #'/home/flo/x1-flo/whales/data/mySamples/whales/tapes/NPW/B/collections/wavAnnColl_grB_fullTapes.txt'
 train_coll = fex.readCols(collFi_train, colIndexes = (0,1))
-test_coll = np.genfromtxt(collFi_test, dtype=object)
-oDir = '/home/flo/x1-flo/whales/MLwhales/whaleSoundDetector/data/experiments/'
+test_coll = None#np.genfromtxt(collFi_test, dtype=object)
+oDir = "/home/florencia/whales/MLwhales/whaleSoundDetector/data/experiments/"
+ #'/home/flo/x1-flo/whales/MLwhales/whaleSoundDetector/data/experiments/'
 
 lt = myML.labelTransformer(clf_labs)
 
@@ -100,12 +101,12 @@ exp = wsd.WSD_experiment(train_coll, test_coll, lt,
                          metric=metric)
 
 #### experiment grid
-param_grid = {'NFFT': [2**6, 2**7, 2**8, 2**9, 2**10], 
+param_grid = {'NFFT': [2**7, 2**8, 2**9, 2**10], 
               'n_mels' : np.hstack((np.arange(1, 10, 1), np.arange(10, 140, 10))),
 		#'n_mels' : np.arange(1, 10, 1),
              # 'n_mels' : [2**8, 2**9, 2**10], # ceps
               #'Nceps' :  np.arange(1, 40, 2),
-              'n_textWS': np.arange(1, 50, 2)}
+              'n_textWS': np.arange(1, 50, 5)}
 
 grid = ParameterGrid(param_grid)
 expSettingsStr = "{} {}".format(len(grid), str(param_grid))
@@ -117,7 +118,7 @@ s += "\n#" + Tpipe.string
 s += "\n# {}\n".format("\n# ".join(["{}: {}".format(k, ", ".join([str(x) for x in v])) for k, v in param_grid.items()]))
 exp.print_comments(end=s)
 exp.print_experiment_header()
-sys.exit()
+#sys.exit()
 
 for p in grid:
         
@@ -134,10 +135,11 @@ for p in grid:
     print(p)
     
     try:
-        exp.run_experiment(Tpipe)
+        exp.run_experiment(Tpipe, class_balance='c')
         
     except ValueError as e:
         print(e, '\nError!', p)
 
 
 exp.print_in_out_file("\n#" + exp.time)
+print("OUTPUT:", out_fN)
