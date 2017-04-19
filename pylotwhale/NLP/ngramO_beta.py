@@ -255,37 +255,48 @@ def twoDimDict2DataFrame(kykyDict):
 
 ### bigrams and time
 
-def dictOfBigramIcTimes(listOfBigrams, df, ict_XY=None, label='call', ict_label='ict'):
+def dictOfBigramIcTimes(listOfBigrams, df, ict_XY_l=None, label='call', ict_label='ict'):
     '''searches sequences (listOfBigrams) of type <label> in the dataframe and returns a 
     dictionary with the ict_label values of the sequences
     Parameters
     ----------
     listOfBigrams: list of bigrams
     df: pandas data frame
-    ict_XY: dictionary 
+    ict_XY_l: dictionary of lists
         bigrams as keys and the ict of the bigrams as values
     label: type of squence, or name of the column in df where to look for the sequences
     ict_label: str
         name of the column
     Return
     ------
-    ict_XY: ictimes bigram dictionary
+    ict_XY: dictionary with lists
+        ICIs by bigram
     '''
-    if ict_XY is None: ict_XY = defaultdict(list)
+    if ict_XY_l is None: ict_XY_l = defaultdict(list)
     for seq in listOfBigrams:
         try:
             seqdf = daT.returnSequenceDf(df, seq, label='call')
         except ValueError: # sequence not found, continue with the next seq
             continue
         ky = ''.join(seq) # seqdf.head(20)
-        ict_XY[ky].extend(seqdf[ict_label].values)
-    return ict_XY
+        ict_XY_l[ky].extend(seqdf[ict_label].values)
+
+    return ict_XY_l
+
+def ICI_XY_list2array(ici_XY_l):
+    ### transform ICI list into ICI numpy array filtering nans and infs
+    ici_XY = {}
+    for k in ici_XY_l.keys():
+        arr = np.array(ici_XY_l[k])
+        ici_XY[k] = arr[np.isfinite(arr)]
+    return ici_XY
 
 def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict_XY=None, label='call', 
                                ict_label='ict'):
-    '''searches sequences (listOfBigrams) in the dataframes from dfDict'''
+    """ICI of the bigrams
+    searches sequences (listOfBigrams) in the dataframes from dfDict"""
     for thisdf in dfDict.values():
-        ict_XY=dictOfBigramIcTimes(listOfBigrams, thisdf, ict_XY=ict_XY, label=label,
+        ict_XY=dictOfBigramIcTimes(listOfBigrams, thisdf, ict_XY_l=ict_XY, label=label,
                                 ict_label=ict_label)
     return ict_XY
     
