@@ -300,12 +300,20 @@ def dfDict2dictOfBigramIcTimes(dfDict, listOfBigrams, ict_XY=None, label='call',
                                 ict_label=ict_label)
     return ict_XY
     
-def selectBigramsAround_dt(ictDict, dt=None, minCts=10):
-    '''takes a dictionary of ict-bigrams (ict) and returns the keys of the elements 
-    with at least <minCts> counts within the dt interval'''
+def selectBigramsAround_dt(ictDict, dt=None, minCts=10, metric=np.median):
+    """takes a dictionary of ict-bigrams (ict) and returns the keys of the elements 
+    with at least <minCts> counts within the dt interval
+    Parameters
+    ----------
+    ictDict: dict of lists
+    df: 2d-tuple
+    minCts: int
+    metric: callable
+    returns a list with the keys of ictDict
+    """
     if dt is None : dt = (None, np.inf)
     collector=[]
-    ict_mean = dict([(item, np.mean(ictDict[item])) for item in ictDict.keys() 
+    ict_mean = dict([(item, metric(ictDict[item])) for item in ictDict.keys() 
                     if len(ictDict[item])>=minCts])
     for ky in ict_mean.keys():
         if ict_mean[ky] > dt[0] and ict_mean[ky] < dt[1]:

@@ -24,7 +24,7 @@ tools for the preparation of annotated files
 """
 
 def y_histogram(y, range=(0,1.5), Nbins=None, oFig=None, figsize=None,
-                 plTitle=None, xl=r"$\tau _{ict}$ (s)",  max_xticks = None):
+                plTitle=None, xl=r"$\tau _{ict}$ (s)",  max_xticks = None):
     ## remove nans and infs
     y = y[~np.logical_or(np.isnan(y), np.isinf(y))]
     ## define number of bins
