@@ -68,18 +68,18 @@ def shuffled_cfd(df, Dtint, label='call', time_param='ict_end_start'):
     my_bigrams = nltk.bigrams(sequences) # detect bigrams
     cfd_nsh = ngr.bigrams2Dict(my_bigrams) # count bigrams
     return cfd_nsh
-    
-    
 
-def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi, 
-                               label='call', time_param='ict_end_start', 
+
+def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
+                               label='call', time_param='ict_end_start',
                                testStat=teStat_proportions_diff):
     """randomisation test for each bigram conditional probability
+        under the null hypothesis H0: testStat_observed > testStat_shuffled
     Parameters
     ----------
     df_dict: dict
         dictionary of dataframes (tapes)
-    Dt: tuple 
+    Dt: tuple
         (None, Dt)
     obsTest: ndarray
         observed stat for each bigram
@@ -96,15 +96,17 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     nr, nc = np.shape(obsTest)
     shuffle_tests = np.zeros((Nsh, nr, nc))
     N_values_r = np.zeros_like(obsTest)
-    for i in range(Nsh):  ## shuffle ith-loop
-        cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
-        for t in df_dict.keys(): # for each tape
+    for i in range(Nsh):  # shuffle ith-loop
+        cfd_sh = nltk.ConditionalFreqDist()  # initialise cond freq dist.
+        for t in df_dict.keys():  # for each tape
             thisdf = df_dict[t]
-            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts
-        Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh, condsLi, sampsLi) # normalised matrix
-        shTest_i = testStat(Mp_sh) # compute satat variable
-        shuffle_tests[i] = shTest_i # save distribution for later
-        N_values_r[shTest_i >= obsTest] += 1 # test right
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label,
+                                   time_param=time_param)  # counts
+        Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh,
+                                                              condsLi, sampsLi)  # normalised matrix
+        shTest_i = testStat(Mp_sh)  # compute satat variable
+        shuffle_tests[i] = shTest_i  # save distribution for later
+        N_values_r[shTest_i >= obsTest] += 1  # test right
         #N_values_l[shTest_i < obsTest] += 1 # test left
     p_r = 1.0*N_values_r/Nsh
     return p_r, shuffle_tests
