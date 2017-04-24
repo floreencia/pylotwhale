@@ -174,8 +174,8 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     if samplesList is None: samplesList = df.index
 
     bigrsDF = df[conditionsList].loc[samplesList]
-    samps = bigrsDF.index
-    conds = bigrsDF.columns
+    samps = bigrsDF.index.values
+    conds = bigrsDF.columns.values
     M = bigrsDF.as_matrix().T # transpose to have conditions as rows
     return M, samps, conds
     
@@ -322,7 +322,7 @@ def selectBigramsAround_dt(ictDict, dt=None, minCts=10, metric=np.median):
 
 
 
-def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ict_end_stop', callLabel='call',
+def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ict_end_start', callLabel='call',
                             startTag='_ini', endTag='_end',
                             return_values='probs', minCalls=1):
     """Bigrams counts/probs as matrix from DataFrame
@@ -351,7 +351,7 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ict_end_stop', callLabel=
 
     calls = [item[0] for item in sorted(Counter(calls0).items(),
                                     key = lambda x : x[1], reverse=True)
-                                     if item[1] > minCalls] # order calls
+                                     if item[1] >= minCalls] # order calls
     samplesLi = calls[:] + [endTag] #None #[ 'A', 'B', 'C', 'E', '_ini','_end']
     condsLi = calls[:] + [startTag]
 
