@@ -298,13 +298,13 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
     nr, nc = np.shape(X)
     nx = X.sum(axis = 1)*1.
     ny = Y.sum(axis = 1)*1.
-    
+
     for r in range(nr)[:]:
         for c in range(nc)[:]:
             if X[r,c] >= min_counts:
                 px = 1.0*X[r,c]/nx[r]
                 py = 1.0*Y[r,c]/ny[r]
-                XYtest[r,c] = testDiffProportions(px, py, nx[r], ny[r], 
+                XYtest[r,c] = testDiffProportions(px, py, nx[r], ny[r],
                                                     pcValue=pcValue)[0]
             else:
                 XYtest[r,c] = np.NaN
@@ -316,7 +316,7 @@ def elementwiseDiffPropTestXY(X, Y, min_counts=5, pcValue=0.9999):
 
 def KSsimilarity(feature_arr, i_diag=1):
     """~similarity matrix between sets of continuous distributions given as rows
-    of feature_arr (2darray) 
+    of feature_arr (2darray)
     Similarity is measured as the p-values of the KS-test
     p=1 distributions were drawn from the same pdf,
     the closer p is to zero the more different are the distributions
@@ -325,9 +325,9 @@ def KSsimilarity(feature_arr, i_diag=1):
     ----------
     feature_arr: list
     i_diag: int
-         deviation from diagonal, = 0 include diagonal   
+         deviation from diagonal, = 0 include diagonal
     """
-    
+
     p = np.zeros((len(feature_arr), len(feature_arr)))+np.nan
     for i in np.arange(len(feature_arr)):
         for j in np.arange(i+i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
@@ -335,6 +335,29 @@ def KSsimilarity(feature_arr, i_diag=1):
             p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return p
     
+
+def KL_div_joint(x, y, Nsh=10):
+    """KL-divergence for assessing the significance of the correlation 
+    between two variables x and y
+    Returns
+    -------
+        the KL divegence between the observed and a suffled distribution
+        the KL divegence between the two suffled distributions
+    """
+    y_sh = np.array(y)
+    KL_dist_obs_sh = np.zeros((Nsh))
+    KL_dist_sh_sh = np.zeros((Nsh))
+    for i in np.arange(Nsh):
+        _,_, pdf = joint_pdf(x, y)
+        np.random.shuffle(y_sh)
+        _,_, pdf_sh1 = joint_pdf(x, y_sh)
+        np.random.shuffle(y_sh)
+        _,_,pdf_sh2 = joint_pdf(x, y_sh)
+        KL_dist_obs_sh[i] = entropy(pdf_sh1.ravel(), pdf.ravel()) # dist obs - shuffled
+        KL_dist_sh_sh[i] = entropy(pdf_sh1.ravel(), pdf_sh2.ravel())
+    return KL_dist_obs_sh, KL_dist_sh_sh
+
+
 
 ##### 
 
