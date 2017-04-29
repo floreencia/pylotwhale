@@ -334,29 +334,29 @@ def KSsimilarity(feature_arr, i_diag=1):
             #print(i, j)
             p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return p
-    
+
 
 def KL_div_joint(x, y, Nsh=10):
-    """KL-divergence for assessing the significance of the correlation 
+    """KL-divergence for assessing the significance of the correlation
     between two variables x and y
     Returns
     -------
-        the KL divegence between the observed and a suffled distribution
-        the KL divegence between the two suffled distributions
+        the KL divergence between the observed and a shuffled distribution
+        the KL divergence between the two shuffled distributions
     """
+    #assert(len(x) == len(y))
     y_sh = np.array(y)
     KL_dist_obs_sh = np.zeros((Nsh))
     KL_dist_sh_sh = np.zeros((Nsh))
     for i in np.arange(Nsh):
-        _,_, pdf = joint_pdf(x, y)
+        _, _, pdf = joint_pdf(x, y)
         np.random.shuffle(y_sh)
-        _,_, pdf_sh1 = joint_pdf(x, y_sh)
+        _, _, pdf_sh1 = joint_pdf(x, y_sh)
         np.random.shuffle(y_sh)
-        _,_,pdf_sh2 = joint_pdf(x, y_sh)
-        KL_dist_obs_sh[i] = entropy(pdf_sh1.ravel(), pdf.ravel()) # dist obs - shuffled
-        KL_dist_sh_sh[i] = entropy(pdf_sh1.ravel(), pdf_sh2.ravel())
+        _, _, pdf_sh2 = joint_pdf(x, y_sh)
+        KL_dist_obs_sh[i] = st.entropy(pdf_sh1.ravel(), pdf.ravel())
+        KL_dist_sh_sh[i] = st.entropy(pdf_sh1.ravel(), pdf_sh2.ravel())
     return KL_dist_obs_sh, KL_dist_sh_sh
-
 
 
 ##### 
