@@ -61,7 +61,7 @@ pca_range = [ 6, 8, 10, 12]
 #estimators.append(('reduce_dim',  PCA()))
 
 ### CLF
-from pylotwhale.MLwhales.clf_pool import svc_l as clf_settings
+from pylotwhale.MLwhales.clf_pool import svc_rbf  as clf_settings
 pipe_estimators.append(('clf',  clf_settings.fun))
 paramsDi.update(clf_settings.grid_params_di)
 gs_grid = [paramsDi] # clfSettings.grid_params #
