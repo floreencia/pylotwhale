@@ -40,7 +40,8 @@ def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     feExFun: callable
     labelsHierarchy: list
     """
-     #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+    #np.loadtxt(collFi, delimiter='\t', dtype='|S')
+    #print("\n==========\nTEST\n==============",wavF)
     waveForm, fs = wav2waveform(wavF)
     tf = len(waveForm)/fs
 

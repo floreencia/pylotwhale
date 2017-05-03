@@ -75,7 +75,7 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     ax.set_xticks(np.arange(n_items)+0.4)
     ax.set_xticklabels(freq_arr_names)
     if xlabel: ax.set_xlabel(xlabel)
-    if ylabel : ax.set_ylabel(ylabel)
+    if ylabel: ax.set_ylabel(ylabel)
     if outFigName:fig.savefig(outFigName)
 
     return fig, ax     
@@ -283,8 +283,9 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
 
 def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None, 
               overlap = 0.5, winN = 'hanning',
-              spec_fac=0.99999, plTitle='', plTitleFontSz=0, cmN='bone_r',
-              figsize=None):
+              xl='time (s)',  yl= 'frequency (kHz)',
+              spec_fac=0.99999, plTitle='', cmN='bone_r',
+              figsize=None, ax=None, **kwargs):
     """
     plots spectrogram
     Parameters
@@ -308,41 +309,41 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     N = int(N)
     win = get_window(winN, N)
     noverlap = int(overlap*N)
-    A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, window = win)[0]
+    A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, 
+                      window = win)[0]
 
     # Spectro edditing
     A = selectBand(A0, fr_f = sRate/2, v_cut=v_cut) # band filter
     A = reScale_E(A, spec_factor=spec_fac) # zeros the the spectral energy smaller than 0.001% of <E>
 
-    plt.clf()
-    fig, ax = plt.subplots(figsize=figsize)#figsize=(max([3,int(tf/0.3)]), ff/8000))
+    #plt.clf()
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)#figsize=(max([3,int(tf/0.3)]), ff/8000))
 
     cax = ax.imshow(np.log(A), extent=[ 0, tf, v_cut[0]/1000, v_cut[1]/1000],
-                    origin='lower', aspect = 'auto', cmap=plt.cm.get_cmap(cmN))#, interpolation = 'nearest')
+                    origin='lower', aspect = 'auto', 
+                    cmap=plt.cm.get_cmap(cmN), **kwargs)#, interpolation = 'nearest')
 
     #labels
-    ax.set_xlabel('time [s]')#, fontsize=16)
-    ax.set_ylabel('frequency [kHz]')#, fontsize=16)
-    if plTitleFontSz: ax.set_title(plTitle, fontsize=plTitleFontSz)
+    ax.set_xlabel(xl)#, fontsize=16)
+    ax.set_ylabel(yl)#, fontsize=16)
 
     if tf<1:
         plt.xticks(np.arange(0, tf, tf/2.0))
     else:
         plt.xticks(np.arange(0, tf, 1.0))
 
+    return ax
+
+def plspectro_cbar(ax):
+    """TODO... plot spectrogram with fancy cbar marks"""    
+    
     #cbar
     ( ll, ml, ul ) = cbarLabels( np.log(A).min(), np.log(A).max() )
     cbar = fig.colorbar(cax, ticks=[ll, ml, ul])
     cbar.ax.set_yticklabels(['10$^{%d}$'%ll,'10$^{%d}$'%ml,'10$^{%d}$'%ul])
 
-    #save
-    #    outF = baseSpecN+'.jpg'
-    if outF:
-        print( "out:", outF )
-        fig.savefig(outF, bbox_inches='tight')
-    
     return fig, ax
-
 
 def selectBand(M, fr_0 = 0, fr_f = 24000, v_cut = (1.0*1000, 20.0*1000)):
     """

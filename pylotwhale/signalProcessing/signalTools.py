@@ -242,13 +242,9 @@ def wav2waveform(wavF, fs=None, **kwargs):
 
 def _wav2waveform(wavF, **kwargs):
     "read wavfile and return fs, waveform"
-    try:
-        y, sr = librosa.core.load(wavF, **kwargs)
-        #fs, waveform = wavfile.read(wavF)
-    except IOError, TypeError:
-        print( "Oops!  Couldn't read:\n %s "%wavF)
-        return IOError
-    #if normalize : waveform = normalizeWF(waveform)
+    assert os.path.isfile(wavF), " ---> {}\n\tFile not found!".format(wavF)
+    y, sr = librosa.core.load(wavF, **kwargs)
+
     return y, sr
 
 

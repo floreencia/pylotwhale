@@ -19,9 +19,9 @@ labelsMapping = {'n_mels': '# Mel-filters',
                  'Nslices': '# slices',
                  'f1_macro_CV': r'$<F_1 >_{call}$', #r'$<F_1>_m$',
                  'f1_macro_CV_std': r'$\sigma (F_1)$',
-                 'ACC': 'A',
-                 'PRE': 'P',
-                 'REC': 'R',
+                 'ACC': 'accuracy',
+                 'PRE': 'precision',
+                 'REC': 'recall',
                  'F1': r'$F_1$'                 
                 }
                 
