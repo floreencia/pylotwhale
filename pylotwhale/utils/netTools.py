@@ -93,7 +93,8 @@ def drawNetwCbar(G, pos, nodeAttr='callFreq', edgeAttr='cpd',
 #### gatherer functions
 
 class dict2network():
-    """network object"""
+    """network object
+        G: networkx graph"""
     def __init__(self, twoDimDict, rmEdge='default', rmNodes=None):
         if rmEdge is 'default': rmEdge = '_end', '_ini'
 
@@ -103,6 +104,7 @@ class dict2network():
         self.G = dict2nxGraph(self.net_dict, rmEdge=self.rmEdge, rmNodes=rmNodes)
 
     def add_edge_attr(self, attr_name, edge_dict):
+        """adds attrs to network, eg. penwidth"""
         return add_edge_attr(self.G, attr_name, edge_dict)
 
     def drawGraphviz(self, dot_file, fig_file, invisibleNodes='default'):
