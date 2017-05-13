@@ -106,6 +106,10 @@ class dict2network():
     def add_edge_attr(self, attr_name, edge_dict):
         """adds attrs to network, eg. penwidth"""
         return add_edge_attr(self.G, attr_name, edge_dict)
+        
+    def remove_edges(self, ebunch):
+        """removes edges from ebunch (a list of tuples)"""
+        self.G.remove_edges_from(ebunch)
 
     def drawGraphviz(self, dot_file, fig_file, invisibleNodes='default'):
         if invisibleNodes == 'default': invisibleNodes = ['_ini', '_end']
