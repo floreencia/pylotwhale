@@ -204,6 +204,44 @@ def bigrams2countsMatrix(bigrams_tu, conditionsList=None, samplesList=None):
                                      samplesList=samplesList)
     
 
+### matrix <--> samps index utilities for H0
+
+def get_insignificant_bigrams(p_values, samps, conds, pc=0.1, 
+                              condition=lambda p_val, pc: p_val > pc):
+    """Get bigrams that violate the null hypothesis
+    Parameters
+    ----------
+    p_values: 2darray
+        bigram's p-values (probability that H0 is true)
+    samps: list like
+    conds: list like
+    returns a list of tuples with the bigrams that cannot reject H0"""
+    bigrams_list = []
+
+    for (r, c), p_val in np.ndenumerate(p_values):
+        if condition(p_values[r, c], pc):#p_values[r, c] > pc:
+            bigrams_list.append((conds[r], samps[c]))
+    return bigrams_list
+
+def get_insignificant_bigram_indices(p_values, pc=0.1):
+    """Get null hypothesis' non rejecting bigram indices
+    Parameters
+    ----------
+    p_values: 2darray
+        bigram's p-values (probability that H0 is true)
+    returns a list of tuples with the bigrams indices that cannot reject H0
+        ([r, c), ...]
+        r = samp index
+        c = cond indes
+    """
+    index_list = []
+
+    for (r, c), p_val in np.ndenumerate(p_values):
+        if p_values[r, c] > pc:
+            index_list.append((r, c))
+    return index_list    
+
+
 ### + CONDITIONAL PROBABILITIES
     
 def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):

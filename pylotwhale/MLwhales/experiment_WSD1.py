@@ -191,7 +191,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
         T_settings: list of tuples
         labelsHierachy: list of strings
         cv: cv folds
-        extimators: list
+        estimators: list
             for pipline
         gs_grid: list
                     

@@ -43,7 +43,9 @@ def teStat_proportions_diff(p1):
 def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None, 
                          kwargs_obs=None, **kwargs):
     """plot randomised distribution (distsM) with observable
-        kwargs_obs {color: 'r', lw=2.5}"""
+        kwargs_obs {color: 'r', lw=2.5}
+        i=conds
+        j=samps"""
     if kwargs_obs is None:
         kwargs_obs = {'color': 'r', 'lw': 2.5}
     #fig, ax =  plt.subplots(figsize=None)
