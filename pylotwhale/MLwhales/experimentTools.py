@@ -55,7 +55,8 @@ def Tpipe_settings_and_header(Tpipe, sep=", "):
             values.append(Tpipe.steps[step].settingsDict[ky])
 
     header_str = ("{}".format(sep).join(header))
-    settings_str = "{}".format(sep).join(["{}".format(item) for item in values])
+    settings_str = "{}".format(sep).join(["{}".format(item) \
+                                          for item in values])
     return header_str, settings_str
 
 
@@ -252,9 +253,10 @@ class callClf_experiment(experiment):
     clf_grid: dict
     out_file: str
     """
-    def __init__(self, train_coll, test_coll, test_frac,
+    def __init__(self, train_coll, test_frac,
                 lt, labsHierarchy, 
-                cv, clf_pipe, clf_grid, out_file, metric=None):
+                cv, clf_pipe, clf_grid, out_file,
+                test_coll=None, metric=None):
 
         self.train_coll = train_coll
         self.test_coll = test_coll
@@ -275,10 +277,10 @@ class callClf_experiment(experiment):
         s += '\n# Labels H: {}'.format(self.labsHierarchy)
         self.print_in_out_file(start + s + end)
 
-    def print_experiment_header(self, sep=', ', start='#', end='\n'):
+    def print_experiment_header(self, Tpipe, sep=',', start='#', end='\n'):
         s = start
-        s += set_WSD_experiment_header(self.clf_classes, 
-                                       metric=str(self.metric), sep=sep)
+        s += scores_header_str(metric=metric, sep=sep)
+        s += sep + Tpipe_settings_and_header(Tpipe)[0]
         s += end
         self.print_in_out_file(s)
 
@@ -307,6 +309,7 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, test_frac,
     Parameters
     ----------
         train_coll: list
+            path/to/wavs    <label>
         test_coll: list
         lt: ML.labelTransformer
         T_settings: list of tuples
@@ -325,7 +328,6 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, test_frac,
             value of the param in experimet, for printing
     """
 
-    #Tpipe = fex.makeTransformationsPipeline(T_settings)
     feExFun = Tpipe.fun
     
     fs = Tpipe.steps['Audio_features'].settingsDict['fs']
@@ -334,12 +336,12 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, test_frac,
     datO = fex.wavLCollection2datXy( wavColl, fs=fs, featExtFun=feExFun )
     X, y_names = datO.filterInstances(filterClfClasses)
     y = lt.nom2num(y_names)
-
+    ## split into train and test
     X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                         test_size=test_frac, 
                                                         random_state=0)
 
-    #### CLF
+    #### classify
     pipe = Pipeline(pipe_estimators)
     gs = GridSearchCV(estimator=pipe,
                       param_grid=gs_grid,
@@ -351,8 +353,7 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, test_frac,
     clf_best = gs.best_estimator_
     y_pred = clf_best.predict(X_test)
 
-    ## clf scores over test set
-
+    #### print clf scores
     settings_str = Tpipe_settings_and_header(Tpipe)[1]
     with open(out_fN, 'a') as out_file:
         ### cv scores
@@ -372,6 +373,13 @@ def callClfExperiment(wavColl, lt, Tpipe, out_fN, test_frac,
         out_file.write("{}\n".format(settings_str))
         
     return clf_best.fit(X, y)
+
+
+
+
+
+
+
 
 
 

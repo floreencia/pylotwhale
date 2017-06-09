@@ -410,7 +410,8 @@ def get_transformationFun(funName=None):
         
 
 class Transformation():
-    """creates a transformation from a tranformation_name and a settings dictionary
+    """creates a transformation from a tranformation_name 
+    and a settings dictionary
     A Transformation has a callable (fun) and a settings string
     """
     def __init__(self, transformation_name, settings_di):

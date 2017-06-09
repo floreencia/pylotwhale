@@ -138,14 +138,15 @@ def Tpipe_settings_and_header(Tpipe, sep=", "):
     header=[]
     values=[]
     for step in Tpipe.step_sequence:
-        header.append( step)
+        header.append(step)
         values.append(Tpipe.steps[step].name)
         for ky in Tpipe.steps[step].settingsDict.keys():
-            header.append( ky)
-            values.append( Tpipe.steps[step].settingsDict[ky] )
+            header.append(ky)
+            values.append(Tpipe.steps[step].settingsDict[ky] )
             
     header_str = ("{}".format(sep).join(header))
-    settings_str = "{}".format(sep).join(["{}".format(item) for item in values])
+    settings_str = "{}".format(sep).join(["{}".format(item) 
+                                          for item in values])
     return header_str, settings_str
 
 def callClfExperiment(wavColl, lt, Tpipe, out_fN, testFrac,
