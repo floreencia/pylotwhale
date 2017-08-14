@@ -356,8 +356,8 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     if display_nums:
         for i in range(r):
             for j in range(c):
-                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center', 
-                        fontsize=fontSz )
+                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center') 
+                        #fontsize=fontSz )
     
     ## ticks labels
     ax.set_xticks(range(c))        

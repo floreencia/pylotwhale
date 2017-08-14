@@ -333,7 +333,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     else:
         plt.xticks(np.arange(0, tf, 1.0))
 
-    return ax
+    return fig, ax
 
 def plspectro_cbar(ax):
     """TODO... plot spectrogram with fancy cbar marks"""    

@@ -75,7 +75,7 @@ lt = myML.labelTransformer(clf_labs)
 """
 
 
-def Tpipe_settings_and_header(Tpipe, sep=", "):
+def Tpipe_settings_and_header(Tpipe, sep=","):
     """returns two strings with the instructions in Tpipe (pipeline of Transformations)
     header_str, settings_str"""
     header=[]
@@ -93,6 +93,11 @@ def Tpipe_settings_and_header(Tpipe, sep=", "):
 
 
 class experiment():
+    """
+    Parameters
+    ----------
+    out_file: str    
+    """
     def __init__(self, out_file):
         self.out_file = out_file
 
@@ -129,7 +134,7 @@ class WSD_experiment(experiment):
         self.metric = metric
         
     def print_comments(self, start='', end='\n'):
-	"""time, collections, classes"""
+        """time, collections, classes"""
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
         s += '\n# Labels H: {}'.format(self.labsHierarchy)
         self.print_in_out_file(start + s + end)
@@ -235,7 +240,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
     with open(out_fN, 'a') as out_file: # print details about the dataset into status file
         #out_file.write("# {} ({})\n".format( collFi_train, len(train_coll)))
         ## samples per class
-        out_file.write(", ".join([str(list(y_names).count(item)) for item in lt.classes_]))
+        out_file.write(",".join([str(list(y_names).count(item)) for item in lt.classes_]))
         ## sizes of the test/train sets
         out_file.write(", {}, {}".format(len(X_train), len(X_test)))
 
@@ -263,7 +268,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
     ### Tpipe -- feature extraction params
     with open(out_fN, 'a') as out_file:
         settings_str = expT.Tpipe_settings_and_header(Tpipe)[1]
-        out_file.write(", " + settings_str+'\n')
+        out_file.write("," + settings_str+'\n')
     
      ### settings
     #settings_str = Tpipe_settings_and_header(Tpipe)[1]
@@ -297,7 +302,7 @@ def run_experiment_WSD(train_coll, test_coll, lt, Tpipe, labsHierarchy, out_fN,
     """
 
                
-    #return clf
+    return clf_best
 
 
 
