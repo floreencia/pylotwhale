@@ -5,6 +5,7 @@ from __future__ import print_function, division
 import numpy as np
 #import os
 from collections import Counter
+from copy import deepcopy
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -156,23 +157,39 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 ### ICIs
 
 def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log, 
-                   check_isfinite=True):
-    
-                       
+                         check_isfinite=True):
+    """
+    returns two dictionaries with the series of the timeLabel
+        e.g. the ici-i calls away
+    """
+
+    s1 = {}
+    s2 = {}                  
     for tape in df_dict.keys():
         ict0 = df_dict[tape][timeLabel].values
         ict = ict0[np.isfinite(ict0)]
-        ict1_l.extend(ict[i:])
-        ict2_l.extend(ict[:-i])
-    return
+        s1[tape] = ict[i:]
+        s2[tape] = ict[:-i]
+    return s1, s2
 
 
 def check_finiteness(s1, s2):
+    """fileters non finete elements in either of both series"""
+    assert(len(s1) == len(s2))
     mask = np.logical_and(np.isfinite(s1), np.isfinite(s2))
     x = s1[mask]
     y = s2[mask]
 
     return x, y
+
+
+def key_shuffle(d):
+    
+    dsh = deepcopy(d)
+    for k in d.keys():
+        np.random.shuffle(dsh[k])
+    return dsh
+
 
 def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
                      check_isfinite=True):
