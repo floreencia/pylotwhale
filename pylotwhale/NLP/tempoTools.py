@@ -155,8 +155,37 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 
 ### ICIs
 
-def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log, 
+def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log, 
+                   check_isfinite=True):
+    
+                       
+    for tape in df_dict.keys():
+        ict0 = df_dict[tape][timeLabel].values
+        ict = ict0[np.isfinite(ict0)]
+        ict1_l.extend(ict[i:])
+        ict2_l.extend(ict[:-i])
+    return
+
+
+def check_finiteness(s1, s2):
+    mask = np.logical_and(np.isfinite(s1), np.isfinite(s2))
+    x = s1[mask]
+    y = s2[mask]
+
+    return x, y
+
+def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
                      check_isfinite=True):
+    """
+    Parameters
+    ----------
+    df_dict: dictionary of pandas dataframe
+    timeLabel: str
+        name of the column to read
+    Returns
+    -------
+    (s1, s2): 2D-tuple with pandas series        
+    """
 
     ict1, ict2 = get_ici_i(df_dict, timeLabel='ict_end_start', i=i)
     ## apply fun
