@@ -330,17 +330,37 @@ def KSsimilarity(feature_arr, i_diag=1):
          deviation from diagonal, = 0 include diagonal
     """
 
-    p = np.zeros((len(feature_arr), len(feature_arr)))+np.nan
+    p = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
     for i in np.arange(len(feature_arr)):
         for j in np.arange(i+i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
             #print(i, j)
             p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return p
 
-def KL_div_simm(x, y):
+
+def KL_div_symm(x, y):
     """returns the symmetric KL-divergence"""
     return st.entropy(x, y) + st.entropy(y, x)
-    
+
+def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
+    """computes the distance between probability distributions
+    Parameters
+    ----------
+    feature_arr: list
+        each element of the list has a probability distribution
+    i_diag: int
+         deviation from diagonal, = 0 include diagonal
+    dist_fun: callable
+        distance function
+    """
+
+    p = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
+    for i in np.arange(len(feature_arr)):
+        for j in np.arange(i+i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
+            #print(i, j)
+            p[i,j] = dist_fun(feature_arr[i], feature_arr[j])
+    return p
+
 
 def KL_div_joint(x, y, Nsh=10):
     """KL-divergence for assessing the significance of the correlation
@@ -391,10 +411,10 @@ def KL_div_joint_inv(x, y, Nsh=10):
 
 
 
-##### 
+#####
 
 def joint_pdf(x, y, grid_size=100j):
-    """joint probability between x and y
+    """joint probability between x and y estimated with a Gaussian kernel
     Parameters
     ----------
     x, y: 1d arrays
@@ -413,3 +433,27 @@ def joint_pdf(x, y, grid_size=100j):
     values = np.vstack([x, y])
     kernel = st.gaussian_kde(values)
     return X, Y, np.reshape(kernel(positions).T, X.shape)
+
+def fit_KDE(x, supp, num=100):
+    """
+    Fits KDE to a sample x in the range x_0 to x_f
+    Parameters
+    ----------
+    x: 1 dim numpy array
+        sample
+    supp: 2-dim tuple
+        range og the KDE
+    num: number of points
+    Return
+    ------
+    y: 1 dim numpy array
+        KDE
+    """
+    assert(len(supp) == 2)
+    x_kde = st.gaussian_kde(x)
+    x_sup = np.linspace(*supp, num=num)
+    y = x_kde.pdf(x_sup)
+    return y    
+    
+    
+    

@@ -230,6 +230,9 @@ def plImshowLabels(A, xTickL, yTickL, xLabel=None, yLabel=None,
 
 def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
                          NcbarTicks=4, cbarAxis=None, oFig=None, **kwargs):
+    """
+    kwargs for matshow
+    """
     
     Y = linkage_matrix = sch.ward(distM)
     

@@ -130,7 +130,7 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     labels_arr: ndarray (m, )
         array with the instance labels
     """
-    labels_arr = np.array([gaps]*m, dtype=object)   # inicialise array
+    labels_arr = np.array([gaps]*int(m), dtype=object)   # initialise array
     assert(len(T) == len(L)), "T and L must match in length"
     assert isinstance(T, np.ndarray), "must be an ndarray"
     assert isinstance(L, np.ndarray), "must be an ndarray"
@@ -157,8 +157,21 @@ def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
     if labelsHierarchy is None:
         labelsHierarchy = ['c', 'w']
     T, L = annT.anns2TLndarrays(annFi)
+    if tf == 'auto':
+        tf = T[-1,-1] + 0.1
     return annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
 
+
+class annotations():
+    
+    def __init__(self, annFi):
+        self.file_path = annFi
+        self.T, self.L = annT.anns2TLndarrays(self.file_path)
+        self.tf = self.T[-1,-1]
+    def as_array(self, m):
+        return annotations2instanceArray(T=self.T, L=self.L, m=m, tf=self.tf,
+                                         labelsHierarchy=[])
+    
 
 def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
     '''
