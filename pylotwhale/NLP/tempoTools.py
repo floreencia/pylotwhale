@@ -156,23 +156,6 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 
 ### ICIs
 
-def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log, 
-                         check_isfinite=True):
-    """
-    returns two dictionaries with the series of the timeLabel
-        e.g. the ici-i calls away
-    """
-
-    s1 = {}
-    s2 = {}                  
-    for tape in df_dict.keys():
-        ict0 = df_dict[tape][timeLabel].values
-        ict = ict0[np.isfinite(ict0)]
-        s1[tape] = ict[i:]
-        s2[tape] = ict[:-i]
-    return s1, s2
-
-
 def check_finiteness(s1, s2):
     """fileters non finete elements in either of both series"""
     assert(len(s1) == len(s2))
@@ -184,11 +167,27 @@ def check_finiteness(s1, s2):
 
 
 def key_shuffle(d):
-    
+    """shuffles the values (array items)
+    Parameters:
+    -----------
+    d: dict of numpy arrays
+    """
+
     dsh = deepcopy(d)
     for k in d.keys():
         np.random.shuffle(dsh[k])
     return dsh
+
+
+def flatten_dictValues(d1, d2):
+    assert(set(d1.keys()) == set(d2.keys()))
+    arr1 = []
+    arr2 = []
+
+    for k in d1.keys():
+        arr1.extend(d1[k])
+        arr2.extend(d2[k])
+    return np.array(arr1), np.array(arr2)
 
 
 def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
@@ -201,42 +200,59 @@ def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
         name of the column to read
     Returns
     -------
-    (s1, s2): 2D-tuple with pandas series        
+    (s1, s2): 2D-tuple with pandas series
     """
 
     ict1, ict2 = get_ici_i(df_dict, timeLabel='ict_end_start', i=i)
     ## apply fun
     ict1_log = fun(ict1)
     ict2_log = fun(ict2)
+    ## filter non_infinites
+    ict1_log, ict2_log = check_finiteness(ict1_log, ict2_log)
 
-    if check_isfinite is True:
-        mask = np.logical_and(np.isfinite(ict1_log), np.isfinite(ict2_log))
-        ict1_log = ict1_log[mask]
-        ict2_log = ict2_log[mask]
-    
     s1 = pd.Series( ict1_log, name=r'$\log (\tau _i)$')
-    s2 = pd.Series( ict2_log, name= r'$\log (\tau _{i+%d})$'%i) 
-       
+    s2 = pd.Series( ict2_log, name= r'$\log (\tau _{i+%d})$'%i)
+
     return  s1, s2
+
 
 def get_ici_i(df_dict, timeLabel='ict_end_start', i=1):
     """returns ici and ici_i as numpy arrays"""
     ict1_l=[]; ict2_l=[]
     for tape in df_dict.keys():
         ict0 = df_dict[tape][timeLabel].values
-        ict = ict0[np.isfinite(ict0)]
-        ict1_l.extend(ict[i:])
-        ict2_l.extend(ict[:-i])
-    
-    return  np.array(ict1_l), np.array(ict2_l)
+        #ict = ict0[np.isfinite(ict0)]
+        ict1_l.extend(ict0[i:])
+        ict2_l.extend(ict0[:-i])
 
+    return np.array(ict1_l), np.array(ict2_l)
+
+
+def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
+                         check_isfinite=True):
+    """
+    returns two dictionaries with the series of the timeLabel
+        e.g. the ici-i calls away
+    """
+    s1 = {}
+    s2 = {}
+    for tape in df_dict.keys():
+        ict0 = df_dict[tape][timeLabel].values
+        #ict = ict0[np.isfinite(ict0)]
+        x = ict0[i:]
+        y = ict0[:-i]
+        x, y = check_finiteness( x, y)
+        s1[tape] = x
+        s2[tape] = y
+
+    return s1, s2
 
 
 ### FOURIER
 
 def window_times(onset_times, t0, tf):
     """windows a onset_times between t0 and tf"""
-    return onset_times[np.logical_and(onset_times >=t0, onset_times<=tf)]
+    return onset_times[np.logical_and(onset_times>=t0, onset_times<=tf)]
 
 def binary_time_series(onset_times, Dt=0.1):
     """converts oneset times into a time-continuous binary array

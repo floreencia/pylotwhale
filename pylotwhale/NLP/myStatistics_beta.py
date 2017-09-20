@@ -337,6 +337,10 @@ def KSsimilarity(feature_arr, i_diag=1):
             p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return p
 
+def KL_div_simm(x, y):
+    """returns the symmetric KL-divergence"""
+    return st.entropy(x, y) + st.entropy(y, x)
+    
 
 def KL_div_joint(x, y, Nsh=10):
     """KL-divergence for assessing the significance of the correlation
