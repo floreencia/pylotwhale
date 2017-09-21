@@ -434,6 +434,7 @@ def joint_pdf(x, y, grid_size=100j):
     kernel = st.gaussian_kde(values)
     return X, Y, np.reshape(kernel(positions).T, X.shape)
 
+
 def fit_KDE(x, supp, num=100):
     """
     Fits KDE to a sample x in the range x_0 to x_f
@@ -444,6 +445,8 @@ def fit_KDE(x, supp, num=100):
     supp: 2-dim tuple
         range og the KDE
     num: number of points
+    addFloat: float
+        to avoid the distribution to have zeros, eg. np.nextafter(0,1)
     Return
     ------
     y: 1 dim numpy array
@@ -453,7 +456,13 @@ def fit_KDE(x, supp, num=100):
     x_kde = st.gaussian_kde(x)
     x_sup = np.linspace(*supp, num=num)
     y = x_kde.pdf(x_sup)
-    return y    
-    
+    return y
+
+
+def deZero(x, n=0):
+    """shifts an array by the smalles non zero value"""
+    epsilon = np.sort(x[x > 0])[n]
+    x += epsilon
+    return x
     
     

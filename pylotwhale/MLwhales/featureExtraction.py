@@ -58,11 +58,11 @@ def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None
     datO = get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy)
     X, y_names = datO.filterInstances(filter_classes)
     return X, y_names
-                 
+              
 
 def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
     """
-    Extracts features and labels from wav-ann colletion    
+    Extracts features and labels from wav-ann collection    
     Parameters
     ----------
     WavAnnCollection: list of tuples
