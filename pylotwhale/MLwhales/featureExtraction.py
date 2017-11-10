@@ -58,7 +58,6 @@ def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None
     datO = get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy)
     X, y_names = datO.filterInstances(filter_classes)
     return X, y_names
-              
 
 def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
     """
@@ -224,6 +223,7 @@ def wavLCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
     > datO: myML.dataXy_names
         data
     """   
+
         
     datO = myML.dataXy_names() #inicialize data object    
 

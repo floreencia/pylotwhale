@@ -47,8 +47,8 @@ def waveformPreprocessingFun(funName=None):
     D = {#'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
         'band_pass_filter': butter_bandpass_filter,
-        'scale' : scale2range,
-        'maxabs_scale':maxAbsScale,
+        'scale': scale2range,
+        'maxabs_scale': maxAbsScale,
         'median_scale': None,
         'whiten': whiten        
         }

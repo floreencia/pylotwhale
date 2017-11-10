@@ -8,6 +8,7 @@ import numpy as np
 import nltk
 import random
 from matplotlib import pyplot as plt
+import pandas as pd
 
 #import pylab as pl
 #import sys
@@ -361,6 +362,24 @@ def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
             p[i,j] = dist_fun(feature_arr[i], feature_arr[j])
     return p
 
+    
+def pairwise_probDists_distance_df(di, dist_fun=KL_div_symm):
+    """
+    di: dict of nd arrays
+        pdfs
+    """
+    keys = di.keys()
+    df = pd.DataFrame(index=keys, columns=keys, dtype=float)
+
+    for i in np.arange(len(keys)):
+        for j in np.arange(len(keys)): # np.arange(len(feature_arr)):
+            #print(i, j)
+            #df[i,j] = dist_fun(feature_arr[i], feature_arr[j])
+            df.at[keys[i], keys[j]] = dist_fun(di[keys[i]], di[keys[j]])
+            df.at[keys[j], keys[i]] = df.at[keys[i], keys[j]]
+            
+    return df
+
 
 def KL_div_joint(x, y, Nsh=10):
     """KL-divergence for assessing the significance of the correlation
@@ -443,7 +462,7 @@ def fit_KDE(x, supp, num=100):
     x: 1 dim numpy array
         sample
     supp: 2-dim tuple
-        range og the KDE
+        range of the KDE
     num: number of points
     addFloat: float
         to avoid the distribution to have zeros, eg. np.nextafter(0,1)

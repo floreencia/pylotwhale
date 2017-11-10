@@ -370,6 +370,9 @@ def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
     shuffle_samples: bool
         arrays are stacked, having them arranged by label.  
         If True, arrays are shuffle before being returned
+    Returns
+    -------
+    balX, baly
     """
     ## class data
     balX, baly = selectData(X, y, class_label)

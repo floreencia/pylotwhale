@@ -54,7 +54,6 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
 
 def getWavSec(waveform, fs, t0, tf):
     """get waveform section
-    
     Parameters
     ----------
     waveform: waveform
