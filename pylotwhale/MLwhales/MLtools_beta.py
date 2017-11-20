@@ -374,11 +374,12 @@ def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
     -------
     balX, baly
     """
-    ## class data
+    ## get data of the class_label
     balX, baly = selectData(X, y, class_label)
-    n_balclass = len(baly)
+    
+    n_balclass = len(baly) # count samples
     ## labels of the rest of the classes
-    balance_labels = set(y) - set(class_label)
+    balance_labels = set(y) - set([class_label])
 
     for l in balance_labels:  # for each of the other classes
         thisX, thisy = selectData(X, y, l)  # get class data
