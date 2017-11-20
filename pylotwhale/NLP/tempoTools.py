@@ -304,7 +304,17 @@ def KLdivergence(feature_arr):
             dist[i,j] = entropy(feature_arr[i], feature_arr[j])
     return dist
 
+### OTHER
 
 
+def nPVI(IOI):
+    """
+    quantifies the temporal variablility in speech rhythm [Grabe & Low, 2002]
+    """
+    n = len(IOI)
+    diff = np.abs(np.diff(IOI))
+    av = (IOI + np.roll(IOI, -1))[:-1]
+    return 2*100/(n-1)*np.sum(diff/av)
+    
 
   
