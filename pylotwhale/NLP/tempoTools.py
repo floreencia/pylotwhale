@@ -313,8 +313,6 @@ def nPVI(IOI):
     """
     n = len(IOI)
     diff = np.abs(np.diff(IOI))
-    av = (IOI + np.roll(IOI, -1))[:-1]
-    return 2*100/(n-1)*np.sum(diff/av)
+    av = (IOI + np.roll(IOI, -1))[:-1]/2
+    return 100/(n-1)*np.sum(diff/av)
     
-
-  

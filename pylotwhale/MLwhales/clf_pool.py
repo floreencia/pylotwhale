@@ -38,14 +38,15 @@ gamma_range = [ 0.1, 1.0, 10.]
 pen_range = [ 0.1, 1.0, 10.0, 100]
 param_grid_di = {'clf__C': pen_range,
                 'clf__gamma': gamma_range}
-                
+
 svc_rbf_p =  clfSettings('svc_rbf_p', SVC(probability=True), param_grid_di)
 
 #RF
 ests_range = np.array([50, 100])
-param_grid_di={}#"max_depth": [3, None],
+param_grid_di = {}#"max_depth": [3, None],
               #"bootstrap": [True, False]}
 #              "n_estimators": ests_range}
-              
-random_forest = clfSettings('rf', RandomForestClassifier(), param_grid_di)
 
+random_forest = clfSettings('rf', 
+                            RandomForestClassifier(max_depth=None, bootstrap=True), 
+                            param_grid_di)

@@ -478,10 +478,10 @@ def fit_KDE(x, supp, num=100):
     return y
 
 
-def deZero(x, n=0):
-    """shifts an array by the smalles non zero value"""
-    epsilon = np.sort(x[x > 0])[n]
-    x += epsilon
+def deZero(x, n=0, epsilon0=0):
+    """shifts an array by the smallest non zero value"""
+    epsilon =np.sort(np.array(list(set(x))))[n] # list(set(np.sort(x[x > 0]))[n]
+    x += epsilon + epsilon0
     return x
     
     
