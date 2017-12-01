@@ -15,6 +15,7 @@ import pandas as pd
 #import time 
 #import itertools as it
 import scipy.stats as st
+import statsmodels as sm
 
 import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
@@ -454,7 +455,7 @@ def joint_pdf(x, y, grid_size=100j):
     return X, Y, np.reshape(kernel(positions).T, X.shape)
 
 
-def fit_KDE(x, supp, num=100):
+def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     """
     Fits KDE to a sample x in the range x_0 to x_f
     Parameters
@@ -471,11 +472,17 @@ def fit_KDE(x, supp, num=100):
     y: 1 dim numpy array
         KDE
     """
-    assert(len(supp) == 2)
-    x_kde = st.gaussian_kde(x)
-    x_sup = np.linspace(*supp, num=num)
-    y = x_kde.pdf(x_sup)
-    return y
+    assert(len(supp_range) == 2)
+    ## fit model
+    kde = sm.nonparametric.kde.KDEUnivariate(x)
+    kde.fit(bw=bw, **kwargs)
+    ## evaluate
+    supp = np.linspace(*supp_range, num=num)
+    y0 = kde.evaluate(supp)
+    #x_kde = st.gaussian_kde(x)
+    #x_sup = np.linspace(*supp, num=num)
+    #y = x_kde.pdf(x_sup)
+    return y0
 
 
 def deZero(x, n=0, epsilon0=0):
