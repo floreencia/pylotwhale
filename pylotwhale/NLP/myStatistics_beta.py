@@ -465,6 +465,9 @@ def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     supp: 2-dim tuple
         range of the KDE
     num: number of points
+    **kwargs: dict
+        eg. gridsize
+        see sm.nonparametric.kde.KDEUnivariate.fit()
     addFloat: float
         to avoid the distribution to have zeros, eg. np.nextafter(0,1)
     Return
@@ -479,9 +482,7 @@ def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     ## evaluate
     supp = np.linspace(*supp_range, num=num)
     y0 = kde.evaluate(supp)
-    #x_kde = st.gaussian_kde(x)
-    #x_sup = np.linspace(*supp, num=num)
-    #y = x_kde.pdf(x_sup)
+
     return y0
 
 
