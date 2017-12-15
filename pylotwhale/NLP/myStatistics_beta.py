@@ -455,9 +455,25 @@ def joint_pdf(x, y, grid_size=100j):
     return X, Y, np.reshape(kernel(positions).T, X.shape)
 
 
+def fit_KDE_CVbw(x, supp_range, num=1000, **kwargs): #, bw_range=None):
+    '''fit KDE estimating using cross validation to estimate the bandwith'''
+    
+    # setup and fit
+    params = {'bandwidth': np.logspace(-2, 0, 10)}
+    grid = GridSearchCV( KernelDensity(), params)
+    data = x[:, np.newaxis]
+    grid.fit(data)
+    kde = grid.best_estimator_
+    
+    # generate density from sample
+    supp = np.linspace(*supp_range, num=num)[:,np.newaxis]
+    y = kde.score_samples(supp)
+    return np.exp(y)
+
+
 def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     """
-    Fits KDE to a sample x in the range x_0 to x_f
+    Fits KDE to a sample x in the range x_0 to x_f, using a bw selection rule
     Parameters
     ----------
     x: 1 dim numpy array
@@ -474,6 +490,10 @@ def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     ------
     y: 1 dim numpy array
         KDE
+        
+    See:
+    ----
+    fit_KDE_CVbw
     """
     assert(len(supp_range) == 2)
     ## fit model
