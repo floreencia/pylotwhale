@@ -10,6 +10,9 @@ import random
 from matplotlib import pyplot as plt
 import pandas as pd
 
+from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV
+
 #import pylab as pl
 #import sys
 #import time 
@@ -455,18 +458,46 @@ def joint_pdf(x, y, grid_size=100j):
     return X, Y, np.reshape(kernel(positions).T, X.shape)
 
 
+def CVbw_KDE(x, params=None):
+    '''KDE with estimating the bw via cross validation
+    Parameters
+    ----------
+    x: 1d numpy array
+        data to fit KDE
+    params: dict
+        GridSearchCV params forKErnelDensity()
+        eg. params = {'bandwidth': np.logspace(-2, 0, 10)}
+    Returns
+    -------
+    kde: estimator
+    '''
+    
+    if params is None:
+        params = {'bandwidth': np.logspace(-2, 0, 10)}
+        
+    grid = GridSearchCV(KernelDensity(), params)
+    data = x[:, np.newaxis]
+    grid.fit(data)
+    return grid.best_estimator_
+
+def get_KDE_CVbw(x, params=None):
+    kde = CVbw_KDE(x, params=params)
+    
+    return(kde.bandwidth)
+    
+
 def fit_KDE_CVbw(x, supp_range, num=1000, **kwargs): #, bw_range=None):
     '''fit KDE estimating using cross validation to estimate the bandwith'''
-    
+
     # setup and fit
     params = {'bandwidth': np.logspace(-2, 0, 10)}
-    grid = GridSearchCV( KernelDensity(), params)
+    grid = GridSearchCV(KernelDensity(), params)
     data = x[:, np.newaxis]
     grid.fit(data)
     kde = grid.best_estimator_
-    
+
     # generate density from sample
-    supp = np.linspace(*supp_range, num=num)[:,np.newaxis]
+    supp = np.linspace(*supp_range, num=num)[:, np.newaxis]
     y = kde.score_samples(supp)
     return np.exp(y)
 
