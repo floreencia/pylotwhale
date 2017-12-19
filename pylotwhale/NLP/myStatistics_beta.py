@@ -486,15 +486,11 @@ def get_KDE_CVbw(x, params=None):
     return(kde.bandwidth)
     
 
-def fit_KDE_CVbw(x, supp_range, num=1000, **kwargs): #, bw_range=None):
+def fit_KDE_CVbw(x, supp_range, num=1000, params=None, **kwargs): #, bw_range=None):
     '''fit KDE estimating using cross validation to estimate the bandwith'''
 
-    # setup and fit
-    params = {'bandwidth': np.logspace(-2, 0, 10)}
-    grid = GridSearchCV(KernelDensity(), params)
-    data = x[:, np.newaxis]
-    grid.fit(data)
-    kde = grid.best_estimator_
+    # get model
+    kde = CVbw_KDE(x, params=params)
 
     # generate density from sample
     supp = np.linspace(*supp_range, num=num)[:, np.newaxis]
