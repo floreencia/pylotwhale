@@ -943,7 +943,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
                 y=y, 
                 train_sizes=samples_arr, 
                 cv=cv,
-                n_jobs=n_jobs)
+                n_jobs=n_jobs, scoring=scoring)
 
     
     train_mean = np.mean(train_scores, axis=1)
