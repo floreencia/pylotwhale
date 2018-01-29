@@ -458,39 +458,41 @@ def joint_pdf(x, y, grid_size=100j):
     return X, Y, np.reshape(kernel(positions).T, X.shape)
 
 
-def CVbw_KDE(x, params=None):
-    '''KDE with estimating the bw via cross validation
+def CVbw_KDE(x, kde_param_grid=None, **CV_kwargs):
+    '''KDE estimating the bw via cross validation
     Parameters
     ----------
     x: 1d numpy array
         data to fit KDE
-    params: dict
-        GridSearchCV params forKErnelDensity()
-        eg. params = {'bandwidth': np.logspace(-2, 0, 10)}
+    kde_param_grid: dict
+        GridSearchCV params for KernelDensity()
+        eg. kde_param_grid = {'bandwidth': np.logspace(-2, 0, 10)}
     Returns
     -------
     kde: estimator
     '''
-    
-    if params is None:
-        params = {'bandwidth': np.logspace(-2, 0, 10)}
-        
-    grid = GridSearchCV(KernelDensity(), params)
+
+    if kde_param_grid is None:
+        kde_param_grid = {'bandwidth': np.logspace(-2, 0, 10)}
+
+    grid = GridSearchCV(estimator=KernelDensity(),
+                        param_grid=kde_param_grid, **CV_kwargs)
     data = x[:, np.newaxis]
     grid.fit(data)
     return grid.best_estimator_
 
-def get_KDE_CVbw(x, params=None):
-    kde = CVbw_KDE(x, params=params)
-    
+def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
+    '''get optimal bw'''
+    kde = CVbw_KDE(x, kde_param_grid=kde_param_grid, **CV_kwargs)
     return(kde.bandwidth)
-    
 
-def fit_KDE_CVbw(x, supp_range, num=1000, params=None, **kwargs): #, bw_range=None):
+
+def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None, 
+                 **CV_kwargs): #, bw_range=None):
     '''fit KDE estimating using cross validation to estimate the bandwith'''
 
     # get model
-    kde = CVbw_KDE(x, params=params)
+    kde = CVbw_KDE(x, kde_param_grid=kde_param_grid, **CV_kwargs)
 
     # generate density from sample
     supp = np.linspace(*supp_range, num=num)[:, np.newaxis]
@@ -517,7 +519,7 @@ def fit_KDE(x, supp_range, num=100, bw='normal_reference', **kwargs):
     ------
     y: 1 dim numpy array
         KDE
-        
+
     See:
     ----
     fit_KDE_CVbw
@@ -538,5 +540,5 @@ def deZero(x, n=0, epsilon0=0):
     epsilon =np.sort(np.array(list(set(x))))[n] # list(set(np.sort(x[x > 0]))[n]
     x += epsilon + epsilon0
     return x
-    
-    
+
+
