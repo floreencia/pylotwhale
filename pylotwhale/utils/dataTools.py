@@ -16,10 +16,10 @@ from collections import Counter
 
 def arrShuffleSplit(arr, frac=0.5):
     """samples an array into two arrays shuffling the elements"""
-    n=len(arr)
+    n = len(arr)
     indices = np.arange(n)
     np.random.shuffle(indices)
-    idx=int(n*0.5)
+    idx = int(n*0.5)
     return arr[indices[:idx]], arr[indices[idx:]]
 
 def stringiseDict(di, distr): 

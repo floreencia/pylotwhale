@@ -203,7 +203,7 @@ def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
     (s1, s2): 2D-tuple with pandas series
     """
 
-    ict1, ict2 = get_ici_i(df_dict, timeLabel='ict_end_start', i=i)
+    ict1, ict2 = get_ici_i(df_dict, timeLabel=timeLabel, i=i)
     ## apply fun
     ict1_log = fun(ict1)
     ict2_log = fun(ict2)

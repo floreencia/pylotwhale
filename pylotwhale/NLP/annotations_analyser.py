@@ -210,7 +210,7 @@ class file2annotationsDF(annotationsDF):
             default = ['t0', 'tf', 'l']
         """
         ### load data
-        if names is None: names=['t0', 'tf', 'l']
+        if names is None: names = ['t0', 'tf', 'l']
         self.annotations_file = path2file
         df = pd.read_csv(self.annotations_file, sep ='\t', names=names )
         annotationsDF.__init__(self, df, names)
@@ -235,6 +235,7 @@ def Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel='call', time_param='ict
         ngramFreqsDtvec_li.append(np.bincount(seqlens)[1:])
 
     return ngramFreqsDtvec_li
+
 
 def flattenlists_2darray(liofli):
     """Maps a list of lists into a 2d ndarray filling with zeroes"""
@@ -293,16 +294,16 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
         endix = -1
     else:
         assert False, 'wrong dtype'
-  
+
     seqsLi = []  # inicialise list of sequences
-    subLi = [fun(df[l].iloc[0])]  # inicialise sequence w/ first element
-    
+    subLi = [fun(df[l].iloc[0])]  # initialise sequence w/ first element
+
     for i in range(len(ict))[:endix]:
         if Dt[0] <= ict[i] <= Dt[1]:  # is part of the sequence?
             subLi.append(df[l].iloc[i+1])
         elif ict[i] >= Dt[1]:  # nope, then start a new sequence
-            seqsLi.append(subLi) # save the one we had
-            subLi = [fun(df[l].iloc[i+1])] #start new squence
+            seqsLi.append(subLi)  # save the one we had
+            subLi = [fun(df[l].iloc[i+1])]  # start new squence
 
     seqsLi.append(subLi)  # append last sequence
     

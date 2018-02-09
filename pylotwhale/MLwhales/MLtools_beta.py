@@ -955,7 +955,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
 
     ax.plot(train_sizes, train_mean, 
          color='blue', marker='o', 
-         markersize=5, label='training accuracy')
+         markersize=5, label='training')
          
     ax.fill_between(train_sizes, 
                  train_mean + train_std,
@@ -965,7 +965,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
     ax.plot(train_sizes, test_mean, 
          color='green', linestyle='--', 
          marker='s', markersize=5, 
-         label='validation accuracy')
+         label='validation')
 
     ax.fill_between(train_sizes, 
                  test_mean + test_std,

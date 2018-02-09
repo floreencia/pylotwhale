@@ -488,7 +488,7 @@ def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
 
 
 def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None, 
-                 **CV_kwargs): #, bw_range=None):
+                 **CV_kwargs):  #, bw_range=None):
     '''fit KDE estimating using cross validation to estimate the bandwith'''
 
     # get model
