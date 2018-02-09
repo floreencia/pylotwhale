@@ -128,7 +128,11 @@ def repsProportion_from_bigramMtx(M):
     return np.sum(np.diag(M))/M.sum()
 
 
-def repsPropotion_in_listOfSeqs(liOfSeqs, deg=1):
+def repsProportion(seq, deg=1):
+    Nreps += len(seq[seq[deg:] == seq[:-deg]])
+
+
+def repsProportion_in_listOfSeqs(liOfSeqs, deg=1):
     """proportion of repetitions in a list of sequeces
     liOfSeqs: list of lists
     """
@@ -136,7 +140,7 @@ def repsPropotion_in_listOfSeqs(liOfSeqs, deg=1):
     Nreps = 0
     for seql in liOfSeqs:
         seq = np.array(seql)
-        Nreps += len(seq[seq[deg:] == seq[:-deg]])
+        Nreps += np.count_nonzero([seq[deg:] == seq[:-deg]])
         Nbigrams += len(seq)-1
     return Nreps, Nbigrams
 

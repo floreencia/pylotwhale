@@ -11,5 +11,10 @@ from pylotwhale.NLP.myStatistics_beta import *
 
 def test_binary_time_series():
     s = [['c', 'c', 'c', 'c', 'b', 'b']]
-    assert repsPropotion_in_listOfSeqs(s) == (4,5)
+    assert repsProportion_in_listOfSeqs(s) == (4,5)
+    #s = [['c', 'c']]
+    #assert repsProportion_in_listOfSeqs(s) == (2,2)
+    #s = [['c']]
+    #assert repsProportion_in_listOfSeqs(s) == (0,0)
+    return True
     
