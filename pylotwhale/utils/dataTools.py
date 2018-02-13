@@ -39,6 +39,29 @@ def dictOfGroupedDataFrames(df0, groupingKey='tape'):
         df_dict[t] = df0[df0[groupingKey] == t].reset_index(drop=True)
     return df_dict
 
+
+def subsetdf(df, cs):
+    '''subset dataframe
+    Parameters
+    -----------
+    df: pandas dataframe
+    cs: dict
+        constrains
+        cs = {'sex': 'm', 'predator': 'leo'}
+    Return
+    ------
+    constrained dataframe
+    '''
+    assert set(df.columns) > set(cs.keys()), "cs's keys should be columns of df \n{}".format(cs.keys())
+    df_temp = []
+    lastdf = df
+    for k, v in cs.items():
+        df_temp.append(lastdf[lastdf[k] == v])
+        lastdf=df_temp[-1]
+
+    return df_temp[-1].reset_index(drop=True) 
+
+
 def groupedCountsInDataFrame(df, group_key, count_key):
     '''group dataframe by group_key and count the frequencies of group_key
     returns a Counters dictionary with group_key as keys
