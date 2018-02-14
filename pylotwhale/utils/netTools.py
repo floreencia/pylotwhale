@@ -21,7 +21,7 @@ import pylotwhale.utils.plotTools as pT
 #### pygraphviz
 def nxGraph2pgv(G):
     '''converts a nx network into a pygraphviz net'''
-    return nx.to_agraph(G)    
+    return nx.nx_agraph.to_agraph(G) #nx.to_agraph(G)    
     
 def drawGraphviz(A, dotFile=None, figName=None):
     '''draws graphviz graph (A)'''
@@ -113,7 +113,8 @@ class dict2network():
 
     def drawGraphviz(self, dot_file, fig_file, invisibleNodes='default'):
         if invisibleNodes == 'default': invisibleNodes = ['_ini', '_end']
-        self.A = conceptualiseNodes( nx.to_agraph(self.G), invisibleNodes )
+        self.A = conceptualiseNodes( nx.nx_agraph.to_agraph(self.G), #nx.to_agraph(self.G), 
+                                    invisibleNodes )
         drawGraphviz(self.A, dot_file, fig_file)
     
 def dict2nxGraph(twoDimDict, rmEdge='default', rmNodes=None):
@@ -208,7 +209,7 @@ def drawNetFrom2DimDict(twoDimDict, dot_file=None, fig_file=None,
     #nx.set_node_attributes(G, 'callFreq', dict(zip(G.nodes(), nw)))
      
 
-    A = conceptualiseNodes( nx.to_agraph(G), invisibleNodes )
+    A = conceptualiseNodes( nx.nx_agraph.to_agraph(G), invisibleNodes )#nx.to_agraph(G), invisibleNodes )
     drawGraphviz(A, dot_file, fig_file)
     return A
     
