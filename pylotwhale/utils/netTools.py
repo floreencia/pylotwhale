@@ -159,7 +159,7 @@ def add_edge_attr(G, attr_name, edge_dict):
         except:
             ed = ""
         cpdw.append(ed)
-    nx.set_edge_attributes(G, attr_name, dict(zip(G.edges(), cpdw)))
+    nx.set_edge_attributes(G, name=attr_name, values=dict(zip(G.edges(), cpdw)))
     return G
 
 
