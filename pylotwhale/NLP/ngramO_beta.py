@@ -160,15 +160,15 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
         and the samples as columns
     Parameters
     -----------
-    df: conditional data frame (output of twoDimDict2DataFrame)
-    conditionsList: list/np.array of conditions to read (None reads all)
-    samplesList: list/np.array of samples to read (None reads all)
-    Return
+    df : conditional data frame (output of twoDimDict2DataFrame)
+    conditionsList : list/np.array of conditions to read (None reads all)
+    samplesList : list/np.array of samples to read (None reads all)
+    Returns
     -------
-    M: matrix representations of the df values
-    samps: labels of the columns of the matrix
-    conds: labels of the rows of the matrix
-    NOTICE that the matrix is transposed with respect to the df
+    M : matrix representations of the df values
+    samps : labels of the columns of the matrix
+    conds : labels of the rows of the matrix
+        NOTICE that the matrix is transposed with respect to the df
     '''
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
@@ -187,13 +187,18 @@ def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None)
         two entry dict,  eg. D[a][b]
     conditionsList : list/np.array of conditions to read (None reads all)
     samplesList : list/np.array of samples to read (None reads all)
-    Return
-    -------\
+    Returns
+    -------
     M : matrix representations of the frequency values, with:
             conditions as the rows and the samples as columns
     samps : labels of the columns of the matrix
-    conds : labels of the rows of the matrix        
+    conds : labels of the rows of the matrix
     '''
+    # make sure all keys are present
+    if( conditionsList is not None or
+        samplesList is not None):
+        kySet = set(conditionsList) | set(samplesList)
+        bigramsDict = fill2KyDict(bigramsDict, kySet )
     df = twoDimDict2DataFrame(bigramsDict)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
     
@@ -285,10 +290,32 @@ def condFreqDict2condProbMatrix(cfd, conditions, samples):
 ### + GENERAL
 
 def twoDimDict2DataFrame(kykyDict):
-    '''two key dict D[condition][sample] = x --> pandas dataframe
-    P (sample = row |condition = column),
-    columns are the condition, rows are sampes'''
+    '''Transforms a two key dictionary into a pandas dataframe
+    
+    Parameters
+    ----------
+    kykyDict : dict
+        two key dict D[condition][sample] = x
+        P (sample = row | condition = column),
+        columns are the condition, rows are sampes
+    Returns
+    -------
+    df : pandas DataFrame
+    '''
     return pd.DataFrame(kykyDict).fillna(0)
+
+def fill2KyDict(kykyDict, kySet):
+    '''fills a conditional frequency distribution with keys
+    Parameters
+    ----------
+    kykyDict : nltk.probability.FreqDist
+    kySey : set with the keys that
+    '''
+    missingSet = set(kySet) - set(kykyDict.keys()).intersection(set(kySet))
+    #print(missingSet)
+    for ky in missingSet:
+        kykyDict[ky] = nltk.FreqDist()
+    return kykyDict
 
 
 ### bigrams and time
