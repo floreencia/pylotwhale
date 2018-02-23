@@ -1,5 +1,3 @@
-#!/usr/mprg/bin/python
-
 from __future__ import print_function, division
 
 import numpy as np
@@ -15,7 +13,7 @@ from sklearn.model_selection import GridSearchCV
 
 #import pylab as pl
 #import sys
-#import time 
+#import time
 #import itertools as it
 import scipy.stats as st
 import statsmodels as sm
@@ -24,22 +22,14 @@ import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
 
 
-#import sequencesO_beta as seqs
-#sys.path.append('/home/florencia/whales/scripts/')
-#import matrixTools as mt 
-
 """
     Module for doing statistics
     florencia @ 16.05.14
 
 """
 
-#################################################################################
-##############################    FUNCTIONS    ##################################
-#################################################################################
 
-
-##### randomisations test for bigrams ######
+##### RANDOMISATIONS TEST FOR BIGRAMS ######
 
 def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
@@ -55,10 +45,36 @@ def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
         kwargs_obs = {'color': 'r', 'lw': 2.5}
     #fig, ax =  plt.subplots(figsize=None)
     if plTitle: ax.set_title(plTitle)
-    ax.hist(shuffledDistsM[:,i,j], **kwargs)
-    ax.axvline(obsM[i,j], **kwargs_obs)
+    ax.hist(shuffledDistsM[:, i, j], **kwargs)
+    ax.axvline(obsM[i, j], **kwargs_obs)
     return ax
-    
+
+
+def repsProportion_from_bigramMtx(M):
+    """proportion of repetitions"""
+    return np.sum(np.diag(M))/M.sum()
+
+
+def repsProportion(seq, deg=1):
+    Nreps += len(seq[seq[deg:] == seq[:-deg]])
+
+
+def repsProportion_in_listOfSeqs(liOfSeqs, deg=1):
+    """proportion of repetitions in a list of sequeces
+    liOfSeqs: list of lists
+    """
+    Nbigrams = 0
+    Nreps = 0
+    for seql in liOfSeqs:
+        seq = np.array(seql)
+        Nreps += np.count_nonzero([seq[deg:] == seq[:-deg]])
+        Nbigrams += len(seq)-1
+    return Nreps, Nbigrams
+
+
+#### USING pandas DataFrame, to define the sequences
+
+
 def shuffleSeries(dataFr, shuffleCol='timeSs'):
     """
     shuffles a series (shuffleCol) from a data frame:
@@ -66,18 +82,34 @@ def shuffleSeries(dataFr, shuffleCol='timeSs'):
     > name a of the column ti shuffle
     """
     x = dataFr[shuffleCol].values.copy()  # select series
-    random.shuffle(x)  #shuffle
+    random.shuffle(x)  # shuffle
     shuffledRecs = dataFr.copy()  # new series
-    shuffledRecs[shuffleCol] = x # set shuffled series
-    return shuffledRecs # data frames and labels
+    shuffledRecs[shuffleCol] = x  # set shuffled series
+    return shuffledRecs  # data frames and labels
+
 
 def shuffled_cfd(df, Dtint, label='call', time_param='ici'):
-    """returns the conditional frequencies of the bigrams in a df after shuffling <label>"""
-    sh_df = shuffleSeries(df, shuffleCol=label) # shuffle the calls
-    sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label,
-                                                        time_param=time_param)) # define the sequeces
-    my_bigrams = nltk.bigrams(sequences) # detect bigrams
-    cfd_nsh = ngr.bigrams2Dict(my_bigrams) # count bigrams
+    """returns the conditional frequencies
+    of the bigrams in a df after shuffling <label>
+    Parameters
+    ----------
+    df : Pandas.DataFrame
+    Dtint : size two list-like
+    label : string
+        name of the label to randomise
+    time_param : string
+        name of the time param (Dtint) to define the sequences
+    Returns
+    -------
+    cfd_ns h: nltk.ConditionalFrequencyDist
+        counts of the randomised sequences
+    """
+    sh_df = shuffleSeries(df, shuffleCol=label)  # shuffle the calls
+    # define the sequences
+    sequences = aa.seqsLi2iniEndSeq(aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label,
+                                                     time_param=time_param))
+    my_bigrams = nltk.bigrams(sequences)  # detect bigrams
+    cfd_nsh = ngr.bigrams2Dict(my_bigrams)  # count bigrams
     return cfd_nsh
 
 
@@ -124,26 +156,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     return p_r, shuffle_tests
 
 
-def repsProportion_from_bigramMtx(M):
-    """proportion of repetitions"""
-    return np.sum(np.diag(M))/M.sum()
 
-
-def repsProportion(seq, deg=1):
-    Nreps += len(seq[seq[deg:] == seq[:-deg]])
-
-
-def repsProportion_in_listOfSeqs(liOfSeqs, deg=1):
-    """proportion of repetitions in a list of sequeces
-    liOfSeqs: list of lists
-    """
-    Nbigrams = 0
-    Nreps = 0
-    for seql in liOfSeqs:
-        seq = np.array(seql)
-        Nreps += np.count_nonzero([seq[deg:] == seq[:-deg]])
-        Nbigrams += len(seq)-1
-    return Nreps, Nbigrams
 
 def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
                                    label='call', time_param='ici',
@@ -168,29 +181,47 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
     shuffle_test: ndarray
         shuffled test distributions
     """
-    N_values=0
-    shuff_dist=np.zeros(Nsh)
-    for i in range(Nsh):  ## shuffle ith-loop
-        cfd_sh = nltk.ConditionalFreqDist() # initialise cond freq dist.
-        for t in df_dict.keys(): # for each tape
+    N_values = 0
+    shuff_dist = np.zeros(Nsh)
+    for i in range(Nsh):  # shuffle ith-loop
+        cfd_sh = nltk.ConditionalFreqDist()  # initialise cond freq dist
+        for t in df_dict.keys():  # for each tape
             thisdf = df_dict[t]
-            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label, time_param=time_param) # counts in current tape
+            cfd_sh += shuffled_cfd(thisdf, Dtint, label=label,
+                                   time_param=time_param)  # counts in current tape
         Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, callsLi, callsLi)
-        #print(np.sum(Mp_sh))        
-        shTest_i = testStat(Mp_sh) # compute satat variable
+        shTest_i = testStat(Mp_sh)  # compute satat variable
         shuff_dist[i] = shTest_i
         if shTest_i >= obsTest:
-            N_values += 1 #
-            
+            N_values += 1
+
     p = 1.0*N_values/Nsh
     return p, shuff_dist
-    
+
+
+#### USING PRE-DEFINED SEQUENCES
+
+def shuffleSequence(seq):
+    '''randomises the elements of a sequence'''
+    return np.random.shuffle(seq)
+
+
+def shuffleSeqOfSeqs(seqOfSeqs):
+    '''shuffles the elements in each sequence,
+    keeping the subsequence structure
+    number of sequences and sequence size'''
+    shuffled_seqOfSeqs = []
+    for s in seqOfSeqs:
+        shuffled_seqOfSeqs.append(shuffleSequence(s))
+    return shuffled_seqOfSeqs
+
+
 ##### other older functions #####    
 
 def mean_confidence_interval(data, confidence=0.95):
     """
     Confidence intervals
-    returns:
+    Returns
     > mu, the mean 
     > h, the distance to the of the ci to mu
     Assuming a students t-distribution
