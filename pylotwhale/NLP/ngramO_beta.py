@@ -387,7 +387,7 @@ def selectBigramsAround_dt(ictDict, dt=None, minCts=10, metric=np.median):
 
 
 
-def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ict_end_start', callLabel='call',
+def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
                             startTag='_ini', endTag='_end',
                             return_values='probs', minCalls=1):
     """Bigrams counts/probs as matrix from DataFrame
