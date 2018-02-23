@@ -71,7 +71,7 @@ def shuffleSeries(dataFr, shuffleCol='timeSs'):
     shuffledRecs[shuffleCol] = x # set shuffled series
     return shuffledRecs # data frames and labels
 
-def shuffled_cfd(df, Dtint, label='call', time_param='ict_end_start'):
+def shuffled_cfd(df, Dtint, label='call', time_param='ici'):
     """returns the conditional frequencies of the bigrams in a df after shuffling <label>"""
     sh_df = shuffleSeries(df, shuffleCol=label) # shuffle the calls
     sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs(sh_df, Dt=Dtint, l=label,
@@ -82,26 +82,27 @@ def shuffled_cfd(df, Dtint, label='call', time_param='ict_end_start'):
 
 
 def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
-                               label='call', time_param='ict_end_start',
+                               label='call', time_param='ici',
                                testStat=teStat_proportions_diff):
-    """randomisation test for each bigram conditional probability
-        under the null hypothesis H0: testStat_observed > testStat_shuffled
+    """one sided randomisation test for each bigram conditional probability
+        under the null hypothesis H0: testStat_observed < testStat_shuffled
+        returns the p-values
     Parameters
     ----------
-    df_dict: dict
+    df_dict : dict
         dictionary of dataframes (tapes)
-    Dt: tuple
+    Dt : tuple
         (None, Dt)
-    obsTest: ndarray
+    obsTest : ndarray
         observed stat for each bigram
-    Nsh: int
-    condLi, sampLi: list
+    Nsh : int
+    condLi, sampLi : list
         list of conditions and samples
     testStat: callable
     Returns
     -------
-    p_values: ndarray
-    shuffle_test: ndarray
+    p_values : ndarray
+    shuffle_test : ndarray
         shuffled test distributions
     """
     nr, nc = np.shape(obsTest)
@@ -145,7 +146,7 @@ def repsProportion_in_listOfSeqs(liOfSeqs, deg=1):
     return Nreps, Nbigrams
 
 def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
-                                   label='call', time_param='ict_end_start',
+                                   label='call', time_param='ici',
                                    testStat=repsProportion_from_bigramMtx):
     """randomisation test for repetitions within the interval Dtint
     shuffle tapes within a tape, define Dtint-seqeunces and count repetitions

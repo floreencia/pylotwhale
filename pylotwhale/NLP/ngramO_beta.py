@@ -403,17 +403,20 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
     -------
     (matrix, sampsLi, condsLi)
     """
-    cfd = nltk.ConditionalFreqDist() # initialise cond freq dist.
+    cfd = nltk.ConditionalFreqDist()  # initialise cond freq dist
     calls0 = []
-    for t in df_dict.keys(): # for reach tape
+    for t in df_dict.keys():  # for reach tape
         thisdf = df_dict[t]
-        sequences = aa.seqsLi2iniEndSeq( aa.df2listOfSeqs( thisdf, Dt=Dtint, 
-                                                          l=callLabel, time_param=timeLabel),
-                                                          ini=startTag, end=endTag) # define the sequeces
-        my_bigrams = nltk.bigrams(sequences) # tag bigrams
-        cfd += bigrams2Dict(my_bigrams) # count bigrams
+        # define the sequeces
+        sequences = aa.seqsLi2iniEndSeq(aa.df2listOfSeqs(thisdf, Dt=Dtint,
+                                                         l=callLabel,
+                                                         time_param=timeLabel),
+                                        ini=startTag, end=endTag)
+        my_bigrams = nltk.bigrams(sequences)  # tag bigrams
+        cfd += bigrams2Dict(my_bigrams)  # count bigrams
         calls0 += list(thisdf[callLabel].values)
 
+    # calls order
     calls = [item[0] for item in sorted(Counter(calls0).items(),
                                     key = lambda x : x[1], reverse=True)
                                      if item[1] >= minCalls] # order calls
@@ -421,7 +424,7 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
     condsLi = calls[:] + [startTag]
 
     if return_values == 'counts':
-        return bigramsDict2countsMatrix( cfd, condsLi, samplesLi)
+        return bigramsDict2countsMatrix(cfd, condsLi, samplesLi)
 
     if return_values == 'probs':
         cpd = condFreqDictC2condProbDict(cfd)#, condsLi, samplesLi)
