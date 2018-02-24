@@ -18,16 +18,22 @@ def test_search_sequence_numpy():
     np.testing.assert_equal(search_sequence_numpy(arr, seq), np.array([0, 1, 5, 6, 7, 8]))
 
     
-def test_filterIndexesForIct():
+def test_filterIndicesForIct():
     ### different calls XY
     seqSize=2
-    np.testing.assert_equal(filterIndexesForIct(np.arange(10)), np.arange(10)[::seqSize])
+    np.testing.assert_equal(filterIndicesForIct(np.arange(10)), np.arange(10)[::seqSize])
     ### repetitions: XX
     arr = np.array([2,3,4,10,11,12,13,20,21])
     idx_0 = arr[:-1][np.array(arr[1:] - arr[:-1] == 1)]
-    idx = filterIndexesForIct(arr, diffCall=False)
+    idx = filterIndicesForIct(arr, diffCall=False)
     np.testing.assert_equal(idx_0, idx)
 
+def test_flattenList():
+    li = [['a', 'b', 'c'], ['t'], ['x', 'y']]
+    assert(flattenList(li) == ['a', 'b', 'c', 't', 'x', 'y'])
+
+    li = [['a', 'b', 'c'], ['t'], ['x', 'y', ['hey']]]   
+    assert(flattenList(li) == ['a', 'b', 'c', 't', 'x', 'y', ['hey']])
 
 
 
