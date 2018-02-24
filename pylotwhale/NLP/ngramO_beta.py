@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
-#import time 
+#import time
 import itertools as it
 from collections import Counter, defaultdict
 
@@ -23,27 +23,23 @@ sys.path.append('/home/florencia/whales/scripts/')
 import matrixTools as mt 
 
 """
-    Module for doing statistics over ngrams
+    Module for doing statistics on ngrams
     florencia @ 16.05.14
 
 """
 
-#################################################################################
-##############################    FUNCTIONS    ##################################
-#################################################################################
 
+############################    PLOTTING    ################################
 
-##############################    PLOTTING    ##################################
-
-def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0, 
-              Bname='bigram', ext='eps', plTitle='', clrMap = 'winter_r', 
-              labSize='18', cbarLim=(1,None), cbarOrientation='vertical', 
+def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0,
+              Bname='bigram', ext='eps', plTitle='', clrMap='winter_r',
+              labSize='18', cbarLim=(1, None), cbarOrientation='vertical',
               cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
               figsize=None):
     """
     plots a bigram matrix
-    A : bigram matrix    
-    
+    A : bigram matrix
+
     OPTIONAL PARAMETERS
     * figDir, if you whant to save the image, give the directory
     * cbarLim, tuple that with the limits of the cbar i.e. (0,1) for
@@ -68,24 +64,24 @@ def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0,
     cmap.set_under('white') #min
     cmap.set_bad('white') #nan
 
-    cax = plt.imshow(A, interpolation = 'nearest', cmap = cmap, 
-                    extent = [0,len(i2c),0,len(i2c)], origin='bottom')
-    
+    cax = plt.imshow(A, interpolation='nearest', cmap=cmap,
+                    extent = [0, len(i2c), 0, len(i2c)], origin='bottom')
+
     #ax.set_xlim((0,xM))
     #ax.set_ylim(0,yM)
-    xM = len(i2c) # masked labels
-    yM = len(i2c) #masked labels
-    ax.set_yticks( np.arange(len( i2c[:yM+1]) ) + 0.5 ) #flo -> +0.1)
-    ax.set_yticklabels( i2c[:yM+1] ) 
-    ax.set_xticks( np.arange(len( i2c[:xM+1]) ) + 0.5 ) 
-    ax.set_xticklabels( i2c[:xM+1], rotation=90 ) 
+    xM = len(i2c)  # masked labels
+    yM = len(i2c)  # masked labels
+    ax.set_yticks(np.arange(len(i2c[: yM + 1])) + 0.5)  # flo -> +0.1)
+    ax.set_yticklabels(i2c[:yM+1])
+    ax.set_xticks(np.arange(len(i2c[: xM + 1])) + 0.5)
+    ax.set_xticklabels(i2c[:xM+1], rotation=90)
     if plTitle: ax.set_title(plTitle)
-    #COLOR BAR
-    if isinstance(cbarLim, tuple): cax.set_clim(cbarLim) # cmap lims
+    # COLOUR BAR
+    if isinstance(cbarLim, tuple): cax.set_clim(cbarLim)  # cmap lims
 
     if cbar: 
         cbar = fig.colorbar(cax, extend='min')
-        if isinstance(cbarLim, tuple): cbar.set_clim(cbarLim) # cbar limits
+        if isinstance(cbarLim, tuple): cbar.set_clim(cbarLim)  # cbar limits
         if isinstance(cbarTicks, list): cbar.set_ticks(cbarTicks)
         if isinstance(cbarTickLabels, list): cbar.set_ticklabels(cbarTickLabels)
     '''
@@ -173,7 +169,8 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
 
-    bigrsDF = df[conditionsList].loc[samplesList]
+    #bigrsDF = df[conditionsList].loc[samplesList]
+    bigrsDF = df[conditionsList].reindex(samplesList)
     samps = bigrsDF.index.values
     conds = bigrsDF.columns.values
     M = bigrsDF.as_matrix().T # transpose to have conditions as rows

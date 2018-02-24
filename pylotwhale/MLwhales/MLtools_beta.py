@@ -37,10 +37,7 @@ import featureExtraction as fex
 #import matrixTools as mt 
 
 """
-
-    #!/usr/mprg/bin/python
-
-    Preprocessing function of machine learning
+    Preprocessing function for doing machine learning
     florencia @ 16.05.15
 
 """
