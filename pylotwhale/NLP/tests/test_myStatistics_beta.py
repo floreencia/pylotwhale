@@ -9,12 +9,12 @@ import numpy as np
 from pylotwhale.NLP.myStatistics_beta import *
 
 
-def test_binary_time_series():
+def test_repsProportion_in_listOfSeqs():
     s = [['c', 'c', 'c', 'c', 'b', 'b']]
-    assert repsProportion_in_listOfSeqs(s) == (4,5)
+    assert repsProportion_in_listOfSeqs(s) == (4, 5)
     s = [['c', 'c']]
-    assert repsProportion_in_listOfSeqs(s) == (2,2)
+    assert repsProportion_in_listOfSeqs(s) == (1, 1)
     s = [['c']]
-    assert repsProportion_in_listOfSeqs(s) == (0,0)
+    assert repsProportion_in_listOfSeqs(s) == (0, 0)
     return True
     
