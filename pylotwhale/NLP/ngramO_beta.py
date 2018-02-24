@@ -136,20 +136,35 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
         fig.savefig(figN, bbox_inches='tight')
         print figN
 
-
-
-
 ##### NLTK - pandas - related ngram code  #####
 
 def bigrams2Dict(bigrams_tu):
     '''
+    DEPRECATED
+    USE bigrams2cfd
     converts a 2D-tuples list into a conditionalFreqDist (~2D-dictionary)
     eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
     :bigrams_tu: bigrams as a list of tuples
     '''
     cfd = nltk.ConditionalFreqDist(bigrams_tu)
     return cfd
- 
+
+
+def bigrams2cfd(bigrams_tu):
+    '''
+    converts a list of 2D-tuples into a nltk.conditionalFreqDist (~2D-dictionary)
+    eg. [(a,b) ... ] --> Di[a][b] = #(a,b)
+    Parameters
+    ----------
+    bigrams_tu : bigrams as a list of tuples
+    Returns
+    -------
+    cfd : nltk.ConditionalFreqDist(
+    '''
+    cfd = nltk.ConditionalFreqDist(bigrams_tu)
+    return cfd
+
+
 def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     '''returns the bigram matrix of the conditionsList and samplesList, with:
         conditions as the rows
@@ -173,10 +188,11 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     bigrsDF = df[conditionsList].reindex(samplesList)
     samps = bigrsDF.index.values
     conds = bigrsDF.columns.values
-    M = bigrsDF.as_matrix().T # transpose to have conditions as rows
+    M = bigrsDF.as_matrix().T  # transpose to have conditions as rows
     return M, samps, conds
-    
-def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
+
+
+def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     '''2dim bigram counts dict --> bigrams matrix
     Parameters
     ----------
@@ -191,17 +207,23 @@ def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None)
     samps : labels of the columns of the matrix
     conds : labels of the rows of the matrix
     '''
-    # make sure all keys are present
-    if( conditionsList is not None or
-        samplesList is not None):
-        kySet = set(conditionsList) | set(samplesList)
-        bigramsDict = fill2KyDict(bigramsDict, kySet )
-    df = twoDimDict2DataFrame(bigramsDict)
+    ## copy values of the cfd not to affect the mutable cfd outsede
+    bigramsD = dict(bigramsDict)
+    # When given conditionsList and/or samplesList
+    # make sure all keys are present in bigramsDict
+    if(conditionsList is not None or
+       samplesList is not None):
+        kySet = set(conditionsList) | set(samplesList)  # union
+        bigramsD = fill2KyDict(bigramsD, kySet)  # fill missing keys with nan
+        print('filling missing keys')
+
+    ## convert 2ble-ky-dictionary into dataFrame
+    df = twoDimDict2DataFrame(bigramsD)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
     
 def bigrams2countsMatrix(bigrams_tu, conditionsList=None, samplesList=None):
     '''bigrams --> bigrams matrix'''
-    return bigramsDict2countsMatrix((bigrams2Dict(bigrams_tu)),
+    return cfdBigrams2countsMatrix((bigrams2cfd(bigrams_tu)),
                                      conditionsList=conditionsList, 
                                      samplesList=samplesList)
     
@@ -300,6 +322,7 @@ def twoDimDict2DataFrame(kykyDict):
     df : pandas DataFrame
     '''
     return pd.DataFrame(kykyDict).fillna(0)
+
 
 def fill2KyDict(kykyDict, kySet):
     '''fills a conditional frequency distribution with keys
@@ -410,7 +433,7 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
                                                          time_param=timeLabel),
                                         ini=startTag, end=endTag)
         my_bigrams = nltk.bigrams(sequences)  # tag bigrams
-        cfd += bigrams2Dict(my_bigrams)  # count bigrams
+        cfd += bigrams2cfd(my_bigrams)  # count bigrams
         calls0 += list(thisdf[callLabel].values)
 
     # calls order
@@ -421,7 +444,7 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
     condsLi = calls[:] + [startTag]
 
     if return_values == 'counts':
-        return bigramsDict2countsMatrix(cfd, condsLi, samplesLi)
+        return cfdBigrams2countsMatrix(cfd, condsLi, samplesLi)
 
     if return_values == 'probs':
         cpd = condFreqDictC2condProbDict(cfd)#, condsLi, samplesLi)
