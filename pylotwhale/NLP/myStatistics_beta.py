@@ -130,7 +130,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     Nsh : int
     condLi, sampLi : list
         list of conditions and samples
-    testStat: callable
+    testStat : callable
     Returns
     -------
     p_values : ndarray
