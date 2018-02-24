@@ -100,22 +100,43 @@ def returnSortingKeys(di, minCounts=None, reverse=True):
     return np.array([item[0] for item in 
             sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] >= minCounts])
 
+### FOR LISTS
 
 def flattenList(L):
     '''flatterns a list
     Parameters
     ----------
-    L: list
+    L : list
         list of lists
     Returns
     -------
-    flattedList: list
+    flattedList : list
     '''
     flattedList = []
     for sublist in L:
         flattedList += sublist
     return flattedList
-        
+    
+
+def sliceBackSuperSequence(superSeq, seqSlicer):
+    '''
+    Parameters
+    ----------
+    superSeq : ndarray
+        sequence to slice into sub sequences
+    seqSlicer : ndarray
+        indices for slicing superSeq
+    Returns
+    -------
+    seqOfSeqs: list
+        list of lists
+    '''
+    i0 = 0
+    seqOfSeqs = []
+    for i in seqSlicer:
+        seqOfSeqs.append(superSeq[i0:i])
+        i0=i
+    return seqOfSeqs
             
 ### search sequence in PANDAS dataframe           
             

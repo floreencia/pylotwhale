@@ -36,5 +36,15 @@ def test_flattenList():
     assert(flattenList(li) == ['a', 'b', 'c', 't', 'x', 'y', ['hey']])
 
 
+def test_sliceBackSuperSequence():
+    tSeq = list('abcdefgxyz')
+    seqSlicer=np.array([3,6, len(tSeq)])
+
+    assert (sliceBackSuperSequence(tSeq, seqSlicer)
+            == [['a', 'b', 'c'],
+                ['d', 'e', 'f'],
+                ['g', 'x', 'y', 'z']])
+    
+
 
 
