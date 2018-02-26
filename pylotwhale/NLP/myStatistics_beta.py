@@ -20,6 +20,7 @@ import statsmodels as sm
 
 import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
+from seaborn import xkcd_palette
 
 
 """
@@ -33,9 +34,10 @@ import pylotwhale.NLP.ngramO_beta as ngr
 
 def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
-    return p1#2*p1-1
+    return p1  # 2*p1-1
 
-def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None, 
+
+def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
                          kwargs_obs=None, **kwargs):
     """plot randomised distribution (distsM) with observable
         kwargs_obs {color: 'r', lw=2.5}
@@ -44,7 +46,8 @@ def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
     if kwargs_obs is None:
         kwargs_obs = {'color': 'r', 'lw': 2.5}
     #fig, ax =  plt.subplots(figsize=None)
-    if plTitle: ax.set_title(plTitle)
+    if plTitle:
+        ax.set_title(plTitle)
     ax.hist(shuffledDistsM[:, i, j], **kwargs)
     ax.axvline(obsM[i, j], **kwargs_obs)
     return ax
@@ -156,8 +159,6 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     return p_r, shuffle_tests
 
 
-
-
 def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
                                    label='call', time_param='ici',
                                    testStat=repsProportion_from_bigramMtx):
@@ -167,8 +168,8 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
     ----------
     df_dict: dict
         dictionary of dataframes (tapes)
-    Dtint: tuple 
-        (None, Dt)
+    Dtint: tuple
+        interval for defining sequences, eg. (None, Dt)
     obsTest: float
         observed stat for each bigram
     Nsh: int
@@ -189,7 +190,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
             thisdf = df_dict[t]
             cfd_sh += shuffled_cfd(thisdf, Dtint, label=label,
                                    time_param=time_param)  # counts in current tape
-        Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix( cfd_sh, callsLi, callsLi)
+        Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix(cfd_sh, callsLi, callsLi)
         shTest_i = testStat(Mp_sh)  # compute satat variable
         shuff_dist[i] = shTest_i
         if shTest_i >= obsTest:
@@ -216,13 +217,25 @@ def shuffleSeqOfSeqs(seqOfSeqs):
     return shuffled_seqOfSeqs
 
 
-##### other older functions #####    
+#### plotting
+
+def pValue_colour(p, pc=0.05):
+    '''returns predefined colours depending on the p-value'''
+    if p < pc:
+        return xkcd_palette(['blue'])[0]
+    if (1 - p) < pc:
+        return xkcd_palette(['red'])[0]
+    else:
+        return xkcd_palette(['light grey'])[0]
+
+
+##### other older functions #####
 
 def mean_confidence_interval(data, confidence=0.95):
     """
     Confidence intervals
     Returns
-    > mu, the mean 
+    > mu, the mean
     > h, the distance to the of the ci to mu
     Assuming a students t-distribution
     """
@@ -232,12 +245,14 @@ def mean_confidence_interval(data, confidence=0.95):
     h = se * st.t._ppf((1+confidence)/2., n-1)
     return m, h
 
+
 def inORout(x, mu, h):
     if (x < mu-h or x > mu+h):
-        print( "is out")
+        print("is out")
         return 1
     else:
         return 0
+
 
 def tabularChiSquare(p, df):
     """
