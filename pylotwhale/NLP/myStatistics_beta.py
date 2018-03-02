@@ -20,6 +20,7 @@ import statsmodels as sm
 
 import pylotwhale.NLP.annotations_analyser as aa
 import pylotwhale.NLP.ngramO_beta as ngr
+from pylotwhale.utils.dataTools import sliceBackSuperSequence, flattenList
 from seaborn import xkcd_palette
 
 
@@ -116,7 +117,7 @@ def shuffled_cfd(df, Dtint, label='call', time_param='ici'):
     return cfd_nsh
 
 
-def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
+def randomisation_test4bigrmas(df_dict, Dtint, obsStat, Nsh, condsLi, sampsLi,
                                label='call', time_param='ici',
                                testStat=teStat_proportions_diff):
     """one sided randomisation test for each bigram conditional probability
@@ -128,7 +129,7 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
         dictionary of dataframes (tapes)
     Dt : tuple
         (None, Dt)
-    obsTest : ndarray
+    obsStat : ndarray
         observed stat for each bigram
     Nsh : int
     condLi, sampLi : list
@@ -140,9 +141,9 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
     shuffle_test : ndarray
         shuffled test distributions
     """
-    nr, nc = np.shape(obsTest)
+    nr, nc = np.shape(obsStat)
     shuffle_tests = np.zeros((Nsh, nr, nc))
-    N_values_r = np.zeros_like(obsTest)
+    N_values_r = np.zeros_like(obsStat)
     for i in range(Nsh):  # shuffle ith-loop
         cfd_sh = nltk.ConditionalFreqDist()  # initialise cond freq dist.
         for t in df_dict.keys():  # for each tape
@@ -153,13 +154,13 @@ def randomisation_test4bigrmas(df_dict, Dtint, obsTest, Nsh, condsLi, sampsLi,
                                                               condsLi, sampsLi)  # normalised matrix
         shTest_i = testStat(Mp_sh)  # compute satat variable
         shuffle_tests[i] = shTest_i  # save distribution for later
-        N_values_r[shTest_i >= obsTest] += 1  # test right
-        #N_values_l[shTest_i < obsTest] += 1 # test left
+        N_values_r[shTest_i >= obsStat] += 1  # test right
+        #N_values_l[shTest_i < obsStat] += 1 # test left
     p_r = 1.0*N_values_r/Nsh
     return p_r, shuffle_tests
 
 
-def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
+def randomisation_test_repetitions(df_dict, Dtint, obsStat, Nsh, callsLi,
                                    label='call', time_param='ici',
                                    testStat=repsProportion_from_bigramMtx):
     """randomisation test for repetitions within the interval Dtint
@@ -170,7 +171,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
         dictionary of dataframes (tapes)
     Dtint: tuple
         interval for defining sequences, eg. (None, Dt)
-    obsTest: float
+    obsStat: float
         observed stat for each bigram
     Nsh: int
     callsLi: list
@@ -193,7 +194,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsTest, Nsh, callsLi,
         Mp_sh, samps, conds = ngr.bigramsDict2countsMatrix(cfd_sh, callsLi, callsLi)
         shTest_i = testStat(Mp_sh)  # compute satat variable
         shuff_dist[i] = shTest_i
-        if shTest_i >= obsTest:
+        if shTest_i >= obsStat:
             N_values += 1
 
     p = 1.0*N_values/Nsh
@@ -215,6 +216,68 @@ def shuffleSeqOfSeqs(seqOfSeqs):
     for s in seqOfSeqs:
         shuffled_seqOfSeqs.append(shuffleSequence(s))
     return shuffled_seqOfSeqs
+
+
+def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sampsLi,
+                                           testStat=teStat_proportions_diff):
+    """one sided randomisation test for each bigram conditional probability
+        under the null hypothesis H0: testStat_observed < testStat_shuffled
+        returns the p-values
+    Parameters
+    ----------
+    seqOfSeqs : list
+        list of lists on which we test for order
+    obsStat : ndarray
+        observed stat for each bigram. defaul: teStat_proportions_diff
+    Nsh : int
+        number of randomisations
+    condLi, sampLi : list
+        list of conditions and samples
+    testStat : callable
+    Returns
+    -------
+    p_values : ndarray
+    shuffle_test : ndarray
+        shuffled test distributions
+    """
+
+    ## define array to slice supperSequnces back into the squences
+    seq_slicer = np.cumsum(np.array([len(item) for item in seqOfSeqs]))
+
+    ## define super sequence vector
+    superSequence = np.array(flattenList(seqOfSeqs))
+
+    ## randomisations test
+    nr, nc = np.shape(obsStat)
+    shuffle_tests = np.zeros((Nsh, nr, nc))
+    N_values_r = np.zeros_like(obsStat)
+
+    for i in np.arange(Nsh):
+        ## randomise supersequence
+        np.random.shuffle(superSequence)
+        np.random.shuffle(superSequence)
+
+        ## define sequences: slice supersequence and put in str format for nltk
+        sequences_str = aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence,
+                                                                       seq_slicer))
+        ## split sequences into bigrams
+        my_bigrams = list(nltk.bigrams(sequences_str))
+        ## count bigrams
+        cfd_sh0 = ngr.bigrams2Dict(my_bigrams)
+        ## fill cfd_sh0 with empty valued keys of the missing values
+        cfd_sh = ngr.fill2KyDict(cfd_sh0, kySet=set(sampsLi) | set(condsLi))
+        ## transform cfd into matrix form
+        Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh,
+                                                              condsLi,
+                                                              sampsLi)  # normalised matrix
+        shTest_i = testStat(Mp_sh)  # compute satat variable
+        shuffle_tests[i] = shTest_i  # save distribution for later
+        N_values_r[shTest_i >= obsStat] += 1  # test right
+
+    # compute p-value
+    p_r = 1.0*N_values_r/Nsh
+
+    return p_r, shuffle_tests
 
 
 #### plotting
@@ -259,14 +322,15 @@ def tabularChiSquare(p, df):
     returns the tabular value of a chi-square distribution with
     df - degrees of freedom
     p - p-value (\alpha = p/100)
-    
+
     by default the st package measures the proportion under a curve (like chi-sq)
     form left to right which is the most natural. However, the common practice
     when doing a chi-square statistics is to take the proportion of the area
     from right to left, tht'a why we difine this function.
     """
     return st.chi2._ppf(1 - p, df)
-    
+
+
 def chiSquare(O, E):
     '''
     chisquare test of an observed frquencies (O)
