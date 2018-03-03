@@ -282,14 +282,27 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
 
 #### plotting
 
-def pValue_colour(p, pc=0.05):
-    '''returns predefined colours depending on the p-value'''
+def pValue_3colour(p, pc=0.05):
+    '''returns predefined colours depending on the p-value.
+    Three colours
+        blue - reject H0, more likely
+        red  - reject H0, less likely
+        gray -  red cannot reject
+    '''
     if p < pc:
         return xkcd_palette(['blue'])[0]
     if (1 - p) < pc:
         return xkcd_palette(['red'])[0]
     else:
         return xkcd_palette(['light grey'])[0]
+
+
+def pValue_colour(p, pc=0.05):
+    '''returns predefined colours depending on the p-value'''
+    if p < pc:
+        return xkcd_palette(['blue'])[0]
+    else:
+        return xkcd_palette(['red'])[0]
 
 
 ##### other older functions #####
