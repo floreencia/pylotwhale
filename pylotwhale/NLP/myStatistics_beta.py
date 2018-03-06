@@ -3,6 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 #import scipy as sp
 #import scipy.stats as stats
+from collections import Counter
 import nltk
 import random
 from matplotlib import pyplot as plt
@@ -217,6 +218,16 @@ def shuffleSeqOfSeqs(seqOfSeqs):
         shuffled_seqOfSeqs.append(shuffleSequence(s))
     return shuffled_seqOfSeqs
 
+def superSequenceSlicer(seqOfSeqs):
+    '''Returns the an array with the indices to slize back
+    Parameters
+    ----------
+    seqOfSeqs: list of lists
+    Returns
+    -------
+    1darray'''
+    return np.cumsum(np.array([len(item) for item in seqOfSeqs]))
+
 
 def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sampsLi,
                                            testStat=teStat_proportions_diff):
@@ -242,7 +253,7 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     """
 
     ## define array to slice supperSequnces back into the squences
-    seq_slicer = np.cumsum(np.array([len(item) for item in seqOfSeqs]))
+    seq_slicer = superSequenceSlicer(seqOfSeqs)#np.cumsum(np.array([len(item) for item in seqOfSeqs]))
 
     ## define super sequence vector
     superSequence = np.array(flattenList(seqOfSeqs))
@@ -255,7 +266,6 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     for i in np.arange(Nsh):
         ## randomise supersequence
         np.random.shuffle(superSequence)
-        np.random.shuffle(superSequence)
 
         ## define sequences: slice supersequence and put in str format for nltk
         sequences_str = aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence,
@@ -263,7 +273,7 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
         ## split sequences into bigrams
         my_bigrams = list(nltk.bigrams(sequences_str))
         ## count bigrams
-        cfd_sh0 = ngr.bigrams2Dict(my_bigrams)
+        cfd_sh0 = ngr.bigrams2cfd(my_bigrams)
         ## fill cfd_sh0 with empty valued keys of the missing values
         cfd_sh = ngr.fill2KyDict(cfd_sh0, kySet=set(sampsLi) | set(condsLi))
         ## transform cfd into matrix form
@@ -278,6 +288,56 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     p_r = 1.0*N_values_r/Nsh
 
     return p_r, shuffle_tests
+
+
+
+class baseSequence():
+    def __init__(self, seqOfSeqs):
+        self.seqOfSeqs = seqOfSeqs
+        #self.slicer = superSequenceSlicer(self.seqOfSeqs)
+        self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
+        self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
+        #aa.seqsLi2iniEndSeq(sliceBackSuperSequence(self.superSequence, seq_slicer))
+    
+
+class sequenceBigrams(baseSequence):
+    '''bounds together sequences
+    in list (seqOfSeqs) and in string format (sequences_str)
+    with bigrams with cfd and cpd
+    '''
+    def __init__(self, seqOfSeqs):
+        baseSequence.__init__(self, seqOfSeqs)
+        #self.seqOfSeqs = seqOfSeqs
+        #self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
+        #self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
+
+    #@property
+    def seqOfSeqs2superSequence(self, seqOfSeqs):
+        '''to initialise superSequence'''
+        return np.array(flattenList(seqOfSeqs))
+
+    @property
+    def bigrams(self):
+        return self.__set_bigrams(self.sequences_str)
+
+    def __set_bigrams(self, seq_str):
+        return ngr.strSeq2bigrams(seq_str)
+
+    @property
+    def cfd(self):
+        return ngr.bigrams2cfd(self.bigrams)
+
+    @property
+    def cpd(self):
+        return ngr.condFreqDictC2condProbDict(self.cfd)
+
+    @property
+    def callCounts(self):
+        return Counter(self.superSequence)
+        
+        
+        
+#class shuffleSequence(sequence):
 
 
 #### plotting
