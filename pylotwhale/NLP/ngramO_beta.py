@@ -138,6 +138,15 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
 
 ##### NLTK - pandas - related ngram code  #####
 
+def strSeq2bigrams(strSeq):
+    '''decomposes a sequence of strings into its bigrmas
+    Parameters
+    ----------
+    strSeq: list
+        list of strings, eg. ['b', 'a', 'c']
+    '''
+    return list(nltk.bigrams(strSeq))
+
 def bigrams2Dict(bigrams_tu):
     '''
     DEPRECATED
