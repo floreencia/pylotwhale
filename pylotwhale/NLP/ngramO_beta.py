@@ -171,7 +171,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
         and the samples as columns
     Parameters
     -----------
-    df : conditional data frame (output of twoDimDict2DataFrame)
+    df : conditional data frame (output of kykyCountsDict2DataFrame)
     conditionsList : list/np.array of conditions to read (None reads all)
     samplesList : list/np.array of samples to read (None reads all)
     Returns
@@ -192,8 +192,18 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     return M, samps, conds
 
 
+def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
+    '''DEPRECATED, USE kykyCountsDict2matrix INSTEAD'''
+    return kykyCountsDict2matrix(bigramsDict,
+                                   conditionsList=conditionsList,
+                                   samplesList=samplesList)
+
+
 def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
-    '''2dim bigram counts dict --> bigrams matrix
+    '''
+    DEPRECATED! use kykyCountsDict2matrix    
+    
+    2dim bigram counts dict --> bigrams matrix
     Parameters
     ----------
     bigramsDict : nltk.ConditionalFreqDist
@@ -215,15 +225,16 @@ def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
        samplesList is not None):
         kySet = set(conditionsList) | set(samplesList)  # union
         bigramsD = fill2KyDict(bigramsD, kySet)  # fill missing keys with nan
-        print('filling missing keys')
+        #print('filling missing keys')
 
     ## convert 2ble-ky-dictionary into dataFrame
-    df = twoDimDict2DataFrame(bigramsD)
+    df = kykyCountsDict2DataFrame(bigramsD)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
-    
+
+
 def bigrams2countsMatrix(bigrams_tu, conditionsList=None, samplesList=None):
     '''bigrams --> bigrams matrix'''
-    return cfdBigrams2countsMatrix((bigrams2cfd(bigrams_tu)),
+    return kykyCountsDict2matrix((bigrams2cfd(bigrams_tu)),
                                      conditionsList=conditionsList, 
                                      samplesList=samplesList)
     
@@ -281,17 +292,37 @@ def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
         P[cond] = {}
         for samp in samples:
             P[cond][samp] = cpd[cond].prob(samp)
-    return P    
+    return P
+
+
+def kykyCountsDict2matrix(kykyDict, conditions, samples):
+    '''
+    return the matrix of conditional probabilities
+    Parameters
+    ----------
+    kykyDict : dict
+        dictionary of counts
+    conditions, samples : list of strings
+        keys of the dictionary that are considered in the matrix
+    Returns
+    -------
+    M : 2darray
+        values
+    '''
+    df = kykyCountsDict2DataFrame(kykyDict)
+    return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
+
 
 def condProbDict2matrix(cpd, conditions, samples):
     '''
+    DEPRECATED USE: kykyCountsDict2matrix
     return the matrix of conditional probabilities
     Parameters
     ----------
     cpd: nltk.conditional_probability_distribution
     M, x_tick_labels, y_tick_labels
     '''
-    return bigramsdf2bigramsMatrix(twoDimDict2DataFrame(cpd), 
+    return bigramsdf2bigramsMatrix(kykyCountsDict2DataFrame(cpd), 
                                    conditionsList=conditions, samplesList=samples)#, condsLi, samplesLi)
     
 def condFreqDict2condProbMatrix(cfd, conditions, samples): 
@@ -303,13 +334,36 @@ def condFreqDict2condProbMatrix(cfd, conditions, samples):
     > M, x_tick_labels, y_tick_labels
     '''
     cpd = condFreqDictC2condProbDict(cfd)
-    return condProbDict2matrix(cpd, conditions, samples)
+    return kykyCountsDict2matrix(cpd, conditions, samples)
 
 
 ### + GENERAL
 
+def kykyCountsDict2DataFrame(kykyDict, fillna=0):
+    '''
+    Transforms counts dictionary into pandas dataframe
+
+    Parameters
+    ----------
+    kykyDict : dict
+        dict of conunts dict, e.g. cfd or a cpd
+        D[condition][sample] = n
+        P (sample = row | condition = column),
+        columns are the condition, rows are sampes
+    fillna : int, float, str
+        value used to fill empty cells
+    Returns
+    -------
+    df : pandas DataFrame
+    '''
+    return pd.DataFrame(kykyDict).fillna(fillna)
+
+
+
 def twoDimDict2DataFrame(kykyDict):
-    '''Transforms a two key dictionary into a pandas dataframe
+    '''
+    DEPRECATED, USE kykyCountsDict2DataFrame
+    Transforms a two key dictionary into a pandas dataframe
     
     Parameters
     ----------
@@ -444,11 +498,11 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
     condsLi = calls[:] + [startTag]
 
     if return_values == 'counts':
-        return cfdBigrams2countsMatrix(cfd, condsLi, samplesLi)
+        return kykyCountsDict2matrix(cfd, condsLi, samplesLi)
 
     if return_values == 'probs':
         cpd = condFreqDictC2condProbDict(cfd)#, condsLi, samplesLi)
-        return  condProbDict2matrix(cpd, condsLi, samplesLi)
+        return  kykyCountsDict2matrix(cpd, condsLi, samplesLi)
 
 
 

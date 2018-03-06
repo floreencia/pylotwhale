@@ -245,9 +245,9 @@ def pl_degree_centrality(G, pltitle= 'degree centrality', oFig=None):
 def pl_betweenness_centrality(G, pltitle='betweenness centrality',
                               oFig=None):
     return pl_nx_propertie(G, nx_property=nx.betweenness_centrality,
-                           pltitle=pltitle, oFig=oFig)  
-                           
-                           
+                           pltitle=pltitle, oFig=oFig)
+                    
+                    
 ### dictionary formating for graph drawing
                            
 def format_cpd(edgeLabelDict, labelDecimals=2, treshold=0.1):
@@ -261,6 +261,7 @@ def format_cpd(edgeLabelDict, labelDecimals=2, treshold=0.1):
             cpf_f[x][y] = "{0:.{1}f}".format(edgeLabelDict[x][y], labelDecimals)
     return cpf_f
 
+
 def format_cpd_width(edgeLabelDict, m=2, b=0):
     """takes a nested dict (cpd) and reformats its values"""
     cpf_f = defaultdict(dict)
@@ -269,11 +270,14 @@ def format_cpd_width(edgeLabelDict, m=2, b=0):
             cpf_f[x][y] = m*edgeLabelDict[x][y] + b
     return cpf_f
 
+
 def format_cfd_width(edgeLabelDict, m=1, b=0):
-    """takes a nested dict (cpd) and reformats its values"""
-    N=edgeLabelDict.N()
+    """takes a nested dict (cpd) and reformats its values
+    m and b are parameters for tunning the widht of the arrows"""
+    N = edgeLabelDict.N()
     cpf_f = defaultdict(dict)
     for x in edgeLabelDict.iterkeys():
         for y in edgeLabelDict[x]:
             cpf_f[x][y] = m*edgeLabelDict[x][y]/N + b
     return cpf_f
+    

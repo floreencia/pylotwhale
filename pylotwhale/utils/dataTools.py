@@ -114,7 +114,7 @@ def flattenList(L):
     '''
     flattedList = []
     for sublist in L:
-        flattedList += sublist
+        flattedList += list(sublist)
     return flattedList
     
 
