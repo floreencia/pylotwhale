@@ -290,26 +290,47 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     return p_r, shuffle_tests
 
 
-
 class baseSequence():
-    def __init__(self, seqOfSeqs):
-        self.seqOfSeqs = seqOfSeqs
-        #self.slicer = superSequenceSlicer(self.seqOfSeqs)
-        self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
-        self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
-        #aa.seqsLi2iniEndSeq(sliceBackSuperSequence(self.superSequence, seq_slicer))
-    
+    '''base class for sequences
+    Parameters
+    ----------
+    seqOfSeqs : list
+        list with lists
 
-class sequenceBigrams(baseSequence):
-    '''bounds together sequences
-    in list (seqOfSeqs) and in string format (sequences_str)
-    with bigrams with cfd and cpd
+    Attributes
+    ----------
+    seqOfSeqs : list
+        list with lists, e.g. [['h', 'o'], ['l', 'a'], ...]
+    superSequence : list
+        flatted seqOfSeqs
+    sequences_str : list
+        list with sequences in str format
+        e.g. ['_ini', 'h', ..., 'a', '_end', ..., '_end']
     '''
     def __init__(self, seqOfSeqs):
+        self.seqOfSeqs = seqOfSeqs
+        self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
+        self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
+
+
+class sequenceBigrams(baseSequence):
+    '''bounds together
+    (1) sequences, in list (seqOfSeqs) and in string formats (sequences_str)
+    with (2) bigram relevant attributes: bigrams, cfd and cpd
+
+    Attributes
+    ----------
+    attrs of baseSequence
+    bigrams : list of 2D-tuples
+    cfd : nltk.ConditionalFreqDist (dict)
+    cpd : dict
+    callCounts : Counter
+    sortedCalls : list
+        tuples with labels and their counts sorted [('A', <counts_A>), ...]
+    '''
+    def __init__(self, seqOfSeqs):
+        ## initialise sequence with: seqOfSeqs, superSequence, sequences_str
         baseSequence.__init__(self, seqOfSeqs)
-        #self.seqOfSeqs = seqOfSeqs
-        #self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
-        #self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
 
     #@property
     def seqOfSeqs2superSequence(self, seqOfSeqs):
@@ -334,9 +355,26 @@ class sequenceBigrams(baseSequence):
     @property
     def callCounts(self):
         return Counter(self.superSequence)
-        
-        
-        
+
+    @property
+    def sortedCalls(self):
+        return sorted(self.callCounts.items(), key = lambda x : x[1], reverse=True)
+
+
+
+class shuffleSequence(baseSequence):
+
+    def __init__(self, seqOfSeqs):
+        ## initialise sequence (seqOfSeqs, superSequence, sequences_str)
+        baseSequence.__init__(self, seqOfSeqs)
+
+        self.slicer = superSequenceSlicer(self.seqOfSeqs)
+        #aa.seqsLi2iniEndSeq(sliceBackSuperSequence(self.superSequence, self.seq_slicer))
+
+    def superSequence2iniEndStrSeq(self, superSequence, slicer):
+        return aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence, slicer))
+
+
 #class shuffleSequence(sequence):
 
 
