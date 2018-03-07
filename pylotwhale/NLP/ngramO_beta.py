@@ -375,22 +375,26 @@ def kykyDict2DataFrame(kykyDict, fillna=0):
     Returns
     -------
     df : pandas DataFrame
+        df.loc[cond, samp] = kykyDict[cond][samp]
     '''
-    return pd.DataFrame(kykyDict).fillna(fillna)
+    #T ranspose the DataFrame to have the conditions as rows (index of the df)
+    # and the saples as columns
+    return pd.DataFrame(kykyDict).T.fillna(fillna)
 
 
 def kykyCountsDict2DataFrame(kykyDict, fillna=0):
     '''
     DEPRECATED, use kykyDict2DataFrame
     '''
-    return kykyDict2DataFrame(kykyDict).fillna(fillna)
+    return kykyDict2DataFrame(kykyDict)
 
 
-def matrix2kykyDict(M, c, r):
+def matrix2kykyDict(M, rows, columns):
     '''converts matrix (M) into kyky dictionary (DICT)
-    where the rows of the matrix are mapped into DICT
-    M[r,c] = DICT[r][c]'''
-    df = matrix2DataFrame(M, c, r)
+    where the rows (r) and columns (c) of M are mapped into DICT
+    M[r, c] = DICT[r][c]
+    '''
+    df = matrix2DataFrame(M, rows=rows,  columns=columns)
     return DataFrame2kykyDict(df)
 
 
@@ -402,9 +406,8 @@ def DataFrame2kykyDict(df):
     '''
     # transpose the DataFrame so that when converting to dictionary
     # the first key corresponds to the condition and the second to the sample
-    # DICT[cond][samp] = df,loc[cond, sample]
+    # DICT[cond][samp] = df.loc[cond, sample]
     thisdf = df.T
-    
     return thisdf.to_dict()
 
 
@@ -413,10 +416,10 @@ def matrix2DataFrame(M, rows=None, columns=None):
     Parameters
     ----------
     M : 2d array
-        rows are for conditions and columns for samples
+        rows = conditions and columns = samples
     rows, columns : list like
-        names of the columns (c)
-        and indices (r) of the matrix
+        indices (r) of the matrix, conditions
+        names of the columns (c), samples
     '''
     return pd.DataFrame(M, columns=columns, index=rows)
 
