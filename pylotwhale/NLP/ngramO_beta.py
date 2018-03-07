@@ -180,7 +180,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
         and the samples as columns
     Parameters
     -----------
-    df : conditional data frame (output of kykyCountsDict2DataFrame)
+    df : conditional data frame (output of kykyDict2DataFrame)
     conditionsList : list/np.array of conditions to read (None reads all)
     samplesList : list/np.array of samples to read (None reads all)
     Returns
@@ -237,7 +237,7 @@ def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
         #print('filling missing keys')
 
     ## convert 2ble-ky-dictionary into dataFrame
-    df = kykyCountsDict2DataFrame(bigramsD)
+    df = kykyDict2DataFrame(bigramsD)
     return bigramsdf2bigramsMatrix(df, conditionsList, samplesList)
 
 
@@ -318,7 +318,7 @@ def kykyCountsDict2matrix(kykyDict, conditions, samples):
     M : 2darray
         values
     '''
-    df = kykyCountsDict2DataFrame(kykyDict)
+    df = kykyDict2DataFrame(kykyDict)
     return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
 
 
@@ -331,7 +331,7 @@ def condProbDict2matrix(cpd, conditions, samples):
     cpd: nltk.conditional_probability_distribution
     M, x_tick_labels, y_tick_labels
     '''
-    return bigramsdf2bigramsMatrix(kykyCountsDict2DataFrame(cpd), 
+    return bigramsdf2bigramsMatrix(kykyDict2DataFrame(cpd), 
                                    conditionsList=conditions, samplesList=samples)#, condsLi, samplesLi)
     
 def condFreqDict2condProbMatrix(cfd, conditions, samples): 
@@ -348,9 +348,9 @@ def condFreqDict2condProbMatrix(cfd, conditions, samples):
 
 ### + GENERAL
 
-def kykyCountsDict2DataFrame(kykyDict, fillna=0):
+def kykyDict2DataFrame(kykyDict, fillna=0):
     '''
-    Transforms counts dictionary into pandas dataframe
+    Transforms kyky dictionary into pandas dataframe
 
     Parameters
     ----------
@@ -367,11 +367,31 @@ def kykyCountsDict2DataFrame(kykyDict, fillna=0):
     '''
     return pd.DataFrame(kykyDict).fillna(fillna)
 
+def kykyCountsDict2DataFrame(kykyDict, fillna=0):
+    '''
+    DEPRECATED, use kykyDict2DataFrame
+    '''
+    return kykyDict2DataFrame(kykyDict).fillna(fillna)
+
+
+def DataFrame2kykyDict(df):
+    '''converts pandas DataFrame into kykyDict'''
+    return df.to_dict()
+
+
+def matrix2DataFrame(M, c, r):
+    '''converts an 2daray into a pandas DataFrame
+    Parameters
+    ----------
+    M : 2d array
+    c, r : list like
+    '''
+    return pd.DataFrame(m, columns=c, index=r)
 
 
 def twoDimDict2DataFrame(kykyDict):
     '''
-    DEPRECATED, USE kykyCountsDict2DataFrame
+    DEPRECATED, USE kykyDict2DataFrame
     Transforms a two key dictionary into a pandas dataframe
     
     Parameters
