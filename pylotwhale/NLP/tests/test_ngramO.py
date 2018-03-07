@@ -12,16 +12,16 @@ m_test = np.random.randint(1, 10, (5, 3))
 columns_test = list('xyz') # samples
 rows_test = list('abcde') # conditions
 
-df_test = ngr.matrix2DataFrame(m_test, rows=rows_test, columns=columns_test)
+df_test = matrix2DataFrame(m_test, rows=rows_test, columns=columns_test)
 
 
 
 def test_matrix2DataFrame():
-    df = ngr.matrix2DataFrame(m_test, rows=rows_test, columns=columns_test)
-    assert df.loc['a', 'x'] == m[0,0]
-    assert df.loc['b', 'y'] == m[1,1]
+    df = matrix2DataFrame(m_test, rows=rows_test, columns=columns_test)
+    assert df.loc['a', 'x'] == m_test[0,0]
+    assert df.loc['b', 'y'] == m_test[1,1]
 
 
 def test_DataFrame2kykyDict():
-    kkD = ngr.DataFrame2kykyDict(df_test)
-    assert thisdf.loc['a', 'x'] == kkD['a']['x']
+    kkD = DataFrame2kykyDict(df_test)
+    assert df_test.loc['a', 'x'] == kkD['a']['x']
