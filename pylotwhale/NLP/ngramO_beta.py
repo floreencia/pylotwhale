@@ -243,32 +243,33 @@ def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
 
 def bigrams2countsMatrix(bigrams_tu, conditionsList=None, samplesList=None):
     '''bigrams --> bigrams matrix'''
-    return kykyCountsDict2matrix((bigrams2cfd(bigrams_tu)),
-                                     conditionsList=conditionsList, 
-                                     samplesList=samplesList)
-    
+    return kykyDict2matrix((bigrams2cfd(bigrams_tu)),
+                           conditionsList=conditionsList,
+                           samplesList=samplesList)
+
 
 ### matrix <--> samps index utilities for H0
 
-def get_insignificant_bigrams(p_values, samps, conds, pc=0.1, 
+def get_insignificant_bigrams(p_values, samps, conds, pc=0.1,
                               condition=lambda p_val, pc: p_val > pc):
-    """Get bigrams that violate the null hypothesis
+    '''Get bigrams that violate the null hypothesis
     Parameters
     ----------
-    p_values: 2darray
+    p_values : 2darray
         bigram's p-values (probability that H0 is true)
-    samps: list like
-    conds: list like
-    returns a list of tuples with the bigrams that cannot reject H0"""
+    samps : list like
+    conds : list like
+    returns a list of tuples with the bigrams that cannot reject H0'''
     bigrams_list = []
 
     for (r, c), p_val in np.ndenumerate(p_values):
-        if condition(p_values[r, c], pc):#p_values[r, c] > pc:
+        if condition(p_values[r, c], pc):  # p_values[r, c] > pc:
             bigrams_list.append((conds[r], samps[c]))
     return bigrams_list
 
+
 def get_insignificant_bigram_indices(p_values, pc=0.1):
-    """Get null hypothesis' non rejecting bigram indices
+    '''Get null hypothesis' non rejecting bigram indices
     Parameters
     ----------
     p_values: 2darray
@@ -277,7 +278,7 @@ def get_insignificant_bigram_indices(p_values, pc=0.1):
         ([r, c), ...]
         r = samp index
         c = cond indes
-    """
+    '''
     index_list = []
 
     for (r, c), p_val in np.ndenumerate(p_values):
@@ -304,7 +305,7 @@ def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
     return P
 
 
-def kykyCountsDict2matrix(kykyDict, conditions, samples):
+def kykyDict2matrix(kykyDict, conditions, samples):
     '''
     return the matrix of conditional probabilities
     Parameters
@@ -322,18 +323,28 @@ def kykyCountsDict2matrix(kykyDict, conditions, samples):
     return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
 
 
+def kykyCountsDict2matrix(kykyDict, conditions, samples):
+    '''
+    DEPRECATED, use kykyDict2matrix
+    '''
+    df = kykyDict2DataFrame(kykyDict)
+    return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
+
+
 def condProbDict2matrix(cpd, conditions, samples):
     '''
-    DEPRECATED USE: kykyCountsDict2matrix
+    DEPRECATED USE: kykyDict2matrix
     return the matrix of conditional probabilities
     Parameters
     ----------
     cpd: nltk.conditional_probability_distribution
     M, x_tick_labels, y_tick_labels
     '''
-    return bigramsdf2bigramsMatrix(kykyDict2DataFrame(cpd), 
-                                   conditionsList=conditions, samplesList=samples)#, condsLi, samplesLi)
-    
+    return bigramsdf2bigramsMatrix(kykyDict2DataFrame(cpd),
+                                   conditionsList=conditions,
+                                   samplesList=samples)#, condsLi, samplesLi)
+
+
 def condFreqDict2condProbMatrix(cfd, conditions, samples): 
     '''
     return the matrix of conditional probabilities
@@ -367,11 +378,20 @@ def kykyDict2DataFrame(kykyDict, fillna=0):
     '''
     return pd.DataFrame(kykyDict).fillna(fillna)
 
+
 def kykyCountsDict2DataFrame(kykyDict, fillna=0):
     '''
     DEPRECATED, use kykyDict2DataFrame
     '''
     return kykyDict2DataFrame(kykyDict).fillna(fillna)
+
+
+def matrix2kykyDict(M, c, r):
+    '''converts matrix (M) into kyky dictionary (DICT)
+    where the rows of the matrix are mapped into DICT
+    M[r,c] = DICT[r][c]'''
+    df = matrix2DataFrame(M, c, r)
+    return DataFrame2kykyDict(df)
 
 
 def DataFrame2kykyDict(df):
@@ -384,7 +404,10 @@ def matrix2DataFrame(M, c, r):
     Parameters
     ----------
     M : 2d array
+        rows are for conditions and columns for samples
     c, r : list like
+        names of the columns (c)
+        and indices (r) of the matrix
     '''
     return pd.DataFrame(m, columns=c, index=r)
 
@@ -392,17 +415,6 @@ def matrix2DataFrame(M, c, r):
 def twoDimDict2DataFrame(kykyDict):
     '''
     DEPRECATED, USE kykyDict2DataFrame
-    Transforms a two key dictionary into a pandas dataframe
-    
-    Parameters
-    ----------
-    kykyDict : dict
-        two key dict D[condition][sample] = x
-        P (sample = row | condition = column),
-        columns are the condition, rows are sampes
-    Returns
-    -------
-    df : pandas DataFrame
     '''
     return pd.DataFrame(kykyDict).fillna(0)
 
@@ -428,16 +440,16 @@ def dictOfBigramIcTimes(listOfBigrams, df, ict_XY_l=None, label='call', ict_labe
     dictionary with the ict_label values of the sequences
     Parameters
     ----------
-    listOfBigrams: list of bigrams
-    df: pandas data frame
-    ict_XY_l: dictionary of lists
+    listOfBigrams : list of bigrams
+    df : pandas data frame
+    ict_XY_l : dictionary of lists
         bigrams as keys and the ict of the bigrams as values
-    label: type of squence, or name of the column in df where to look for the sequences
-    ict_label: str
+    label : type of squence, or name of the column in df where to look for the sequences
+    ict_label : str
         name of the column
     Return
     ------
-    ict_XY: dictionary with lists
+    ict_XY : dictionary with lists
         ICIs by bigram
     '''
     if ict_XY_l is None: ict_XY_l = defaultdict(list)
