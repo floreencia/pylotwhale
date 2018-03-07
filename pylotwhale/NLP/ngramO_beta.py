@@ -395,21 +395,30 @@ def matrix2kykyDict(M, c, r):
 
 
 def DataFrame2kykyDict(df):
-    '''converts pandas DataFrame into kykyDict'''
-    return df.to_dict()
+    '''converts pandas DataFrame into kykyDict
+    df: DataFrame
+        conditions as index and
+        samples as rows
+    '''
+    # transpose the DataFrame so that when converting to dictionary
+    # the first key corresponds to the condition and the second to the sample
+    # DICT[cond][samp] = df,loc[cond, sample]
+    thisdf = df.T
+    
+    return thisdf.to_dict()
 
 
-def matrix2DataFrame(M, c, r):
+def matrix2DataFrame(M, rows=None, columns=None):
     '''converts an 2daray into a pandas DataFrame
     Parameters
     ----------
     M : 2d array
         rows are for conditions and columns for samples
-    c, r : list like
+    rows, columns : list like
         names of the columns (c)
         and indices (r) of the matrix
     '''
-    return pd.DataFrame(m, columns=c, index=r)
+    return pd.DataFrame(M, columns=columns, index=rows)
 
 
 def twoDimDict2DataFrame(kykyDict):
