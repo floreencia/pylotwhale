@@ -229,7 +229,55 @@ def superSequenceSlicer(seqOfSeqs):
     return np.cumsum(np.array([len(item) for item in seqOfSeqs]))
 
 
-def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sampsLi,
+def randtest4bigrmas_inSequences(seqOfSeqs, Nsh, condsLi, sampsLi):
+    """one sided randomisation test for each bigram conditional probability
+        under the null hypothesis H0: testStat_observed < testStat_shuffled
+        returns the p-values
+    Parameters
+    ----------
+    seqOfSeqs : list
+        list of lists on which we test for order
+    Nsh : int
+        number of randomisations
+    condLi, sampLi : list
+        list of conditions and samples
+    Returns
+    -------
+    p_values : ndarray
+    shuffle_test : ndarray
+        shuffled test distributions
+    """
+
+    ## sequence object
+    Seq = sequenceBigrams(seqOfSeqs)
+    ## observed conditional probabilities
+    obs_df = Seq.df_cpd.loc[condsLi, sampsLi]
+
+    ## initialise data containers for randomisations test
+    nr, nc = np.shape(obs_df)
+    shuffle_tests = np.zeros((Nsh, nr, nc)) # distributions
+    N_values_r = pd.DataFrame(0, index=obs_df.index, column=obs_df.columns)
+    
+    ## get supersequence
+    superSequence = Seq.superSequence
+
+    for i in np.arange(Nsh):
+        ## randomise supersequence and create sequence object
+        Seq_sh = sequenceBigrams(np.random.shuffle(superSequence))
+
+        ## transform cfd into matrix form
+        shTestStat_i = Seq_sh.df_cpd
+
+        shuffle_tests[i] = shTestStat_i  # save distribution for later
+        N_values_r[shTestStat_i >= df_obsStat] += 1  # test right
+
+    # compute p-value
+    p_r = 1.0*N_values_r/Nsh
+
+    return p_r, shuffle_tests
+
+
+def randomisation_test4bigrmas_inSequences(seqOfSeqs, df_obsStat, Nsh, condsLi, sampsLi,
                                            testStat=teStat_proportions_diff):
     """one sided randomisation test for each bigram conditional probability
         under the null hypothesis H0: testStat_observed < testStat_shuffled
@@ -238,7 +286,7 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     ----------
     seqOfSeqs : list
         list of lists on which we test for order
-    obsStat : ndarray
+    df_obsStat : pandas DataFrame
         observed stat for each bigram. defaul: teStat_proportions_diff
     Nsh : int
         number of randomisations
@@ -259,9 +307,9 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
     superSequence = np.array(flattenList(seqOfSeqs))
 
     ## randomisations test
-    nr, nc = np.shape(obsStat)
+    nr, nc = np.shape(df_obsStat)
     shuffle_tests = np.zeros((Nsh, nr, nc))
-    N_values_r = np.zeros_like(obsStat)
+    N_values_r = np.zeros_like(df_obsStat)
 
     for i in np.arange(Nsh):
         ## randomise supersequence
@@ -269,7 +317,7 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
 
         ## define sequences: slice supersequence and put in str format for nltk
         sequences_str = aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence,
-                                                                       seq_slicer))
+                                                                   seq_slicer))
         ## split sequences into bigrams
         my_bigrams = list(nltk.bigrams(sequences_str))
         ## count bigrams
@@ -277,12 +325,11 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, obsStat, Nsh, condsLi, sam
         ## fill cfd_sh0 with empty valued keys of the missing values
         cfd_sh = ngr.fill2KyDict(cfd_sh0, kySet=set(sampsLi) | set(condsLi))
         ## transform cfd into matrix form
-        Mp_sh, samps, conds = ngr.condFreqDict2condProbMatrix(cfd_sh,
-                                                              condsLi,
-                                                              sampsLi)  # normalised matrix
+        Mp_sh = ngr.condFreqDict2condProbMatrix(cfd_sh,
+                                                condsLi, sampsLi)[0]  # normalised matrix
         shTest_i = testStat(Mp_sh)  # compute satat variable
         shuffle_tests[i] = shTest_i  # save distribution for later
-        N_values_r[shTest_i >= obsStat] += 1  # test right
+        N_values_r[shTest_i >= df_obsStat] += 1  # test right
 
     # compute p-value
     p_r = 1.0*N_values_r/Nsh
@@ -306,11 +353,32 @@ class baseSequence():
     sequences_str : list
         list with sequences in str format
         e.g. ['_ini', 'h', ..., 'a', '_end', ..., '_end']
+
+    callCounts : Counter
+    sortedCallCounts : list
+    sortedCalls : list
     '''
     def __init__(self, seqOfSeqs):
         self.seqOfSeqs = seqOfSeqs
-        self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
+        self.__superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
         self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
+        
+    def seqOfSeqs2superSequence(self, seqOfSeqs):
+        '''to initialise superSequence'''
+        return np.array(flattenList(seqOfSeqs))
+
+    @property
+    def callCounts(self):
+        return Counter(self.__superSequence)
+
+    @property
+    def sortedCallCounts(self):
+        return sorted(self.callCounts.items(),
+                      key=lambda x: x[1], reverse=True)
+
+    @property
+    def sortedCalls(self):
+        return [item[0] for item in self.sortedCallCounts]
 
 
 class sequenceBigrams(baseSequence):
@@ -332,11 +400,6 @@ class sequenceBigrams(baseSequence):
         ## initialise sequence with: seqOfSeqs, superSequence, sequences_str
         baseSequence.__init__(self, seqOfSeqs)
 
-    #@property
-    def seqOfSeqs2superSequence(self, seqOfSeqs):
-        '''to initialise superSequence'''
-        return np.array(flattenList(seqOfSeqs))
-
     @property
     def bigrams(self):
         return self.__set_bigrams(self.sequences_str)
@@ -353,12 +416,23 @@ class sequenceBigrams(baseSequence):
         return ngr.condFreqDictC2condProbDict(self.cfd)
 
     @property
-    def callCounts(self):
-        return Counter(self.superSequence)
+    def df_cfd(self):
+        return ngr.kykyDict2DataFrame(self.cfd)
 
     @property
-    def sortedCalls(self):
-        return sorted(self.callCounts.items(), key = lambda x : x[1], reverse=True)
+    def df_cpd(self):
+        return ngr.kykyDict2DataFrame(self.cpd)
+
+    def sortedCalls_with_minNcalls(self, minCalls):
+        return [item[0] for item in self.sortedCallCounts if item[1] >= minCalls]
+
+    def samplesLi(self, minCalls, iniL='_end'):
+        calls = self.sortedCalls_with_minNcalls(minCalls)
+        return calls[:] + [iniL]
+
+    def conditionsLi(self, minCalls, endL='_ini'):
+        calls = self.sortedCalls_with_minNcalls(minCalls)
+        return calls[:] + [endL]
 
 
 
@@ -373,6 +447,10 @@ class shuffleSequence(baseSequence):
 
     def superSequence2iniEndStrSeq(self, superSequence, slicer):
         return aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence, slicer))
+
+    def randomise(self, supersequence):
+        return 1
+        
 
 
 #class shuffleSequence(sequence):
