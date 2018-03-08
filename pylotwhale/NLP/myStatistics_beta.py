@@ -256,20 +256,22 @@ def randtest4bigrmas_inSequences(seqOfSeqs, Nsh, condsLi, sampsLi):
     ## initialise data containers for randomisations test
     nr, nc = np.shape(obs_df)
     shuffle_tests = np.zeros((Nsh, nr, nc)) # distributions
-    N_values_r = pd.DataFrame(0, index=obs_df.index, column=obs_df.columns)
+    N_values_r = pd.DataFrame(0, index=obs_df.index, columns=obs_df.columns)
     
     ## get supersequence
-    superSequence = Seq.superSequence
+    superSequence = Seq.seqOfSeqs
 
     for i in np.arange(Nsh):
         ## randomise supersequence and create sequence object
-        Seq_sh = sequenceBigrams(np.random.shuffle(superSequence))
+        sos_sh = randomiseSeqOfSeqs(Seq.seqOfSeqs)
+        ## create object
+        S_sh = sequenceBigrams(sos_sh)
 
-        ## transform cfd into matrix form
-        shTestStat_i = Seq_sh.df_cpd
+        ## transform cfd into df
+        shTestStat_i = S_sh.df_cpd.loc[condsLi, sampsLi]
 
-        shuffle_tests[i] = shTestStat_i  # save distribution for later
-        N_values_r[shTestStat_i >= df_obsStat] += 1  # test right
+        shuffle_tests[i] = shTestStat_i.values  # save distribution for later
+        N_values_r[shTestStat_i >= obs_df] += 1  # test right
 
     # compute p-value
     p_r = 1.0*N_values_r/Nsh
@@ -336,6 +338,10 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, df_obsStat, Nsh, condsLi, 
 
     return p_r, shuffle_tests
 
+def seqOfSeqs2superSequence(seqOfSeqs):
+    '''to initialise superSequence'''
+    return np.array(flattenList(seqOfSeqs))
+
 
 class baseSequence():
     '''base class for sequences
@@ -362,10 +368,10 @@ class baseSequence():
         self.seqOfSeqs = seqOfSeqs
         self.__superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
         self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
-        
+
     def seqOfSeqs2superSequence(self, seqOfSeqs):
         '''to initialise superSequence'''
-        return np.array(flattenList(seqOfSeqs))
+        return seqOfSeqs2superSequence(seqOfSeqs)
 
     @property
     def callCounts(self):
@@ -436,6 +442,21 @@ class sequenceBigrams(baseSequence):
 
 
 
+def randomiseSeqOfSeqs(seqOfSeqs):
+    '''randomises a sequence'''
+    ## define slicer
+    slicer = superSequenceSlicer(seqOfSeqs)  # slicer
+    ## map to supersequence
+    superSequence = seqOfSeqs2superSequence(seqOfSeqs)
+    ## randomise labels
+    np.random.shuffle(superSequence)
+    ## slice back to seq of seqs
+    seqOfSeqs_sh = sliceBackSuperSequence(superSequence,
+                                          slicer)
+
+    return seqOfSeqs_sh  # sequenceBigrams(seqOfSeqs_sh)
+
+
 class shuffleSequence(baseSequence):
 
     def __init__(self, seqOfSeqs):
@@ -448,8 +469,18 @@ class shuffleSequence(baseSequence):
     def superSequence2iniEndStrSeq(self, superSequence, slicer):
         return aa.seqsLi2iniEndSeq(sliceBackSuperSequence(superSequence, slicer))
 
-    def randomise(self, supersequence):
-        return 1
+
+    def randomise(self, seqOfSeqs):
+        slicer = superSequenceSlicer(seqOfSeqs)
+
+        superSequence = self.seqOfSeqs2superSequence(seqOfSeqs)
+        superSequence_sh = np.random.shuffle(superSequence)
+        ## back to seq of seqs
+        seqOfSeqs_sh = self.sliceBackSuperSequence(superSequence_sh, 
+                                                   slicer)
+        seqO = sequenceBigrams(seqOfSeqs_sh)
+        
+        return seqO
         
 
 
