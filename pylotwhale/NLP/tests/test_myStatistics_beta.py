@@ -37,7 +37,7 @@ def test_sequenceBigrams():
 def test_randomisation_test4bigrmas_inSequences():
     test_seq = test_seq1 + ['a', 'b']
     seqO = sequenceBigrams(test_seq)
-    calls = [item[0] for item in seqO.sortedCalls if item[1] >= 0]
+    calls = [item[0] for item in seqO.sortedCallCounts if item[1] >= 0]
     samplesLi = calls[:] + ['_end'] #None #[ 'A', 'B', 'C', 'E', '_ini','_end']
     condsLi = calls[:] + ['_ini']
     note2samp_i = {s: i for i, s in enumerate(samplesLi)}
@@ -51,3 +51,4 @@ def test_randomisation_test4bigrmas_inSequences():
     assert (p_values[note2cond_i['a'], note2samp_i['b']] > 0.5)
     assert (p_values[note2cond_i['b'], note2samp_i['a']] > 0.5)
     assert (p_values[note2cond_i['b'], note2samp_i['b']] < 0.1)
+
