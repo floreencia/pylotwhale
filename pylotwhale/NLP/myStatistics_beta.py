@@ -218,6 +218,7 @@ def shuffleSeqOfSeqs(seqOfSeqs):
         shuffled_seqOfSeqs.append(shuffleSequence(s))
     return shuffled_seqOfSeqs
 
+
 def superSequenceSlicer(seqOfSeqs):
     '''Returns the an array with the indices to slize back
     Parameters
@@ -255,9 +256,9 @@ def randtest4bigrmas_inSequences(seqOfSeqs, Nsh, condsLi, sampsLi):
 
     ## initialise data containers for randomisations test
     nr, nc = np.shape(obs_df)
-    shuffle_tests = np.zeros((Nsh, nr, nc)) # distributions
+    shuffle_tests = np.zeros((Nsh, nr, nc))  # distributions
     N_values_r = pd.DataFrame(0, index=obs_df.index, columns=obs_df.columns)
-    
+
     ## get supersequence
     superSequence = Seq.seqOfSeqs
 
@@ -281,25 +282,7 @@ def randtest4bigrmas_inSequences(seqOfSeqs, Nsh, condsLi, sampsLi):
 
 def randomisation_test4bigrmas_inSequences(seqOfSeqs, df_obsStat, Nsh, condsLi, sampsLi,
                                            testStat=teStat_proportions_diff):
-    """one sided randomisation test for each bigram conditional probability
-        under the null hypothesis H0: testStat_observed < testStat_shuffled
-        returns the p-values
-    Parameters
-    ----------
-    seqOfSeqs : list
-        list of lists on which we test for order
-    df_obsStat : pandas DataFrame
-        observed stat for each bigram. defaul: teStat_proportions_diff
-    Nsh : int
-        number of randomisations
-    condLi, sampLi : list
-        list of conditions and samples
-    testStat : callable
-    Returns
-    -------
-    p_values : ndarray
-    shuffle_test : ndarray
-        shuffled test distributions
+    """DEPRECATED: use randtest4bigrmas_inSequences
     """
 
     ## define array to slice supperSequnces back into the squences
