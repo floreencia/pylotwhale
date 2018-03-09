@@ -110,6 +110,9 @@ class dict2network():
     def remove_edges(self, ebunch):
         """removes edges from ebunch (a list of tuples)"""
         self.G.remove_edges_from(ebunch)
+        
+    def remove_nodes(self, nodeLi):
+        self.G.remove_nodes_from(nodeLi)
 
     def drawGraphviz(self, dot_file, fig_file, invisibleNodes='default'):
         if invisibleNodes == 'default': invisibleNodes = ['_ini', '_end']
