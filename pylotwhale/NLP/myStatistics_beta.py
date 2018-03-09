@@ -38,7 +38,6 @@ def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
     return p1  # 2*p1-1
 
-
 def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
                          kwargs_obs=None, **kwargs):
     """plot randomised distribution (distsM) with observable
@@ -415,11 +414,11 @@ class sequenceBigrams(baseSequence):
     def sortedCalls_with_minNcalls(self, minCalls):
         return [item[0] for item in self.sortedCallCounts if item[1] >= minCalls]
 
-    def samplesLi(self, minCalls, iniL='_end'):
+    def samplesLi(self, minCalls=0, iniL='_end'):
         calls = self.sortedCalls_with_minNcalls(minCalls)
         return calls[:] + [iniL]
 
-    def conditionsLi(self, minCalls, endL='_ini'):
+    def conditionsLi(self, minCalls=0, endL='_ini'):
         calls = self.sortedCalls_with_minNcalls(minCalls)
         return calls[:] + [endL]
 
