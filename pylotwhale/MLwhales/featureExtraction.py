@@ -499,9 +499,9 @@ class TransformationsPipeline():
         return s
 
     def processing_steps(self):
-        s=''
+        s = ''
         for k in self.step_sequence:
-            s += "{}, {}, {}\n".format(k, self.steps[k].name, 
+            s += "{}, {}, {}\n".format(k, self.steps[k].name,
                                        self.steps[k].settingsDict)
         return s
 
@@ -971,21 +971,23 @@ class wavFeatureExtraction():
         if isinstance(feature_extr_di, dict):
             self.feature_extr_di = feature_extr_di
             self.feature_str = self.set_featureExtStr(dict(self.feature_extr_di))
-            
+
+
 class wavFeatureExtractionWalk(wavFeatureExtraction):
     """class for the extraction of wav features 
     by framing the signal walking in steps of textWS"""
     def __init__(self, feature_extr_di=None):
         if feature_extr_di is None:
             feature_extr_di = self.defaultFeatureExtractionDi()
-        wavFeatureExtraction.__init__(self, feature_extr_di) #sets string and dictionary
+        wavFeatureExtraction.__init__(self, feature_extr_di) # sets string and dictionary
         self.newFeatExtrDi(feature_extr_di)
-        
+
     def defaultFeatureExtractionDi(self):
         '''default settings'''
         feExDict = {'featExtrFun' : 'melspectro', 'textWS' : 0.1, 'n_mels' : 2**4 }
         return feExDict
-        
+
+
 class wavFeatureExtractionSplit(wavFeatureExtraction):
     """class for the extraction of wav features by splitting section into Nslices"""
     def __init__(self, feature_extr_di=None):
