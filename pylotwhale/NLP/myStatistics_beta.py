@@ -348,7 +348,7 @@ class baseSequence():
     '''
     def __init__(self, seqOfSeqs):
         self.seqOfSeqs = seqOfSeqs
-        self.__superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
+        self.superSequence = self.seqOfSeqs2superSequence(self.seqOfSeqs)
         self.sequences_str = aa.seqsLi2iniEndSeq(self.seqOfSeqs)
 
     def seqOfSeqs2superSequence(self, seqOfSeqs):
@@ -357,7 +357,7 @@ class baseSequence():
 
     @property
     def callCounts(self):
-        return Counter(self.__superSequence)
+        return Counter(self.superSequence)
 
     @property
     def sortedCallCounts(self):
