@@ -9,6 +9,20 @@ function tools
 """
 from ..dataTools import *
 import numpy as np
+import pandas as pd
+
+s = {('w', 'a'),
+     ('w', 'b'),
+     ('x', 'a'),
+     ('x', 'b'),
+     ('y', 'a'),
+     ('y', 'b'),
+     ('z', 'a'),
+     ('z', 'b')}
+
+thisdf_r = pd.DataFrame(np.random.randint(1,5, (4,2)), columns=list('ab'), index=list('wxyz'))
+thisdf_c = pd.DataFrame(3, columns=list('ab'), index=list('wxyz'))
+
 
 def test_search_sequence_numpy():
     """find sequence in numpy array
@@ -46,5 +60,8 @@ def test_sliceBackSuperSequence():
                 ['g', 'x', 'y', 'z']])
     
 
-
-
+def test_get_indexColFromDataFrame():
+    condFun = lambda x: x >= 2
+    assert(s == get_indexColFromDataFrame(thisdf_c, condFun))
+    condFun = lambda x: x >= 5
+    assert(set() == get_indexColFromDataFrame(thisdf_c, condFun))

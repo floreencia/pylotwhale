@@ -22,14 +22,8 @@ def arrShuffleSplit(arr, frac=0.5):
     idx = int(n*0.5)
     return arr[indices[:idx]], arr[indices[idx:]]
 
-def stringiseDict(di, distr): 
-    '''converts a dictionary into string, supports dictionaries as values'''
-    for ky, val in di.items(): # for each element in the dictionary
-        if isinstance(val, dict):
-            distr += '-'+stringiseDict(val, ky)
-        else:
-            distr += '-{}_{}'.format(ky, val)            
-    return distr
+    
+#### DATAFRAMES
 
 def dictOfGroupedDataFrames(df0, groupingKey='tape'):
     '''groups a dataframe according to groupingKey and returns a dictionary of data frames'''
@@ -75,7 +69,8 @@ def groupedCountsInDataFrame(df, group_key, count_key):
     for gr in set(df[group_key]):
         cd[gr] = Counter(df[df[group_key] == gr][count_key])
     return cd
-    
+
+
 def get_indexColFromDataFrame(df, condFun):
     '''returns the chordenates (index, column) of the values in 
     a DataFrame that satisfy a condition
@@ -96,69 +91,7 @@ def get_indexColFromDataFrame(df, condFun):
                 indexCol |= {(i, j)}
                 #print(i,j, V)
     return indexCol
-
-def arrangeDict(di, ordering_keys):
-    '''returns a numpy array with the values of the keys ordered according to ordering_keys
-    if oredering key not in di.keys(), then the entry will be 0'''
-    return np.array([di[ky] if ky in di.keys() else 0 for ky in ordering_keys ])
-
-def ignoredKeys(di, ignoreKeys):
-    return [item for item in di.items() if item[0] not in ignoreKeys]
     
-def removeFromList(l0, l_ignore=['_ini', '_end']):
-    '''Removes l_ignore from l0 
-    l0, l_ignote : list/np.array'''
-    return [item for item in l0 if item not in l_ignore] #any(set(l_ignore).intersection(item))] 
-    
-def removeElementWith(l0, l_ignore=['_ini', '_end']):
-    '''Removes any element containing any intersection with l_ignore
-    l0 : list of lists, l_ignote : list/np.array'''
-    return  [item for item in l0 if not any(set(l_ignore).intersection(item))]    
-
-def returnSortingKeys(di, minCounts=None, reverse=True):
-    '''keys that sort a dictionary
-        di : key --> num dictionary, eg. Counter dictionary'''
-    return np.array([item[0] for item in 
-            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] >= minCounts])
-
-### FOR LISTS
-
-def flattenList(L):
-    '''flatterns a list
-    Parameters
-    ----------
-    L : list
-        list of lists
-    Returns
-    -------
-    flattedList : list
-    '''
-    flattedList = []
-    for sublist in L:
-        flattedList += list(sublist)
-    return flattedList
-    
-
-def sliceBackSuperSequence(superSeq, seqSlicer):
-    '''
-    Parameters
-    ----------
-    superSeq : ndarray
-        sequence to slice into sub sequences
-    seqSlicer : ndarray
-        indices for slicing superSeq
-    Returns
-    -------
-    seqOfSeqs: list
-        list of lists
-    '''
-    i0 = 0
-    seqOfSeqs = []
-    for i in seqSlicer:
-        seqOfSeqs.append(superSeq[i0:i])
-        i0=i
-    return seqOfSeqs
-            
 ### search sequence in PANDAS dataframe           
             
 def search_sequence_numpy(arr, seq):
@@ -184,14 +117,15 @@ def search_sequence_numpy(arr, seq):
 
     # Create 2D array of sliding indices across entire length of input array.
     # Match up with the input sequence & get the matching starting indices.
-    M = (arr[np.arange(Na-Nseq+1)[:,None] + r_seq] == seq).all(1)
+    M = (arr[np.arange(Na - Nseq + 1)[:, None] + r_seq] == seq).all(1)
 
     # Get the range of those indices as final output
-    if M.any>0:
-        return np.where(np.convolve(M, np.ones((Nseq),dtype=int)) > 0 )[0]
+    if M.any > 0:
+        return np.where(np.convolve(M, np.ones((Nseq), dtype=int)) > 0)[0]
     else:
         return np.array([])
-    
+
+
 def filterIndicesForIct(ixArray, seqSize=2, diffCall=True):
     """get the indexes of a dataframe corresponding to the ict
     because the ict are defined by two consecutive calls, we are interested in the 
@@ -229,6 +163,85 @@ def returnSequenceDf(df0, seq, label='call'):
     arr = df0[label].values
     ix=filterIndicesForIct(search_sequence_numpy(arr, np.array(seq)), diffCall=diffCall)
     return df0.loc[ix].reset_index()
+
+
+##### DICTIONARIES
+
+def stringiseDict(di, distr):
+    '''converts a dictionary into string, supports dictionaries as values'''
+    for ky, val in di.items():  # for each element in the dictionary
+        if isinstance(val, dict):
+            distr += '-'+stringiseDict(val, ky)
+        else:
+            distr += '-{}_{}'.format(ky, val)
+    return distr
+
+
+def arrangeDict(di, ordering_keys):
+    '''returns a numpy array with the values of the keys ordered according to ordering_keys
+    if oredering key not in di.keys(), then the entry will be 0'''
+    return np.array([di[ky] if ky in di.keys() else 0 for ky in ordering_keys ])
+
+
+def ignoredKeys(di, ignoreKeys):
+    return [item for item in di.items() if item[0] not in ignoreKeys]
+
+def returnSortingKeys(di, minCounts=None, reverse=True):
+    '''keys that sort a dictionary
+        di : key --> num dictionary, eg. Counter dictionary'''
+    return np.array([item[0] for item in 
+            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] >= minCounts])
+
+### LISTS
+
+def flattenList(L):
+    '''flatterns a list
+    Parameters
+    ----------
+    L : list
+        list of lists
+    Returns
+    -------
+    flattedList : list
+    '''
+    flattedList = []
+    for sublist in L:
+        flattedList += list(sublist)
+    return flattedList
+
+
+def sliceBackSuperSequence(superSeq, seqSlicer):
+    '''
+    Parameters
+    ----------
+    superSeq : ndarray
+        sequence to slice into sub sequences
+    seqSlicer : ndarray
+        indices for slicing superSeq
+    Returns
+    -------
+    seqOfSeqs: list
+        list of lists
+    '''
+    i0 = 0
+    seqOfSeqs = []
+    for i in seqSlicer:
+        seqOfSeqs.append(superSeq[i0:i])
+        i0 = i
+    return seqOfSeqs
+
+
+def removeFromList(l0, l_ignore=['_ini', '_end']):
+    '''Removes l_ignore from l0 
+    l0, l_ignote : list/np.array'''
+    return [item for item in l0 if item not in l_ignore] #any(set(l_ignore).intersection(item))] 
+
+    
+def removeElementWith(l0, l_ignore=['_ini', '_end']):
+    '''Removes any element containing any intersection with l_ignore
+    l0 : list of lists, l_ignote : list/np.array'''
+    return  [item for item in l0 if not any(set(l_ignore).intersection(item))]    
+
 
 ### matrices \\ 2dim numpy array
 
