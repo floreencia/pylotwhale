@@ -75,6 +75,27 @@ def groupedCountsInDataFrame(df, group_key, count_key):
     for gr in set(df[group_key]):
         cd[gr] = Counter(df[df[group_key] == gr][count_key])
     return cd
+    
+def get_indexColFromDataFrame(df, condFun):
+    '''returns the chordenates (index, column) of the values in 
+    a DataFrame that satisfy a condition
+    Parameters
+    ----------
+    df: DataFrame
+    condFun: callable
+        e.g. lambda x: x >= 3
+    Return
+    ------
+    indexCol: set of tuples
+        set of index col tuples, {(i1, c1), ..., (in, cn)}
+        '''
+    indexCol = set()
+    for i, r in df.iterrows():
+        for j, V in r.iteritems():
+            if condFun(V):
+                indexCol |= {(i, j)}
+                #print(i,j, V)
+    return indexCol
 
 def arrangeDict(di, ordering_keys):
     '''returns a numpy array with the values of the keys ordered according to ordering_keys
