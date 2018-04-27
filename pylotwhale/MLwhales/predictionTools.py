@@ -240,7 +240,7 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None, sep='
         pass
     
     with open(inFile) as f: # read lines
-        lines=f.readlines()
+        lines = f.readlines()
 
     with open(outFile, 'a') as g: # predict
         g.write("#{}\n".format(lt.classes_))
@@ -298,27 +298,29 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
             with open(outFile, 'a') as f:
                 f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, label))
 
-    return outFile   
-                                  
-                                  
-                                  
-  
+    return outFile
+
+
 def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
                               sep='\t', printProbs=False, header=''):
     '''
     Predicts the label (call types) of each annotated section and writes 
-    the prediction into a outFile
-    Parameters:
-    -----------
-    < wavF : wave file
-    < annF : anontatiosn file
-    < clf : classifier
-    < featExtFun :  feature extraction function (callable)
-                    or a dictionary with the feature extraction settings
-                    featureExtrationParams = dict(zip(i, i))
+    the prediction into outFile
+    Parameters
+    ----------
+    wavF : str
+        wave file
+    annF : str
+        annotation file
+    clf : sklearn fitted estimator
+        classifier
+    featExtFun :  callable
+        feature extraction function
+        or a dictionary with the feature extraction settings
+        featureExtrationParams = dict(zip(i, i))
     '''
     ### out file handling
-    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'       
+    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
     try: # remove file if exists
         os.remove(outFile)
     except OSError:
@@ -336,18 +338,18 @@ def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
     np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s', 
                delimiter = '\t', header=header)
     return outFile
-   
 
-### GARBAGE    
-    
+
+### GARBAGE
+
 def plConfusionMatrix(cM, labels, outFig='', figsize=None):
     '''
     MOOVED TO myML
     '''
     print("~WARNING!!! USE THE ONE IN myML")
     myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
-    
-    
+
+
 def predictAndWrite(inFile, clf, lt, col=0, outFile=None, sep='\t', stop=None):
     ''' don't use this function
         use "predictFeatureCollectionAndWrite" instead. THIS FUNCITON WILL BE REMOVED'''
