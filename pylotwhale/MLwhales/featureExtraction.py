@@ -123,13 +123,13 @@ def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
     annF: str
         path to wavfile
     featExtFun:  callable
-        feature extraction function 
-                  
+        feature extraction function
+
     Returns
     -------
     datO: ML.dataXy_names
         classification features
-    """  
+    """
 
     ### extract features for each annotated section
     segmentsLi, fs = auf.getAnnWavSec(wavF, annF)

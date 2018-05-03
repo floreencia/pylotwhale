@@ -276,6 +276,49 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
     return outFile
 
 
+def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
+                                printProbs=False, readSections=None,
+                                printreadSectionsC=True):
+    """predicts annotations for call types sections
+    Parameters
+    ----------
+    wavF : str
+    annF : str
+    clf : estimator
+    featExtFun : callable
+    lt : labelTransformer
+    printProbs : bool
+    readSections : list of str
+        regions in the annF for which we predict
+    printreadSectionsC : bool
+    """
+
+    ## load annotations
+    waveform, fs = sT.wav2waveform(wavF)
+    T, L = annT.anns2TLndarrays(annF)
+    ## set of annotation-sectins to predcit
+    if readSections is None:
+        readSections = list(set(L))
+    ## for each annotation section
+    for i, label in enumerate(L):
+        if label in readSections:
+            waveformSec = auf.getWavSec(waveform, fs, *T[i])
+            ## predict
+            try:
+                M0 = featExtFun(waveformSec)  # estract features
+                M = np.expand_dims(M0.flatten(), axis=0)
+                y_pred = lt.num2nom(clf.predict(M))  # predict label
+            except AssertionError:
+                y_pred = [label]
+            ## write
+            with open(outFile, 'a') as f:
+                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, *y_pred))
+        elif printreadSectionsC:
+            with open(outFile, 'a') as f:
+                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, label))
+
+    return Tp, Lp
+
 def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
                               sep='\t', printProbs=False, header='',
                               readSections=None, printreadSectionsC=True):
@@ -292,7 +335,7 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     printProbs: bool
     header: str
     readSections: list of str
-        regions in the annF for wich we predict
+        regions in the annF for which we predict
     printreadSectionsC: bool"""
 
     if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                     
