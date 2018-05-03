@@ -73,14 +73,14 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, o
     if annSections == 'default':
         annSections = ['c']
 
-    tf = 1.0*len(waveform)/fs    
-    M0 =  feExFun(waveform)#, annotations=annotLi_t)
+    tf = 1.0*len(waveform)/fs
+    M0 = feExFun(waveform) #, annotations=annotLi_t)
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
     return outF
 
 
-def predictAnnotations(waveform, fs, feExFun, lt, clf):#, annSections=None):
+def predictAnnotations(waveform, fs, feExFun, lt, clf): #, annSections=None):
     """
     predicts annotation sections of a waveform
     walking along a waveform
@@ -231,18 +231,39 @@ def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
 
 ### PREDICT THE LABELS OF THE ANNOTATED SECTION IN A WAV FILE  (CALL TYPE)
 
-def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None, sep='\t', stop=None):
-    '''read a collection (indexfile) of features (*.npy) --> predict --> save predictions'''
-    if outFile is None: outFile = os.path.splitext(inFile)[0] + '-predictions.txt'       
-    try: # remove file if exists
+
+def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
+                                     sep='\t', stop=None):
+    '''read a collection (indexfile) of features (*.npy)
+    --> predict --> save predictions
+    one prediction per file in the collection
+    Parameters
+    ----------
+    inFile : str
+        collection of feature files, in *.npy format
+    clf : sklearn estimator
+    lt : label transformer
+    col : int
+    outFile : str
+        collection with the predicted labels, path to file
+    sep: str
+    stop: int
+    Returns
+    -------
+    outFile: str
+        path to output file
+    '''
+    if outFile is None:
+        outFile = os.path.splitext(inFile)[0] + '-predictions.txt'
+    try:  # remove file if exists
         os.remove(outFile)
     except OSError:
         pass
-    
-    with open(inFile) as f: # read lines
+
+    with open(inFile) as f:  # read lines
         lines = f.readlines()
 
-    with open(outFile, 'a') as g: # predict
+    with open(outFile, 'a') as g:  # predict
         g.write("#{}\n".format(lt.classes_))
         for li in lines[:stop]:
             if li[0] != '#':
@@ -274,11 +295,11 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
         regions in the annF for wich we predict
     printreadSectionsC: bool"""
 
-    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                        
+    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                     
     ## load files
     waveform, fs = sT.wav2waveform(wavF)
     T, L = annT.anns2TLndarrays(annF)
-    if readSections == None: 
+    if readSections == None:
         readSections = list(set(L))
     ## for each annotation section
     for i, label in enumerate(L):
@@ -286,9 +307,9 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
             waveformSec = auf.getWavSec(waveform, fs, *T[i] )
             ## predict
             try:
-                M0 = featExtFun(waveformSec)
+                M0 = featExtFun(waveformSec)  # estract features 
                 M = np.expand_dims(M0.flatten(), axis=0)
-                y_pred = lt.num2nom(clf.predict(M))
+                y_pred = lt.num2nom(clf.predict(M)) # predict label
             except AssertionError:
                 y_pred = [label]
             ## write
