@@ -99,12 +99,13 @@ def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='
         labels in hierarchical order for setting the label of the instances
 
     Return
-    ------    
+    ------
     > datO :  a file with the paths to the features and their labels
-    """   
+    """
     coll = np.genfromtxt(WavAnnCollectionFi, dtype=object)
 
     return wavAnnCollection2datXy(coll, feExFun, labelsHierarchy)
+
 
 ### 1 section x feature vector (SPLITTING)
 
