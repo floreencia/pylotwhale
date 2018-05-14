@@ -279,7 +279,7 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
 def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
                                 printProbs=False, readSections=None,
                                 printreadSectionsC=True):
-    """predicts annotations for call types sections
+    """generates annotations predicting audio section classes
     Parameters
     ----------
     wavF : str
@@ -295,29 +295,24 @@ def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
 
     ## load annotations
     waveform, fs = sT.wav2waveform(wavF)
-    T, L = annT.anns2TLndarrays(annF)
-    ## set of annotation-sectins to predcit
+    T, L0 = annT.anns2TLndarrays(annF)
+    ## set of annotation-sections to predict
     if readSections is None:
-        readSections = list(set(L))
+        readSections = np.array(list(set(L0)))
+    ## filter for sections of interest
+    IO_sections = np.isin(L0, readSections)
+    Tp = T[IO_sections]
+    L = L0[IO_sections]
+    Lp = np.zeros_like(L)
     ## for each annotation section
-    for i, label in enumerate(L):
-        if label in readSections:
-            waveformSec = auf.getWavSec(waveform, fs, *T[i])
-            ## predict
-            try:
-                M0 = featExtFun(waveformSec)  # estract features
-                M = np.expand_dims(M0.flatten(), axis=0)
-                y_pred = lt.num2nom(clf.predict(M))  # predict label
-            except AssertionError:
-                y_pred = [label]
-            ## write
-            with open(outFile, 'a') as f:
-                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, *y_pred))
-        elif printreadSectionsC:
-            with open(outFile, 'a') as f:
-                f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, label))
+    for i, label in enumerate(L):  # for each section
+        waveformSec = auf.getWavSec(waveform, fs, *Tp[i])  # load waveform section
+        M0 = featExtFun(waveformSec)  # extract features
+        M = np.expand_dims(M0.flatten(), axis=0)
+        Lp[i] = lt.num2nom(clf.predict(M))[0]  # predict
 
     return Tp, Lp
+
 
 def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
                               sep='\t', printProbs=False, header='',
@@ -336,7 +331,11 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     header: str
     readSections: list of str
         regions in the annF for which we predict
-    printreadSectionsC: bool"""
+    printreadSectionsC: bool
+    See also
+    --------
+       TLpredictAnnotationSections 
+    """
 
     if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                     
     ## load files
