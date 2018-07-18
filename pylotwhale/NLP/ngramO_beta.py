@@ -194,7 +194,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     if samplesList is None: samplesList = df.index
 
     #bigrsDF = df[conditionsList].loc[samplesList]
-    bigrsDF = df[conditionsList].reindex(samplesList)
+    bigrsDF = df[samplesList].reindex(conditionsList)
     samps = bigrsDF.index.values
     conds = bigrsDF.columns.values
     M = bigrsDF.as_matrix() # .T  # transpose to have conditions as rows
