@@ -204,8 +204,8 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     '''DEPRECATED, USE kykyCountsDict2matrix INSTEAD'''
     return kykyCountsDict2matrix(bigramsDict,
-                                   conditionsList=conditionsList,
-                                   samplesList=samplesList)
+                                 conditions=conditionsList,
+                                 samples=samplesList)
 
 
 def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):

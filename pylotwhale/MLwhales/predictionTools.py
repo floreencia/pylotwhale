@@ -255,10 +255,12 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
     '''
     if outFile is None:
         outFile = os.path.splitext(inFile)[0] + '-predictions.txt'
+
     try:  # remove file if exists
         os.remove(outFile)
     except OSError:
         pass
+    
 
     with open(inFile) as f:  # read lines
         lines = f.readlines()
@@ -334,10 +336,16 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     printreadSectionsC: bool
     See also
     --------
-       TLpredictAnnotationSections 
+       TLpredictAnnotationSections
     """
 
-    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'                                     
+    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
+
+    try:  # remove file if exists
+        os.remove(outFile)
+    except OSError:
+        pass
+                                       
     ## load files
     waveform, fs = sT.wav2waveform(wavF)
     T, L = annT.anns2TLndarrays(annF)
@@ -384,6 +392,7 @@ def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
     '''
     ### out file handling
     if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
+    
     try: # remove file if exists
         os.remove(outFile)
     except OSError:

@@ -15,24 +15,26 @@ tools for the preparation of annotated files
 
 #### AUP annotations <---> mtl (marsyas) annotations
 
+
 def anns2array(annF):
     '''loads annotations file into ndarray'''
     return np.genfromtxt(annF, dtype=None)
+
 
 def loadAnnLabels(fi, cols=(2,)):
     """Loads labels from annotations file (3rd column)"""
     return np.loadtxt(fi, dtype=object, usecols=cols, ndmin=1)
 
 
-def anns2TLndarrays(fi, Tcols=(0,1), Lcols=(2,)):
+def anns2TLndarrays(fi, Tcols=(0, 1), Lcols=(2, )):
     """like anns2array but returns 2 ndarrays T (n, 2) and L (n,)"""
     T = np.loadtxt(fi, usecols=Tcols, ndmin=2)
     L = loadAnnLabels(fi, cols=Lcols)
     return T, L
 
+
 def save_TLannotations(T, L, outF, opening_mode='w'):
     """saves T, L as an annotations file"""
-    
     assert len(T) == len(L), "T and L must match in length"
 
     if opening_mode == 'w':
@@ -40,55 +42,54 @@ def save_TLannotations(T, L, outF, opening_mode='w'):
             os.remove(outF)
         except OSError:
             pass
-        
+      
     with open(outF, opening_mode) as f:  # new annotations
         for i in np.arange(len(L)):  # print new annotations
             f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(T[i, 0],
                     T[i, 1], L[i]))
     return outF
-    
+
+
 def parseAupFile(inFilename, sep='.'):
-    """ 
+    """
     parses an audacity text file
     Parameters:
     -----------
     inFilename : file with audacity-like annotations (t0 \t tf \t label)
     sep : decimal separator, by default "." but often i.e. the case of my
         aup the decimal separator is a ","
-    Returns:
+    Returns
     --------
     data : list of dictionaries with the aup annotations format
-            { startTime  endTime  label } 
-
+            { startTime  endTime  label }
     """
     #print(inFilename)
     with open(inFilename, "r") as f:
-        lines = f.read().splitlines() 
-    
+        lines = f.read().splitlines()
+
     data = []
-    
+
     for line in lines:
         try:
-            m = re.search('([-0-9%s]*)\t([-0-9%s]*)\t(\w*)'%(sep, sep), line)
+            m = re.search('([-0-9%s]*)\t([-0-9%s]*)\t(\w*)' % (sep, sep), line)
             assert m, "{}\nlines don't match the RE".format(line)
             pass
         except:
             print("{}\nnot parsed: {}".format(inFilename, line))
             continue
-            
-        startTime = float(m.group(1).replace(sep, '.')) # replaces separator for dot
+
+        startTime = float(m.group(1).replace(sep, '.'))  # replaces separator for dot
         endTime = float(m.group(2).replace(sep, '.'))
         label = m.group(3)
-        item = { 'startTime' : startTime, 'endTime' : endTime, 'label' : label }
+        item = {'startTime': startTime, 'endTime': endTime, 'label': label}
         data.append(item)
-        
-    return data      
+
+    return data
 
 
 def readCols(fName, colIndexes, sep='\t'):
     '''
     Read the columns "colIxes" of a file "fName"
-    
     np.loadtxt(file, delimiter='\t', dtype='|S') can be used instead!
     Parameters
     ----------
@@ -103,10 +104,10 @@ def readCols(fName, colIndexes, sep='\t'):
     '''
     with open(fName) as f:
         lines = f.readlines()
-    
+
     #li = [tuple([line.strip().split(sep)[ci] for ci in colIndexes]) for line in lines if not line.startswith('#')]
     li = [[line.strip().split(sep)[ci] for ci in colIndexes] for line in lines if not line.startswith('#')]
-    return li  
+    return li
 
 
 def getLabels_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
