@@ -197,7 +197,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     bigrsDF = df[conditionsList].reindex(samplesList)
     samps = bigrsDF.index.values
     conds = bigrsDF.columns.values
-    M = bigrsDF.as_matrix().T  # transpose to have conditions as rows
+    M = bigrsDF.as_matrix() # .T  # transpose to have conditions as rows
     return M, samps, conds
 
 
@@ -318,6 +318,8 @@ def kykyDict2matrix(kykyDict, conditions, samples):
     -------
     M : 2darray
         values
+    samps : labels of the columns of the matrix
+    conds : labels of the rows of the matrix
     '''
     df = kykyDict2DataFrame(kykyDict)
     return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
