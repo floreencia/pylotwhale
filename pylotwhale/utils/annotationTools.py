@@ -42,7 +42,7 @@ def save_TLannotations(T, L, outF, opening_mode='w'):
             os.remove(outF)
         except OSError:
             pass
-      
+
     with open(outF, opening_mode) as f:  # new annotations
         for i in np.arange(len(L)):  # print new annotations
             f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(T[i, 0],
@@ -214,6 +214,11 @@ def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
 
 def getSections(y, tf=None):
     """
+    DEPRECATED!!! because dictionaries don't preserve order
+    
+    USE: yLabels2sectionsLi
+    
+    ----------------
     takes labels (numeric) vector and returns a dictionary of the sections
     by joining labels of the same type into sections.
     If tf is given the sections will have time units otherwise they'll have
@@ -246,6 +251,71 @@ def getSections(y, tf=None):
         sectionsDict[(s0*scaleFac, len(y)*scaleFac)] = y[s0+1]
     return(sectionsDict)
     
+    
+def yLabels2sectionsLi(y, tf=None):
+    """
+    takes labels (numeric) vector and returns a dictionary of the sections
+    by joining labels of the same type into sections.
+    If tf is given the sections will have time units otherwise they'll have
+    sample units
+    Parameters
+    ----------
+    y: labels (np.array)
+    tf: time at y[-1]
+    Returns
+    -------
+    > sections dictionary in analysed fft-samples
+        (s0, sf) : label
+        
+    ASSUMPTIONS:
+        - no time overlapping regions in the annotations
+        
+    """
+    scaleFac = 1.*tf/len(y) if tf else 1
+    
+    sectionsLi = []
+    s0 = 0
+    
+    for tr in np.where([y[i] != y[i - 1] for i in range(1, len(y)) ] )[0]:
+        sectionsLi.append((s0 * scaleFac, (tr + 1)*scaleFac, y[tr]))
+        s0 = tr+1
+
+    # write the last interval if there is still space for one 
+    #print("interval:", s0, len(y)) 
+    if s0 + 1 <= len(y) - 1:
+        sectionsLi.append((s0 * scaleFac, len(y) * scaleFac, y[s0 + 1]))
+
+    return sectionsLi
+    
+def clf_y_predictions2TLsections(y, tf=None):
+    """
+    takes labels (numeric) vector and returns a dictionary of the sections
+    by joining labels of the same type into sections.
+    If tf is given the sections will have time units otherwise they'll have
+    sample units
+    Parameters
+    ----------
+    y: np.array
+        labels, e.g. predictions of a clf
+    tf: float
+        end time of the recording, timestamp at y[-1]
+    Returns
+    -------
+    sections dictionary 
+        {(t0, tf) : label}
+        
+    ASSUMPTIONS:
+        - no time overlapping regions in the annotations 
+    """
+    secDi = getSections(y, tf=None)
+    n = len(secDi)
+    secDi.keys()
+    secDi.values()
+    T = np.array()
+    return T, L
+    
+    
+    
 def annDi2annArrays(sectionsD):
     """reformats sectionsD into T array with the times and L
     array with the labels"""
@@ -263,7 +333,7 @@ def predictions2annotations(y, tf=None):
     ----------
     y: ndarray
         predictions
-    tf: final time of the wavform to wich this predictions belong to
+    tf: final time of the wavform to which this predictions belong to
     Returns
     -------
     T: ndarray (n, 2)

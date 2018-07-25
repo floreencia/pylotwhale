@@ -186,9 +186,8 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     Returns
     -------
     M : matrix representations of the df values
-    samps : labels of the columns of the matrix
     conds : labels of the rows of the matrix
-        NOTICE that the matrix is transposed with respect to the df
+    samps : labels of the columns of the matrix
     '''
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
@@ -198,7 +197,7 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     conds = bigrsDF.index.values
     samps = bigrsDF.columns.values
     M = bigrsDF.as_matrix() # .T  # transpose to have conditions as rows
-    return M, samps, conds
+    return M, conds, samps
 
 
 def bigramsDict2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
@@ -223,8 +222,8 @@ def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     -------
     M : matrix representations of the frequency values, with:
             conditions as the rows and the samples as columns
-    samps : labels of the columns of the matrix
     conds : labels of the rows of the matrix
+    samps : labels of the columns of the matrix
     '''
     ## copy values of the cfd not to affect the mutable cfd outsede
     bigramsD = dict(bigramsDict)
@@ -318,8 +317,8 @@ def kykyDict2matrix(kykyDict, conditions, samples):
     -------
     M : 2darray
         values
-    samps : labels of the columns of the matrix
     conds : labels of the rows of the matrix
+    samps : labels of the columns of the matrix  
     '''
     df = kykyDict2DataFrame(kykyDict)
     return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)

@@ -286,6 +286,7 @@ def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
     ----------
     wavF : str
     annF : str
+        path to the file with the annotationn section to predict
     clf : estimator
     featExtFun : callable
     lt : labelTransformer
@@ -337,6 +338,7 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     See also
     --------
        TLpredictAnnotationSections
+       TODO: recode to use TLpredictAnnotationSections
     """
 
     if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
