@@ -287,7 +287,8 @@ def yLabels2sectionsLi(y, tf=None):
 
     return sectionsLi
     
-def clf_y_predictions2TLsections(y, tf=None):
+    
+def clf_y_predictions2TLsections(y, tf=None, sections='default'):
     """
     takes labels (numeric) vector and returns a dictionary of the sections
     by joining labels of the same type into sections.
@@ -299,22 +300,32 @@ def clf_y_predictions2TLsections(y, tf=None):
         labels, e.g. predictions of a clf
     tf: float
         end time of the recording, timestamp at y[-1]
+    sections: array
+        default = ['c']
     Returns
     -------
-    sections dictionary 
-        {(t0, tf) : label}
-        
+    T, L
+
     ASSUMPTIONS:
-        - no time overlapping regions in the annotations 
+        - no time overlapping regions in the annotations
     """
-    secDi = getSections(y, tf=None)
-    n = len(secDi)
-    secDi.keys()
-    secDi.values()
-    T = np.array()
-    return T, L
-    
-    
+    if sections == 'default':
+        sections = [0]
+    assert isinstance(sections, (list, np.ndarray))
+
+    secLi = yLabels2sectionsLi(y, tf=tf)
+    n = len(secLi)
+    T = np.zeros((n, 2))
+    L = np.zeros((n, ), dtype=int)
+    for i, item in enumerate(secLi):
+        T[i,0] = secLi[i][0]
+        T[i,1] = secLi[i][1]
+        L[i] = secLi[i][2]
+
+    mask = np.in1d(L, sections)
+
+    return T[mask, :], L[mask]
+   
     
 def annDi2annArrays(sectionsD):
     """reformats sectionsD into T array with the times and L

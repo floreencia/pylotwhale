@@ -654,9 +654,9 @@ def KSsimilarity(feature_arr, i_diag=1):
 
     p = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
     for i in np.arange(len(feature_arr)):
-        for j in np.arange(i+i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
+        for j in np.arange(i + i_diag, len(feature_arr)): # np.arange(len(feature_arr)):
             #print(i, j)
-            p[i,j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
+            p[i, j] = st.ks_2samp(feature_arr[i], feature_arr[j])[1]
     return p
 
 
@@ -795,8 +795,9 @@ def CVbw_KDE(x, kde_param_grid=None, **CV_kwargs):
     grid = GridSearchCV(estimator=KernelDensity(),
                         param_grid=kde_param_grid, **CV_kwargs)
     data = x[:, np.newaxis]
-    grid.fit(data)
-    return grid.best_estimator_
+    grid.fit(data)  # execute grid-search
+    return grid.best_estimator_  # chose best estimator
+
 
 def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
     '''get optimal bw'''
@@ -804,8 +805,8 @@ def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
     return(kde.bandwidth)
 
 
-def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None, 
-                 **CV_kwargs):  #, bw_range=None):
+def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None,
+                 **CV_kwargs):  #  bw_range=None):
     '''fit KDE estimating using cross validation to estimate the bandwith'''
 
     # get model
