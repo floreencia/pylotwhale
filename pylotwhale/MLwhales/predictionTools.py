@@ -374,7 +374,7 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     return outFile
 
 
-def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
+def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
                               sep='\t', printProbs=False, header=''):
     '''
     Predicts the label (call types) of each annotated section and writes 
@@ -401,15 +401,15 @@ def predictAnnotationSections0(wavF, annF, clf, feExtParams, lt, outFile=None,
         pass
 
     ## read data
-    predO = fex.wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=feExtParams)
+    predO = fex.wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=featExtFun)
     ## predict
     predictions = np.expand_dims(lt.num2nom(clf.predict(predO.X)), axis=1)
     if printProbs:
         predictions = np.hstack((predictions, clf.predict_proba(predO.X)))
         header = '{}'.format(le.classes_)
     ## save file
-    A = np.loadtxt(annF, delimiter='\t', dtype=object, ndmin=2)#,usecols=[0,1])
-    np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s', 
+    A = np.loadtxt(annF, delimiter='\t', dtype=object, ndmin=2) # usecols=[0,1])
+    np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s',
                delimiter = '\t', header=header)
     return outFile
 
