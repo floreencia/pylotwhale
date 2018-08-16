@@ -15,6 +15,10 @@ import pandas as pd
 
 import librosa as lb
 
+
+# In[10]:
+
+
 import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.MLwhales.MLtools_beta as myML
@@ -44,7 +48,12 @@ fft_ws = 512
 sum_ws = 10
 
 
-inF = './data/annotations_301117.csv'
+# In[8]:
+
+
+pDir = os.path.dirname(os.path.abspath(__file__))
+inF = os.path.join(pDir, 'data/annotations_301117.csv')
+#inF = '/home/florencia/profesjonell/bioacoustics/kdarras/data/annotations/annotations_301117.csv'
 df0 = pd.read_csv(inF)
 
 

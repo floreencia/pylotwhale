@@ -60,7 +60,7 @@ import pylotwhale.utils.annotationTools as annT
 # In[21]:
 
 
-pDir = os.getcwd()
+pDir = os.path.dirname(os.path.abspath(__file__))
 
 
 # ## Feature extraction

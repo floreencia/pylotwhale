@@ -50,7 +50,7 @@ import pylotwhale.MLwhales.clf_pool as clfpool
 # In[ ]:
 
 
-pDir = os.getcwd()
+pDir = os.path.dirname(os.path.abspath(__file__))
 
 
 # # Train detector for segmenting whale calls
