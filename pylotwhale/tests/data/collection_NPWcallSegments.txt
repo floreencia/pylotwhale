@@ -1,0 +1,1 @@
+/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/wav/WAV_0111_001-48kHz.wav	/home/florencia/whales/data/mySamples/whales/tapes/NPW/B/annotations/c-w/WAV_0111_001-48kHz-curated-c_w_nl_nh.txt
