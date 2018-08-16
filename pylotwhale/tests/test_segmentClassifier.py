@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from __future__ import print_function, division
@@ -24,7 +24,7 @@ import sklearn.metrics as mt
 from sklearn import svm
 
 
-# In[17]:
+# In[ ]:
 
 
 import pylotwhale.MLwhales.featureExtraction as fex
@@ -41,10 +41,16 @@ import pylotwhale.MLwhales.predictionTools as pre
 import pylotwhale.MLwhales.MLEvalTools as MLvl
 
 
-# In[3]:
+# In[ ]:
 
 
 import pylotwhale.MLwhales.clf_pool as clfpool
+
+
+# In[ ]:
+
+
+pDir = os.getcwd()
 
 
 # # Train detector for segmenting whale calls
@@ -57,10 +63,11 @@ import pylotwhale.MLwhales.clf_pool as clfpool
 # 
 # ## Dataset
 
-# In[23]:
+# In[ ]:
 
 
-collection = './data/collection_NPWcallSegments.txt'
+collection = os.path.join(pDir, 'data/collection_NPWcallSegments.txt')
+#'/home/florencia/whales/scripts/test_pylotwhale/data/collection_NPWcallSegments.txt'
 
 collList = np.loadtxt(collection, dtype=object, usecols=(0,1), ndmin=2)
 #collList
@@ -70,7 +77,7 @@ waveform, sr = lb.core.load(wavF, sr=None)
 tf = 1.*len(waveform)/sr
 
 
-# In[25]:
+# In[ ]:
 
 
 def test_input():
@@ -86,7 +93,7 @@ def test_input():
 # 
 # **y** settings
 
-# In[7]:
+# In[ ]:
 
 
 clf_labs = ['c', 'b']
@@ -95,7 +102,7 @@ lt = myML.labelTransformer(clf_labs)
 
 # **X** settings
 
-# In[8]:
+# In[ ]:
 
 
 T_settings =[]
@@ -125,13 +132,13 @@ labsHierarchy = ['c', 'w']
 feExFun = Tpipe.fun
 
 
-# In[9]:
+# In[ ]:
 
 
 dataO = fex.wavAnnCollection2datXy(collList, feExFun, labsHierarchy)
 
 
-# In[10]:
+# In[ ]:
 
 
 X0, y0_names = dataO.filterInstances(lt.classes_)  # filter for clf_labs
@@ -141,7 +148,7 @@ labsD = lt.targetNumNomDict()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 
-# In[11]:
+# In[ ]:
 
 
 def test_featureExtraction():
@@ -150,7 +157,7 @@ def test_featureExtraction():
 print('\nFEATURE EXTRACTION')
 
 
-# In[12]:
+# In[ ]:
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y,
@@ -193,7 +200,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y,
 #     
 # '''
 
-# In[29]:
+# In[ ]:
 
 
 print('\nclf fit...')
@@ -207,7 +214,7 @@ print('\nclf fitted')
 clf
 
 
-# In[30]:
+# In[ ]:
 
 
 def test_clf():
@@ -217,7 +224,7 @@ def test_clf():
 
 # # Predict
 
-# In[31]:
+# In[ ]:
 
 
 y_pred = clf.predict(X)
@@ -225,7 +232,7 @@ T_pred, L_pred = annT.clf_y_predictions2TLsections(y_pred, tf=tf, sections=np.ar
 T_true, L_true = annT.clf_y_predictions2TLsections(y, tf=tf, sections=np.array([lt.nom2num(['c'])]))
 
 
-# In[32]:
+# In[ ]:
 
 
 def test_predictions():
