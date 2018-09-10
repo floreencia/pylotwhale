@@ -286,8 +286,8 @@ def yLabels2sectionsLi(y, tf=None):
         sectionsLi.append((s0 * scaleFac, len(y) * scaleFac, y[s0 + 1]))
 
     return sectionsLi
-    
-    
+
+
 def clf_y_predictions2TLsections(y, tf=None, sections='default'):
     """
     takes labels (numeric) vector and returns a dictionary of the sections
