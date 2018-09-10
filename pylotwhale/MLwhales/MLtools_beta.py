@@ -173,41 +173,46 @@ def vis_dataXy(X, y, outPl='', plTitle=''):
     if outPl: fig.savefig(outPl)
 
 
-def plXy(X, y, #y_ix_names=None, 
-         figsize=None, outFig='', plTitle='',
-        cmapName_L = 'gray_r', cmapName_Fig = 'gray_r'):
-    '''
+def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
+    """Plot feateure matrix with labels
     Parameters
     ----------
-    y_names : dictionary with the mapping between the target index and the names
-             { ix : target } 
-    imshows the:
-        X matrix n x m
-        y vector 1 x m
-    '''    
+    X : ndarray (n, m)
+        features
+    y : ndarray
+        labels, (n,)
+    figsize : listlike
+        size of the figure
+    cmapName_L : str
+        name of the colormap for the labels
+    cmapName_Fig : str
+        name of the colormap for the features matrix
+
+    Returns
+    -------
+    fig : matpltlib figure
+    """
 
     ## initialise figure
     fig = plt.figure(figsize=figsize)
-    ## definitions for the axes sizes
+    ## define axes
     left, width, height = 0.1, 0.9, 0.9
     width_y, bottom_y = 0.05, 0.1
-    bottom = bottom_y + width_y 
-    # 
+    bottom = bottom_y + width_y
+    #
     rect_X = [left, bottom, width, height]  # [x0, y0, xf, yf ] - big  plot
     rect_Y = [left, bottom_y, width, width_y]  # small plot
     # add axes
-    axX = fig.add_axes(rect_X) # big plot for instance features
-    axY = fig.add_axes(rect_Y) # small plot for instance labels
-    # no tick labels
+    axX = fig.add_axes(rect_X)  # big plot for instance features
+    axY = fig.add_axes(rect_Y)  # small plot for instance labels
+    # remove tick labels
     axX.get_xaxis().set_visible(False)
     axY.get_yaxis().set_visible(False)
-    # axis labels
+    # set axis labels
     axX.set_ylabel('features')
     axY.set_xlabel('instances')
 
-    vmax = None
-
-    ## labels mapping
+    ## define labels mapping
     label_set = list(set(y))
     n_labels = len(label_set)
     y_map = {label: i for i, label in enumerate(label_set)}
@@ -215,39 +220,35 @@ def plXy(X, y, #y_ix_names=None,
     ## create keys for the labels
     artistLi = []
     txtLi = []
-    # 
-    for label, ix_label in y_map.items(): #np.arange(N):
+    # draw label keys
+    for label, ix_label in y_map.items():
         # line
-        artistLi.append(plt.Line2D((0,1), (0,0), color=labels_cmap[ix_label], 
-                                    linewidth=14))
-        txtLi.append(label) # text
+        artistLi.append(plt.Line2D((0, 1), (0, 0), color=labels_cmap[ix_label],
+                        linewidth=14))
+        txtLi.append(label)  # text
     axX.legend(artistLi, txtLi)
 
     #### PLOTS
-    ### features figure
-    axX.imshow(X, aspect='auto', interpolation='nearest', 
+    ## plot features figure
+    axX.imshow(X, aspect='auto', interpolation='nearest',
                cmap=plt.cm.get_cmap(cmapName_Fig))
-    ## labels figure
+    ## labels
+    ## map labels into numbers
     yL = [y_map[item] for item in y]
     y_num = np.array(yL, ndmin=2)
     # check dimensions
     m_instances_X = np.shape(X)[1]
     m_instances_y = np.shape(y_num)[1]
-
-    if m_instances_y != m_instances_X : 
+    if m_instances_y != m_instances_X:
         print('WARNING! X and y have different sizes (%d =/= %d)'%(m_instances_X, m_instances_y) )
-    axY.imshow(y_num, aspect='auto', cmap=plt.cm.get_cmap(cmapName_L), vmax=vmax, 
-               interpolation='nearest')#, bins=bins)
-    
-    if plTitle: axX.set_title(plTitle)#, bbox_inches='tight')
-    # save
-    if outFig: 
-        fig.savefig(outFig, bbox_inches='tight')
-        
-    return fig
+    # plot labels
+    axY.imshow(y_num, aspect='auto', cmap=plt.cm.get_cmap(cmapName_L),
+               interpolation='nearest')
+
+    return fig, axX, axY
 
 
-    
+
 def vis_arff(arffFile, preproFun='standardize', outPl='', outDir='', plTitle=''):
     
     matrixTransf = {'rescale': rescale, 
@@ -271,8 +272,8 @@ def vis_arff(arffFile, preproFun='standardize', outPl='', outDir='', plTitle='')
     M = scale(X.T, normfun = matrixTransf[preproFun])
     print(np.shape(M), np.shape(y_num), outPl)
     vis_dataXy(M, y_num, outPl, plTitle)
-        
-    
+
+
 def wav2mf(wavFi, mfDir):
     '''
     creates mf colections with the given wav file
@@ -309,7 +310,7 @@ def mf2arff(mfFi, arffDir, baseN=None, moreOptions='Default'):
     ## add options to the base name    
     optStr = "_".join(moreOptions)
     arffFi = os.path.join(arffDir, baseN + '%s.arff'%optStr)
-    
+
     command = ['bextract', '-fe'] + mfFi + ['-w', arffFi] + moreOptions 
     call(command)
     print(" ".join(command))
