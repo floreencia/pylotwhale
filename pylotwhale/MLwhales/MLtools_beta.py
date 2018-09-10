@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 from subprocess import call
 import pandas as pd
+import seaborn as sns
 
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools as sT
@@ -172,76 +173,75 @@ def vis_dataXy(X, y, outPl='', plTitle=''):
     if outPl: fig.savefig(outPl)
 
 
-def plXy(X, y, y_ix_names=None, figsize=None, outFig='', plTitle='',
+def plXy(X, y, #y_ix_names=None, 
+         figsize=None, outFig='', plTitle='',
         cmapName_L = 'gray_r', cmapName_Fig = 'gray_r'):
     '''
+    Parameters
+    ----------
     y_names : dictionary with the mapping between the target index and the names
              { ix : target } 
     imshows the:
         X matrix n x m
         y vector 1 x m
     '''    
-    nullfmt = NullFormatter()         # no labels
 
-    # definitions for the axes
+    ## initialise figure
+    fig = plt.figure(figsize=figsize)
+    ## definitions for the axes sizes
     left, width, height = 0.1, 0.9, 0.9
     width_y, bottom_y = 0.05, 0.1
     bottom = bottom_y + width_y 
-
+    # 
     rect_X = [left, bottom, width, height]  # [x0, y0, xf, yf ] - big  plot
-    rect_Y = [left, bottom_y, width, width_y] # small plot
-
-    # start with a rectangular Figure
-    fig = plt.figure(1, figsize=figsize)
-    
-    # plt.subplots()
-    axX = fig.add_axes(rect_X) # big plot
-    axY = fig.add_axes(rect_Y) # small plot
-    
+    rect_Y = [left, bottom_y, width, width_y]  # small plot
+    # add axes
+    axX = fig.add_axes(rect_X) # big plot for instance features
+    axY = fig.add_axes(rect_Y) # small plot for instance labels
     # no tick labels
-    axX.xaxis.set_major_formatter(nullfmt) 
-    axY.yaxis.set_major_formatter(nullfmt)
-    
+    axX.get_xaxis().set_visible(False)
+    axY.get_yaxis().set_visible(False)
     # axis labels
     axX.set_ylabel('features')
     axY.set_xlabel('instances')
-    
-    vmax=None
-    #### target legends
-    if type(y_ix_names)==dict:
-        N=len(y_ix_names)
-        vmax=N-1
-        cmap = plt.cm.get_cmap(cmapName_L, N) 
-        clrs = [cmap(i) for i in range(cmap.N)]
-        artistLi=[]
-        txtLi=[]
-        for i in np.arange(N):
-            #print(i, N, len(clrs))
-            artistLi.append(plt.Line2D((0,1),(0,0), color=clrs[i], linewidth=14))
-            #print(y_ix_names.keys(), y_ix_names.values())            
-            #print(y_ix_names[i])            
-            txtLi.append(y_ix_names[i])
-        axX.legend(artistLi, txtLi)
-        
+
+    vmax = None
+
+    ## labels mapping
+    label_set = list(set(y))
+    n_labels = len(label_set)
+    y_map = {label: i for i, label in enumerate(label_set)}
+    labels_cmap = sns.color_palette(cmapName_L, n_colors=n_labels)
+    ## create keys for the labels
+    artistLi = []
+    txtLi = []
+    # 
+    for label, ix_label in y_map.items(): #np.arange(N):
+        # line
+        artistLi.append(plt.Line2D((0,1), (0,0), color=labels_cmap[ix_label], 
+                                    linewidth=14))
+        txtLi.append(label) # text
+    axX.legend(artistLi, txtLi)
+
     #### PLOTS
-    ### figure    
+    ### features figure
     axX.imshow(X, aspect='auto', interpolation='nearest', 
                cmap=plt.cm.get_cmap(cmapName_Fig))
-    ### annotations (labels)   
-    if y.ndim == 1: y = y.reshape((1, len(y)) )
-    ## check dimensions
+    ## labels figure
+    yL = [y_map[item] for item in y]
+    y_num = np.array(yL, ndmin=2)
+    # check dimensions
     m_instances_X = np.shape(X)[1]
-    m_instances_y = np.shape(y)[1]
-    
+    m_instances_y = np.shape(y_num)[1]
+
     if m_instances_y != m_instances_X : 
         print('WARNING! X and y have different sizes (%d =/= %d)'%(m_instances_X, m_instances_y) )
-    axY.imshow(y, aspect='auto', cmap=plt.cm.get_cmap(cmapName_L), vmax=vmax, 
+    axY.imshow(y_num, aspect='auto', cmap=plt.cm.get_cmap(cmapName_L), vmax=vmax, 
                interpolation='nearest')#, bins=bins)
     
     if plTitle: axX.set_title(plTitle)#, bbox_inches='tight')
     # save
     if outFig: 
-        #fig.tight_layout()        
         fig.savefig(outFig, bbox_inches='tight')
         
     return fig
