@@ -9,8 +9,7 @@ import pylotwhale.utils.dataTools as daT
 
 
 """
-    Extracting features from annotations
-    florencia @ 16.05.16
+    NLP feature extraction tools
 """
 
 
@@ -25,7 +24,7 @@ def df2X_stry(df, groupingKey='tape', call='note', sep=' '):
     Returns
     --------
     X_str: list of strings (n_instances)
-        feateure matrix to use as input of CountVectorizer
+        feature matrix to use as input of CountVectorizer
     y: list, (n_instances)
         labels of the instances from the grouping key
     """

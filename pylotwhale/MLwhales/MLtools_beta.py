@@ -18,6 +18,8 @@ import scipy.io.arff as arff
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
+from matplotlib import colors # for plXy
+
 from subprocess import call
 import pandas as pd
 import seaborn as sns
@@ -173,6 +175,7 @@ def vis_dataXy(X, y, outPl='', plTitle=''):
     if outPl: fig.savefig(outPl)
 
 
+
 def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     """Plot feateure matrix with labels
     Parameters
@@ -221,6 +224,7 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     artistLi = []
     txtLi = []
     # draw label keys
+
     for label, ix_label in y_map.items():
         # line
         artistLi.append(plt.Line2D((0, 1), (0, 0), color=labels_cmap[ix_label],
@@ -230,6 +234,7 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
 
     #### PLOTS
     ## plot features figure
+
     axX.imshow(X, aspect='auto', interpolation='nearest',
                cmap=plt.cm.get_cmap(cmapName_Fig))
     ## labels
@@ -242,11 +247,11 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     if m_instances_y != m_instances_X:
         print('WARNING! X and y have different sizes (%d =/= %d)'%(m_instances_X, m_instances_y) )
     # plot labels
-    axY.imshow(y_num, aspect='auto', cmap=plt.cm.get_cmap(cmapName_L),
+    cmap = colors.ListedColormap(labels_cmap)
+    axY.imshow(y_num, aspect='auto', cmap=cmap, #plt.cm.get_cmap(cmapName_L),
                interpolation='nearest')
 
     return fig, axX, axY
-
 
 
 def vis_arff(arffFile, preproFun='standardize', outPl='', outDir='', plTitle=''):
