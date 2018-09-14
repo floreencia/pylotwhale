@@ -132,11 +132,10 @@ def removeBuggyFeatures(M, y=None):
     if y == None: y=np.zeros(np.shape(M)[1])
     ## find buggy instances    
     idx = removeBuggs_idx(M, axis=0)
-    return M[idx, :], y[idx], idx             
+    return M[idx, :], y[idx], idx      
 
 ####    visualizing    ############################
 
-         
 def arffData2Xy(arffFile):
     '''
     reads an arff file ( output of bextract ) and returns:
@@ -924,7 +923,9 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     ax.set_ylabel('true label')
     if title: ax.set_title(title)
     
-    if outFig: fig.savefig(outFig)    
+    if outFig: fig.savefig(outFig)  
+    
+    return fig, ax
     
 ### learnig curve
 
