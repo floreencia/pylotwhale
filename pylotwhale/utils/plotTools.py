@@ -86,7 +86,7 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
         
 ###### ultilities ######
         
-def display_numbers(fig, ax, M, fontSz, format=int, condition=lambda x: True):
+def display_numbers(fig, ax, M, fontSz, fmt=int, condition=lambda x: True):
     """
     add text to imshow matrix
     Parameters:
@@ -101,7 +101,7 @@ def display_numbers(fig, ax, M, fontSz, format=int, condition=lambda x: True):
     for i in range(r):
         for j in range(c):
             if condition(M[i,j]):
-                ax.text(x=j, y=i, s=format(M[i, j]), va='center', ha='center', 
+                ax.text(x=j, y=i, s=fmt(M[i, j]), va='center', ha='center', 
                         fontsize=fontSz )                        
     return fig, ax
         
@@ -288,7 +288,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
               overlap = 0.5, winN = 'hanning',
               xl='time (s)',  yl= 'frequency (kHz)',
               spec_fac=0.99999, plTitle='', cmN='bone_r',
-              figsize=None, ax=None, **kwargs):
+              figsize=None, ax=None, fig=None, **kwargs):
     """
     plots spectrogram
     Parameters
@@ -331,10 +331,12 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     ax.set_xlabel(xl)#, fontsize=16)
     ax.set_ylabel(yl)#, fontsize=16)
 
+    '''
     if tf<1:
         plt.xticks(np.arange(0, tf, tf/2.0))
     else:
         plt.xticks(np.arange(0, tf, 1.0))
+    '''
 
     return fig, ax
 

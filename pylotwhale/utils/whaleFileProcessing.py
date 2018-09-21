@@ -14,14 +14,13 @@ Created on Tue Nov  3 17:08:19 201
 #### Heike's name convension parsing
 
 def parseHeikesNameConv(fileN):
-    '''
-    parse Heikes name file convension
+    '''parse Heikes file-naming
     Parameters
     ----------
     fileN : string with a file name using Heike's convension
         e.g. ...NPW-033-J-B-090713_f50-8_00_01_52...
     Returns
-    ------->
+    -------
     di : dictionary with the info encoded in the file name
         call, date, group, quality, 
             tape, timestamp, whale <-- This are often problematic! 

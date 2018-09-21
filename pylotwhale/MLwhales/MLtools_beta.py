@@ -58,19 +58,26 @@ import featureExtraction as fex
 
 def rescale(M):
     '''
-    rescales the columns of a matrix
-    so that each feature varies between [0,1]
-    '''    
+    rescales the columns of a matrix so that ots values lay in [0,1]
+    substracting the mean and dividing by the range (max-min),
+    also called normalisation
+    '''
     return np.divide((1.0*M - np.min(M, axis=0)), np.max(M, axis=0) - np.min(M, axis=0) )
 
-         
+
 def standarize(M):
     '''
-    standarized the columns of a matrix
-    ''' 
-    return 1.0*(M-np.mean(M, axis=0))/np.std(M-np.mean(M, axis=0), axis=0) 
-    
-    
+    standarized the columns of a matrix, so that they have mean = 0 and std = 1
+    '''
+    return 1.0*(M - np.mean(M, axis=0))/np.std(M-np.mean(M, axis=0), axis=0)
+
+
+def colCounts2colFreqs(M):
+    '''tranform column counts to column frequencies
+    by dividing the matrix columns by total counts of each column'''
+    return np.divide(1.*M, 1.*M.sum(axis=0))
+
+
 def scale(M, normfun=rescale, axis=1):
     '''
     rescales a matrix
@@ -78,7 +85,7 @@ def scale(M, normfun=rescale, axis=1):
          = 1 (rows)
          
     normfun 'normalization function'
-                {rescale, standarize}
+                {rescale, standarize, colCounts2colFreqs}
                 
     ! this function replazed normalizeMatrix()
     '''
@@ -890,7 +897,7 @@ def printIterClfScores( fileN, clf, X, y, c0, comments=None, commtLi='#'):
 ### confusion matrix
 
 def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None, 
-                      display_nums=True, alpha=0.3, title=None):
+                      display_nums=True, alpha=0.3, title=None, fig=None, ax=None):
     '''
     plots confusion matrix
     cM : confusion matrix
@@ -898,32 +905,27 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
             le.inverse_transform(clf.classes_)
     outFig : name where to save fig
     '''
-    # myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
-    #font = {'size' : fontSz}; matplotlib.rc('font', **font)
-    #warnings.warn(DEPRECATION_MSG, DeprecationWarning) 
-    fig, ax = plt.subplots(figsize=figsize)#(5, 5))
+
+    fig, ax = plt.subplots(figsize=figsize) #(5, 5))
     ax.imshow(cM, cmap=plt.cm.Blues, alpha=alpha, interpolation='nearest')
-    
+
     r,c = np.shape(cM)
-    
+
     ## display numbers in the matrix
     if display_nums:
         for i in range(r):
             for j in range(c):
-                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center', 
-                        fontsize=fontSz )
-    
+                ax.text(x=j, y=i, s=cM[i, j], va='center', ha='center',
+                        fontsize=fontSz)
+
     ## ticks labels
-    ax.set_xticks(range(c))        
-    ax.set_xticklabels(labels,rotation=90)
-    ax.set_yticks(range(r))        
-    ax.set_yticklabels(labels)#,rotation=90)
+    ax.set_xticks(range(c))
+    ax.set_xticklabels(labels, rotation=90)
+    ax.set_yticks(range(r))
+    ax.set_yticklabels(labels) #,rotation=90)
     ## axis labels
     ax.set_xlabel('predicted label')
     ax.set_ylabel('true label')
-    if title: ax.set_title(title)
-    
-    if outFig: fig.savefig(outFig)  
     
     return fig, ax
     
