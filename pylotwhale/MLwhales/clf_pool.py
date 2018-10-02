@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 16 18:56:27 2016
-
+Common parameters for sklearn classifiers
 @author: florencia
 """
 
@@ -12,6 +11,7 @@ import numpy as np
 
 
 class clfSettings():
+    '''class for binding sklearn classifiers with common hyperparameter values'''
     def __init__(self, clf_name, fun, grid_params_di, pipeStep_name='clf'):
         self.clf_name = clf_name
         self.fun = fun
@@ -19,15 +19,7 @@ class clfSettings():
         self.pipeStep_name = pipeStep_name
 
 
-#SVC rbf
-gamma_range = [ 0.1, 1.0, 10.]
-pen_range = [ 0.1, 1.0, 10.0, 100]
-param_grid_di = {'clf__C': pen_range,
-                'clf__gamma': gamma_range}
-                
-svc_rbf =  clfSettings('svc_rbf', SVC(), param_grid_di)
-
-#SVC linear
+#### SVC linear
 pen_range = [ 0.1, 1.0, 10.0, 100]
 param_grid_di = {'clf__kernel': ['linear'],
                  'clf__C': pen_range}
@@ -36,17 +28,27 @@ svc_l =  clfSettings('svc_linear',
                      SVC(), 
                     param_grid_di)
 
-#SVC rbf w/ probs
+
+#### SVC rbf
 gamma_range = [ 0.1, 1.0, 10.]
 pen_range = [ 0.1, 1.0, 10.0, 100]
 param_grid_di = {'clf__C': pen_range,
                 'clf__gamma': gamma_range}
 
-svc_rbf_p =  clfSettings('svc_rbf_p', 
+svc_rbf =  clfSettings('svc_rbf', SVC(), param_grid_di)
+
+
+#### SVC rbf w/ probs
+gamma_range = [ 0.1, 1.0, 10.]
+pen_range = [ 0.1, 1.0, 10.0, 100]
+param_grid_di = {'clf__C': pen_range,
+                'clf__gamma': gamma_range}
+
+svc_rbf_p =  clfSettings('svc_rbf_p',
                          SVC(probability=True), 
                         param_grid_di)
 
-#RF
+#### RF
 ests_range = [50, 100]
 param_grid_di = {"clf__max_depth": [3, None],
                  "clf__bootstrap": [True, False],

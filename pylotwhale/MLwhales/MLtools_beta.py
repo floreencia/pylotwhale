@@ -153,17 +153,15 @@ def arffData2Xy(arffFile):
     attrNames = metDat.names()
     N_attr = len(attrNames)
     M = np.array([dat[attrNames[i]] for i in range(len(attrNames[:-1])) ])
-    
+
     labels = dat[attrNames[-1]]
     labSet = list(set(labels))
     N_labels = len(labels)
     print(N_attr, N_labels, labSet)
-    
-    return M.T, labels
-    
-    
 
-    
+    return M.T, labels
+
+
 def vis_dataXy(X, y, outPl='', plTitle=''):
     '''
     plots features (X) and labels y
@@ -172,7 +170,7 @@ def vis_dataXy(X, y, outPl='', plTitle=''):
     m, # instaces
     n, # features
     '''    
-    fig, ax = plt.subplots()#1,1,figsize=(5,len(y)/10))
+    fig, ax = plt.subplots()  # 1 ,1,figsize=(5,len(y)/10))
     y[y==1]=np.max(X)
     ax.imshow(np.vstack((X, y,y,y,y)), aspect='auto', interpolation='nearest')#, cmap=plt.cm.Accent)
     ax.set_ylabel('features')
