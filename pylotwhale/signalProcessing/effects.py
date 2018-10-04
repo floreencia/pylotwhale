@@ -1,26 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 30 16:18:42 2016
-
-@author: florencia
-"""
-
-#!/usr/bin/python
-
-from __future__ import print_function
+from __future__ import print_function, division
 import numpy as np
 import functools
 
 ### Audio feature modules
-import librosa as lf # Librosa for audio
-#import features as psf # Librosa for audio
+import librosa as lf 
 
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import pandas as pd
-#import random
-#import ast
+
 from scipy.io import wavfile
 #import scikits.audiolab as al
 import sys
@@ -28,11 +18,12 @@ import os.path
 import scipy.signal as sig
 
 import pylotwhale.utils.annotationTools as annT
-matplotlib.rcdefaults()
-matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
+#matplotlib.rcdefaults()
+#matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
 
 """
     Module for waveform effects
+    motivation: audio data augmentation
     florencia @ 06.09.14
 """
 
@@ -40,25 +31,28 @@ matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
 #####           waveform manipulations                #####
 ###########################################################
 
-    
-#### WAVEFORM MANIPULATIONS    
-    
+
+#### WAVEFORM MANIPULATIONS
+
 def normalizeWF(waveform):
-    return 1.0*waveform/np.max(np.abs(waveform))
-    
+    return 1.0 * waveform / np.max(np.abs(waveform))
+
+
 def tileTillN(arr, N, n0=0):
-    '''returns an arrray of size N (>0) from tiling of arr. n0 is the starting index'''
+    '''returns an arrray of size N (>0) 
+    from tiling of arr. n0 is the starting index'''
     #np.tile(arr, int(n/len(arr))+1)[:n]
     return arr[np.array([i for i in np.arange(n0, N + n0)%len(arr)])]
-    
+
+ 
 def addWhiteNoise(y, param=1.0):
     """
     adds white noise with amplitude 'param" to y
     """
-    y_ns = np.random.random_sample(len(y))*2 - 1 # white noise
+    y_ns = np.random.random_sample(len(y))*2 - 1  # white noise
     return y + param*y_ns
 
-    
+
 def addToSignal(y1, y2, noiseIndex):
     '''
     adds y2 (noise) to the primary signal y1. Returns the sum, keeping the size of y1
@@ -77,9 +71,7 @@ def freqshift(y, Fs, param=100):
     y = np.roll(x.real,nbins) + 1j*np.roll(x.imag,nbins)
     z = np.fft.irfft(y)
     return z
-    
-    
-    
+
 
 def waveformEffectsDictionary(funName=None):
     '''
@@ -177,9 +169,10 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     for i in range(len(shift_grid)):
         Y[i,:] = lf.effects.pitch_shift(y_template, fs, shift_grid[i])
         #y_template + intensity_grid[i]*tileTillN(y_add, len(y_template), np.random.randint(0,len(y_template)))
-    
-    return Y    
-    
+
+    return Y
+
+
 def generateTimeStreachEnsemble(y_template, streach_grid=None):
     '''
     generate an ensemble of y_template-singnals adding y_add

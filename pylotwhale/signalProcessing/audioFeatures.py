@@ -17,10 +17,11 @@ import pylotwhale.utils.annotationTools as annT
 
 ######     ANNOTATIONS     #########
 
-def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime', 
+
+def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
                  label='label'):
-    '''
-    read annotated sections from a waveform
+    '''read annotated sections from a waveform
+
     Parameters
     ----------
     wavFi : wav file name
@@ -29,6 +30,7 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
     t0Label : name of the label for the start time (used by annT.parseAupFile)
     tfLabel : name of the label for the end time (used by annT.parseAupFile)
     label : name of the label with the annotation label (used by annT.parseAupFile)
+
     Returns
     -------
     sectionsLi : a list with dictionaries with the label and waveform information
@@ -51,6 +53,7 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
         sectionsLi.append(item)
 
     return(sectionsLi, fs)
+
 
 def getWavSec(waveform, fs, t0, tf):
     """get waveform section
@@ -172,35 +175,6 @@ class annotations():
                                          labelsHierarchy=[])
     
 
-def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
-    '''
-    extracts the labels from an annotations file and retuns a list filling all time gaps
-    with 'b' (backgroun noise)
-    < txtFi : annotations file name (t0 \t tf \t label)
-    < gap : name of the filling gap label
-    < filterLabset :  list with the names of the labels to filter out
-    < l_ix : index of the label to filter (2 --> sound_label)
-    ------>
-    > annTu : list of (sample, label) pairs
-                    where sample is the first sample with the given label
-
-    >>> WARNING!: ASSUMES NO OVERLAP BETWEEN THE LABELES <<<
-    >>> ACHTUNG!: NEVER FILTER ANNOTATIONS AFTER THIS STEP <<<
-    '''
-    t0 = 0
-    annTu=[(t0, gap)]
-    with open(txtFi, 'r') as f:
-        lines = f.read().splitlines()
-
-    if filterLabSet: # filterout unwanted labels (still in the aup txt format)
-            lines = [li for li in lines if li.split('\t')[l_ix] not in filterLabSet]
-
-    for li in lines: # transform annotations into the tu-li format (for later processing)
-        t0, tf, label = li.split('\t')
-        annTu.append(( float(t0.replace(',','.')), label))
-        annTu.append(( float(tf.replace(',','.')), gap))
-    return annTu
-
 
 def findLabel( stamp, stampLabelTu, i=0):
     '''
@@ -228,11 +202,13 @@ def findLabel( stamp, stampLabelTu, i=0):
 
     ## search stamp
     while s[i] < stamp:
-        i+=1
+        i += 1
 
     ## first stamp with the wanted label
-    if s[i] > stamp: i-=1
+    if s[i] > stamp:
+        i -= 1
     return l[i], i
+
 
 def setLabel(idx, annotTu):
     s, l = zip(*annotTu)
@@ -382,15 +358,13 @@ def texturiseWalking(M, n_textWS, normalise=False):
     return fM
 
 
-
-
 #### FEATURE EXTRACTION and processing #####
 
 def featureExtractionFun(funName=None):
     '''
     Dictionary of feature extracting functions
-    returns funciton of the requested requensted feature (str)
-    or the feture options
+    returns function of the requested feature (str)
+    or the feature options
     Parameters:    
     ------
     > feature names (if None)
@@ -661,7 +635,7 @@ def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0
     print("step:", step, "overlap", overl, "len signal", len(y),
           "step (s)", 1.0*step/fs)
     while ix < len(y):
-        yi = y[ix0:ix] # signal section
+        yi = y[ix0:ix]  # signal section
         ix0 = ix - overl
         ix = ix0 + step
         di = featExtrFun(yi, fs)
@@ -669,10 +643,8 @@ def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0
         if annotations : targetArr.append(setLabel(ix0 + step/2, annotations))
 
     return(feat_df, targetArr)
-    
-    
-    
-    
+
+
 #### FEATURE EXTRACTION CLASSES
 
    

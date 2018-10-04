@@ -51,6 +51,7 @@ def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     datO = myML.dataXy_names(M0, y0_names)
     return datO
 
+
 def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None):
     """Extract features from wavfile and labels from annotations
     returns feature matrix (X) and labels (y_names)"""

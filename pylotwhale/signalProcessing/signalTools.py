@@ -18,15 +18,11 @@ from sklearn.preprocessing import scale, maxabs_scale, minmax_scale
 from scipy.io import wavfile
 import librosa  # Librosa for audio
 
-#import scikits.audiolab as al
-
-
-#matplotlib.rcdefaults()
-#matplotlib.rcParams.update({'savefig.bbox': 'tight'})
 
 """
-    Tools for manipulating audio signals
-    florencia @ 06.09.14
+    Tools for manipulating audio signals -wavforms-
+    * normalisation
+    * extractig features, using librosa
 """
 
 #warnings.simplefilter('always', DeprecationWarning)
@@ -458,8 +454,7 @@ def spectral_nDelta(waveform, fs, NFFT=2**9, overlap=0.5, winN='hanning',
 
 def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True,
              **kwargs):
-    """
-    Extracts the cepstral features from a waveform
+    """Extracts cepstral features from a waveform
     Parameters
     ----------
     < waveform : numpy array
@@ -490,7 +485,7 @@ def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True,
 def mfcepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_mels=128,
              **kwargs):
     """
-    Extracts the Mel-cepstral features from a waveform
+    Extracts MFCC from a waveform
     Parameters:
     ----------
     < waveform : numpy array
