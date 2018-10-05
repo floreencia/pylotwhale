@@ -241,7 +241,7 @@ def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
         #ict = ict0[np.isfinite(ict0)]
         x = ict0[i:]
         y = ict0[:-i]
-        x, y = check_finiteness( x, y)
+        x, y = check_finiteness(x, y)
         s1[tape] = x
         s2[tape] = y
 
@@ -284,12 +284,33 @@ def binary_time_series(onset_times, Dt=0.1):
 
 
 def binarise_times_in_window(times, t0, tf, Dt=0.1):
-    """Windows a signal with onset times and binarises it with ones at the onset times"""
-    winL = tf-t0
+    """Crates binary sigal from onset times
+    by windowing every Dt
+    Make sure all provided paramters have thesame units.
+
+    Parameters
+    ----------
+    times : array_like, shape (n_samples,)
+            onset times (if in seconds => Dt in Hz)
+    t0 : float
+        start time
+    tf : float
+        end time
+    Dt : float
+        sampling step, Fs = 1/Dt
+
+    Returns
+    ------
+    t_vec : array_like, shape (n_samples,)
+        times
+    IO : array_like, shape (n_samples,)
+        onsets   
+    """
+    winL = tf - t0
     win_times = window_times(times, t0, tf) - t0
-    t0_vec, IO_0, Fs = binary_time_series( win_times, Dt=Dt)
-    t_vec = np.arange( 0, tf -t0 + Dt, Dt)
-    IO = np.zeros_like( t_vec)
+    t0_vec, IO_0, Fs = binary_time_series(win_times, Dt=Dt)
+    t_vec = np.arange(0, tf - t0 + Dt, Dt)
+    IO = np.zeros_like(t_vec)
     IO[:len(IO_0)] = IO_0
     return t_vec, IO
 
