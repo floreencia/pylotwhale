@@ -251,8 +251,21 @@ def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
 ### FOURIER
 
 def window_times(onset_times, t0, tf):
-    """windows a onset_times between t0 and tf"""
-    return onset_times[np.logical_and(onset_times>=t0, onset_times<=tf)]
+    """windows onset_times between t0 and tf
+    Parameters
+    ----------
+    onset_times : array_like, shape (n_samples,)
+        onset times, assumes onset times are sorted so that calling 
+        it window makes sense.
+    t0 : float
+        start of window
+    tf : float
+        end of window
+    """
+    assert tf > t0, "t0 must be smaller than tf"
+    assert daT.isArraySorted(onset_times), "must be sorted"
+    return onset_times[np.logical_and(onset_times >= t0,
+                                      onset_times <= tf)]
 
 def binary_time_series(onset_times, Dt=0.1):
     """converts oneset times into a time-continuous binary array
@@ -304,7 +317,7 @@ def binarise_times_in_window(times, t0, tf, Dt=0.1):
     t_vec : array_like, shape (n_samples,)
         times
     IO : array_like, shape (n_samples,)
-        onsets   
+        onsets
     """
     winL = tf - t0
     win_times = window_times(times, t0, tf) - t0
@@ -317,9 +330,9 @@ def binarise_times_in_window(times, t0, tf, Dt=0.1):
 
 def KLdivergence(feature_arr):
     """KL-divergence matrix between all the elements of the feature_arr"""
-    
+
     dist = np.zeros((len(feature_arr), len(feature_arr))) + np.nan
-    
+
     for i in np.arange(len(feature_arr)):
         for j in np.arange(len(feature_arr)): # np.arange(len(feature_arr)):
             dist[i,j] = entropy(feature_arr[i], feature_arr[j])

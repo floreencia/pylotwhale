@@ -65,3 +65,19 @@ def test_get_indexColFromDataFrame():
     assert(s == get_indexColFromDataFrame(thisdf_c, condFun))
     condFun = lambda x: x >= 5
     assert(set() == get_indexColFromDataFrame(thisdf_c, condFun))
+
+
+
+
+def test_isArraySorted():
+	x = np.arange(10)
+	assert(isArraySorted(x) is True)
+	assert(isArraySorted(x[::-1]) is False)
+	x[-1] = 2
+	assert(isArraySorted(x) is False)
+	x[-1] = 20
+	assert(isArraySorted(x) is True)
+
+
+
+
