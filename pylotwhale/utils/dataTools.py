@@ -194,6 +194,13 @@ def returnSortingKeys(di, minCounts=None, reverse=True):
 
 ### LISTS
 
+def isArraySorted(arr):
+    """checks is arr is sorted increasingly
+    arr: array like"""
+    x = [arr[i + 1] > arr[i] for i in np.arange(len(arr)-1)]
+    return(all(x))
+
+
 def flattenList(L):
     '''flatterns a list
     Parameters
