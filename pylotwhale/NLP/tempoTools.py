@@ -255,7 +255,7 @@ def window_times(onset_times, t0, tf):
     Parameters
     ----------
     onset_times : array_like, shape (n_samples,)
-        onset times, assumes onset times are sorted so that calling 
+        onset times, assumes onset times are sorted so that calling
         it window makes sense.
     t0 : float
         start of window
@@ -266,6 +266,7 @@ def window_times(onset_times, t0, tf):
     assert daT.isArraySorted(onset_times), "must be sorted"
     return onset_times[np.logical_and(onset_times >= t0,
                                       onset_times <= tf)]
+
 
 def binary_time_series(onset_times, Dt=0.1):
     """converts oneset times into a time-continuous binary array

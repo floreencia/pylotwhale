@@ -660,9 +660,29 @@ def KSsimilarity(feature_arr, i_diag=1):
     return p
 
 
-def KL_div_symm(x, y):
+def JS_divergence(P, Q):
+    '''Jensen–Shannon divergence
+    
+    Parameters
+    ----------
+    P, Q : array-like (n,)
+        probability distributions
+
+    based in stackoverflow's questions 15880133, answer by Doug Shore
+    https://en.wikipedia.org/wiki/Jensen_Shannon_divergence'''
+    assert len(P) == len(Q)
+    ## normalise PDFs to compute M
+    Pn = P/np.linalg.norm(P, ord=1)
+    Qn = Q/np.linalg.norm(Q, ord=1)
+    M = (Pn + Qn) / 2
+    return (st.entropy(P, M) + st.entropy(Q, M))/2
+
+
+def KL_div_symm(P, Q):
     """returns the symmetric KL-divergence"""
-    return st.entropy(x, y) + st.entropy(y, x)
+    assert len(P) == len(Q)
+    return st.entropy(P, Q) + st.entropy(Q, P)
+
 
 def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
     """computes the distance between probability distributions
