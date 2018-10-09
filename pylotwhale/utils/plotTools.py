@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Apr 28 16:56:58 2016
-
-@author: florencia
+Tools for plotting
 """
 
-from __future__ import print_function
+from __future__ import print_function, division
 #import sys
 import seaborn as sns
 import numpy as np
@@ -21,18 +19,17 @@ import scipy.cluster.hierarchy as sch
 
 def cbarLabels(minV, maxV):
     """
-    give me the maximum and the minimum values of color bar and I will retun 3 label
-    the lables returned are int type. ment for exponents.
+    Returns a tuple with three integer labels between minV and maxV
+    Meant for exponents.
     """
     minV = int(np.ceil(minV))
     maxV = int(np.floor(maxV))
     ml = (minV + maxV)/2
-    #print minV, maxV,"ml", ml
     D = min(abs(ml-maxV), abs(minV-ml))
     ul = ml - D
     ll = ml + D
-    #print D, ul, ll
     return (ll, ml, ul)
+
 
 def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
                    key_labels=None, figsize=None, outFigName=None,
@@ -74,18 +71,20 @@ def stackedBarPlot(freq_arr, freq_arr_names=None, ylabel=None, xlabel=None,
     plt.legend()
     ax.set_xticks(np.arange(n_items)+0.4)
     ax.set_xticklabels(freq_arr_names)
-    if xlabel: ax.set_xlabel(xlabel)
-    if ylabel: ax.set_ylabel(ylabel)
-    if outFigName:fig.savefig(outFigName)
 
-    return fig, ax     
-  
-        
-### 2D plots ###
-        
-        
-###### ultilities ######
-        
+    if xlabel:
+        ax.set_xlabel(xlabel)
+    if ylabel:
+        ax.set_ylabel(ylabel)
+    if outFigName:
+        fig.savefig(outFigName)
+
+    return fig, ax
+
+
+###### utilities ######
+
+      
 def display_numbers(fig, ax, M, fontSz, fmt=int, condition=lambda x: True):
     """
     add text to imshow matrix
@@ -94,7 +93,7 @@ def display_numbers(fig, ax, M, fontSz, fmt=int, condition=lambda x: True):
     condition: must be satisfied in order to show the numbers
         eg. lambda x : x > 0
     """
-        
+
     r,c = np.shape(M)
     
     ## display numbers in the matrix
@@ -116,7 +115,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, cmap=plt.cm.jet, clrBarGaps=15,
     '''
     draws a beautiful color plot
     tickLabsDict     dictionary where the keys are the label of the cba ticks
-                    and the values a the postions
+                    and the values a the positions
     Parameters:
     ------------                    
         X : 2d numpy array
@@ -282,7 +281,7 @@ def plDmatrixWDendrogram(distM, labels, cmap=plt.cm.RdYlBu, figsize=None,
 
     if oFig: fig.savefig(oFig, bbox_inches='tight')
     
-#### spectrogrms
+#### spectrograms
 
 def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None, 
               overlap = 0.5, winN = 'hanning',
@@ -301,7 +300,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     NFFT overlap
     spec_fac: 
         cuts off the powerspectrum 0 max cutting, 1 doesn't do anything
-    thresould all with variations smaller than
+    threshold all with variations smaller than
     """
 
     if v_cut is None:
@@ -315,7 +314,7 @@ def plspectro(waveform, sRate, outF='', N=2**9, v_cut=None,
     A0 = plt.specgram(waveform, Fs = sRate, NFFT = N, noverlap = noverlap, 
                       window = win)[0]
 
-    # Spectro edditing
+    # Spectro editing
     A = selectBand(A0, fr_f = sRate/2, v_cut=v_cut) # band filter
     A = reScale_E(A, spec_factor=spec_fac) # zeros the the spectral energy smaller than 0.001% of <E>
 
@@ -352,7 +351,7 @@ def plspectro_cbar(ax):
 
 def selectBand(M, fr_0 = 0, fr_f = 24000, v_cut = (1.0*1000, 20.0*1000)):
     """
-    selects a band on frquencies from the matrix M
+    selects a band on frequencies from the matrix M
     fr_0, initial frequency of the matrix
     fr_f, final frequency of the matrix, sampR/2
     cutting frequencies
@@ -368,7 +367,7 @@ def selectBand(M, fr_0 = 0, fr_f = 24000, v_cut = (1.0*1000, 20.0*1000)):
 
 def reScale_E(M, spec_factor = 1.0/3.0):
     """
-    Zeroes the noise by taking only the part of the spectrum with the higest energy.
+    Zeroes the noise by taking only the part of the spectrum with the highest energy.
     - spec_factor \in [0,1],
     --- 0 - max cutting energy (we don't see anything)
     --- 1 - min cutting energy (returns M without doing anything )

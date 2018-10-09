@@ -189,10 +189,12 @@ def ignoredKeys(di, ignoreKeys):
 def returnSortingKeys(di, minCounts=None, reverse=True):
     '''keys that sort a dictionary
         di : key --> num dictionary, eg. Counter dictionary'''
-    return np.array([item[0] for item in 
-            sorted(di.items(), key = lambda x:x[1], reverse=reverse) if item[1] >= minCounts])
+    return np.array([item[0] for item in
+                    sorted(di.items(), key=lambda x: x[1], reverse=reverse)
+                    if item[1] >= minCounts])
 
 ### LISTS
+
 
 def isArraySorted(arr):
     """checks is arr is sorted increasingly

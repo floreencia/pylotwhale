@@ -119,7 +119,8 @@ class dict2network():
         self.A = conceptualiseNodes( nx.nx_agraph.to_agraph(self.G), #nx.to_agraph(self.G), 
                                     invisibleNodes )
         drawGraphviz(self.A, dot_file, fig_file)
-    
+
+
 def dict2nxGraph(twoDimDict, rmEdge='default', rmNodes=None):
     """2dim dictionary to graphviz network
     Parameters
@@ -136,6 +137,7 @@ def dict2nxGraph(twoDimDict, rmEdge='default', rmNodes=None):
     except TypeError: 'cannot remove nodes'
     return G
 
+
 def cfd2nxDiGraph(cfd, rmNodes='default'):
     if rmNodes == 'default':
         rmNodes = ['_ini', '_end']
@@ -144,7 +146,7 @@ def cfd2nxDiGraph(cfd, rmNodes='default'):
         G0.remove_node(n)
     return G0
 
-   
+
 def add_edge_attr(G, attr_name, edge_dict):
     """
     adds edge attribute to networkx graph
