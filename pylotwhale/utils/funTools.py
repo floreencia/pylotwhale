@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri 
-
-@author: florencia
-
-
-function tools
+Function/calleble tools
 """
 
 import functools
