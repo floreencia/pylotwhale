@@ -1,20 +1,15 @@
-#!/usr/bin/python
-
-from __future__ import print_function
-#import sys
-import numpy as np
+from __future__ import print_function, division
 import re
 import os
-#import scikits.audiolab as au
-#import warnings
+
+import numpy as np
 
 
 """
-tools for the preparation of annotated files
+tools for preparing of annotated files
 """
 
-#### AUP annotations <---> mtl (marsyas) annotations
-
+### load annotation files to numpy arrays and back
 
 def anns2array(annF):
     '''loads annotations file into ndarray'''
@@ -52,7 +47,7 @@ def save_TLannotations(T, L, outF, opening_mode='w'):
 
 def parseAupFile(inFilename, sep='.'):
     """
-    parses an audacity text file
+    parses an audacity's annotation file
     Parameters:
     -----------
     inFilename : file with audacity-like annotations (t0 \t tf \t label)
@@ -91,11 +86,13 @@ def readCols(fName, colIndexes, sep='\t'):
     '''
     Read the columns "colIxes" of a file "fName"
     np.loadtxt(file, delimiter='\t', dtype='|S') can be used instead!
+
     Parameters
     ----------
     fName : file to read
     colIndexes : list with the indexs of the columns to read
     sep : column separator
+
     Returns
     -------
     collectionList : list of tuples with the wav - annotation files
@@ -115,18 +112,18 @@ def getLabels_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
     parses the annotations of a collection
     Parameters:
     -----------
-        collection : 
-        anncollLabel : number of the column with the annotations
-        labelCol : column of the label in the annotation file
+    collection : list-like
+    anncollLabel : number of the column with the annotations
+    labelCol : column of the label in the annotation file
     '''
     labels = []
     for li in collection:
         annF=li[annCollLabel]
         l = readCols(annF, [labelCol])
         labels.extend(reduce(lambda x,y: x+y,l))
-    
-    return labels  
-    
+
+    return labels
+
 
 ### text file editing
      
@@ -182,34 +179,33 @@ def svAnn2t0_tf_label(svAnnFile, newAnnFi=None):
         except:
             continue
     return newAnnFi
-    
 
-def filterAnotations_minTime(annFi, outFi=None, minTime=0.01):
+
+def filterAnnotations_minTime(annFi, outFi=None, minTime=0.01):
     '''
     Filters out annotations shorter that minTime
     '''
-    
-    if outFi is None: outFi = annFi.replace('.txt', '-timeFiltered.txt')
-       
+
+    if outFi is None:
+        outFi = annFi.replace('.txt', '-timeFiltered.txt')
+
     with open(annFi) as f:
         lines = f.readlines()
-        
+
     try:
         os.remove(outFi)
     except OSError:
         pass
-        
+
     for li in lines:
         t0, tf, label = li.split('\t')
         if float(tf)-float(t0) > minTime:
             with open(outFi, 'a') as g:
                 g.write(li)
-                
-    return(outFi)
-    
-#def fixAnnotationsFromHeikesCurations():
 
-                    
+    return(outFi)
+
+               
 #### back to time stamps -- audio frame analyser (walking)
 
 def getSections(y, tf=None):
@@ -266,22 +262,21 @@ def yLabels2sectionsLi(y, tf=None):
     -------
     > sections dictionary in analysed fft-samples
         (s0, sf) : label
-        
+
     ASSUMPTIONS:
         - no time overlapping regions in the annotations
-        
     """
     scaleFac = 1.*tf/len(y) if tf else 1
-    
+
     sectionsLi = []
     s0 = 0
-    
-    for tr in np.where([y[i] != y[i - 1] for i in range(1, len(y)) ] )[0]:
+
+    for tr in np.where([y[i] != y[i - 1] for i in range(1, len(y))])[0]:
         sectionsLi.append((s0 * scaleFac, (tr + 1)*scaleFac, y[tr]))
         s0 = tr+1
 
-    # write the last interval if there is still space for one 
-    #print("interval:", s0, len(y)) 
+    # write the last interval if there is still space for one
+    #print("interval:", s0, len(y))
     if s0 + 1 <= len(y) - 1:
         sectionsLi.append((s0 * scaleFac, len(y) * scaleFac, y[s0 + 1]))
 
@@ -318,15 +313,15 @@ def clf_y_predictions2TLsections(y, tf=None, sections='default'):
     T = np.zeros((n, 2))
     L = np.zeros((n, ), dtype=int)
     for i, item in enumerate(secLi):
-        T[i,0] = secLi[i][0]
-        T[i,1] = secLi[i][1]
+        T[i, 0] = secLi[i][0]
+        T[i, 1] = secLi[i][1]
         L[i] = secLi[i][2]
 
     mask = np.in1d(L, sections)
 
     return T[mask, :], L[mask]
-   
-    
+
+
 def annDi2annArrays(sectionsD):
     """reformats sectionsD into T array with the times and L
     array with the labels"""
@@ -337,7 +332,8 @@ def annDi2annArrays(sectionsD):
         T[i, :] = t
         labels[i] = sectionsD[t]
     return T, labels
-        
+
+
 def predictions2annotations(y, tf=None):
     """interprets predictions as annotations: 
     Parameters

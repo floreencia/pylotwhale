@@ -5,7 +5,7 @@ import warnings
 from collections import Counter
 
 """
-Module for creating collections and handling annotation files
+Module for creating collections and handling paths of annotation files
 
 Some features are:
 - finding paths in directories
