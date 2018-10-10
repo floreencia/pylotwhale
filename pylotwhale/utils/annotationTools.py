@@ -6,10 +6,14 @@ import numpy as np
 
 
 """
-tools for preparing of annotated files
+x:
+- transforming them into numpy arrays
+- replacing strings, e.g. commas
+- transforming classifier predictions to annotation files
 """
 
 ### load annotation files to numpy arrays and back
+
 
 def anns2array(annF):
     '''loads annotations file into ndarray'''
@@ -43,6 +47,38 @@ def save_TLannotations(T, L, outF, opening_mode='w'):
             f.write("{:5.5f}\t{:5.5f}\t{:}\n".format(T[i, 0],
                     T[i, 1], L[i]))
     return outF
+
+
+def readCols(fName, colIndexes, sep='\t'):
+    '''
+    Read the columns "colIxes" of a file "fName"
+    np.loadtxt(file, delimiter='\t', dtype='|S') can be used instead!
+
+    Parameters
+    ----------
+    fName : file to read
+    colIndexes : list with the indexes of the columns to read
+    sep : column separator
+
+    Returns
+    -------
+    collectionList : list of tuples with the wav - annotation files
+                        tu[0] : path to wav file
+                        tu[1] : path to annotation file
+
+    li = [[line.strip().split(sep)[ci] for ci in colIndexes]
+    for line in lines if not line.startswith('#')]
+
+    '''
+    with open(fName) as f:
+        lines = f.readlines()
+
+    li = []
+    for line in lines:
+        if not line.startswith('#'):
+            li.append([line.strip().split(sep)[ci] for ci in colIndexes])
+
+    return li
 
 
 def parseAupFile(inFilename, sep='.'):
@@ -82,31 +118,6 @@ def parseAupFile(inFilename, sep='.'):
     return data
 
 
-def readCols(fName, colIndexes, sep='\t'):
-    '''
-    Read the columns "colIxes" of a file "fName"
-    np.loadtxt(file, delimiter='\t', dtype='|S') can be used instead!
-
-    Parameters
-    ----------
-    fName : file to read
-    colIndexes : list with the indexs of the columns to read
-    sep : column separator
-
-    Returns
-    -------
-    collectionList : list of tuples with the wav - annotation files
-                        tu[0] : path to wav file
-                        tu[1] : path to annotation file
-    '''
-    with open(fName) as f:
-        lines = f.readlines()
-
-    #li = [tuple([line.strip().split(sep)[ci] for ci in colIndexes]) for line in lines if not line.startswith('#')]
-    li = [[line.strip().split(sep)[ci] for ci in colIndexes] for line in lines if not line.startswith('#')]
-    return li
-
-
 def getLabels_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
     '''
     parses the annotations of a collection
@@ -118,68 +129,81 @@ def getLabels_from_wavAnnColl(collection, annCollLabel=1, labelCol=2):
     '''
     labels = []
     for li in collection:
-        annF=li[annCollLabel]
+        annF = li[annCollLabel]
         l = readCols(annF, [labelCol])
-        labels.extend(reduce(lambda x,y: x+y,l))
+        labels.extend(reduce(lambda x, y: x + y, l))
 
     return labels
 
 
-### text file editing
-     
+### tools for editing text files, replacing strings, e.g. commas
+
+
 def replaceInFile(textFile, string, replaceString, newTextFile=None):
+    '''Replaces all occurrences of a string in a file
+    Parameters
+    ----------
+    textFile : str
+        path to the file that will be edited
+    string : str
+        string to replace
+    replaceString : str
+        replacing string
     '''
-    replaces all occurrences of a string in a file
-    textFile : file to edit
-    string : string to replace 
-    replaceString : replacing string
-    '''
-    if newTextFile == None : newTextFile = textFile
+    if newTextFile == None:
+        newTextFile = textFile
     try:
         with open(textFile, 'r') as f: ## read sv-lines
             s = f.read().replace( string, replaceString)
     except IOError:
         print("WARNING! cannot open: \n\t {}".format(textFile))
-        return None        
+        return None  
         
     #s = open(textFile).read().replace( string, replaceString)
-    with open( newTextFile, 'w') as f:
+    with open(newTextFile, 'w') as f:
         f.write(s)    
     return newTextFile    
-    
+
+
 def commas2periods(textFile, newTextFile=None):
     '''
     replaces all commas for dots
-    '''    
-    return replaceInFile(textFile, ',', '.', newTextFile=newTextFile)    
-    
+    '''
+    return replaceInFile(textFile, ',', '.', newTextFile=newTextFile)
+
+
+#### change annotations format, SV
+
 def svAnn2t0_tf_label(svAnnFile, newAnnFi=None):
     """converts sonic visualizer annotations to aup annotations
         sv : [t0, freq, Delta t, label]
         aup: [t0, tf, label]
     """
-    if newAnnFi == None : newAnnFi = svAnnFile.replace('.txt', '-aupAnn.txt')
-    try: ## remove annotations file if already exists
+    if newAnnFi is None:
+        newAnnFi = svAnnFile.replace('.txt', '-aupAnn.txt')
+    try:  # remove annotations file if already exists
         os.remove(newAnnFi)
     except OSError:
         pass
-    
+
     try:
-        with open(svAnnFile, 'r') as f: ## read sv-lines
+        with open(svAnnFile, 'r') as f:  # read sv-lines
             lines = f.read().splitlines()
     except IOError:
         print("WARNING! cannot open: \n\t {}".format(svAnnFile))
         return None
-            
+
     for li in lines:
-        try: # check format
-            t0, _, dt, l = li.strip().split() 
+        try:  # check format
+            t0, _, dt, l = li.strip().split()
             with open(newAnnFi, 'a') as g:
                 g.write("{}\t{}\t{}\n".format(t0, float(t0)+float(dt), l))
         except:
             continue
     return newAnnFi
 
+
+#### Preprocessing annotations
 
 def filterAnnotations_minTime(annFi, outFi=None, minTime=0.01):
     '''
@@ -205,8 +229,10 @@ def filterAnnotations_minTime(annFi, outFi=None, minTime=0.01):
 
     return(outFi)
 
-               
-#### back to time stamps -- audio frame analyser (walking)
+
+#### transform classifier predictions to annotated segments
+#### audio frame analyser (walking)
+
 
 def getSections(y, tf=None):
     """
@@ -363,21 +389,20 @@ def predictions2txt(y, outTxt, tf, sections):
     outTxt: output file name
     tf: float
         final time
-    sections: list 
+    sections: list
         sections (num) we are interested
     Returns
     -------
     txtFile: str
         name of the output file with the annotations
     '''
-        
+
     sectionsD = getSections(y, tf)  ## find sections
     ky = sorted(sectionsD.keys(), key = lambda x: x[0]) ## sort the stamps
-    
+
     with open(outTxt, 'w') as f: ## write
         for (t0, tf) in ky:
             #print("keys:", t0, tf, sectionsD[(t0, tf)], sections)
             if sectionsD[(t0, tf)] in sections:
-                f.write("%f\t%f\t%s\n"%(t0, tf, sectionsD[(t0, tf)] ) )   
-                
-           
+                f.write("%f\t%f\t%s\n"%(t0, tf, sectionsD[(t0, tf)]))
+
