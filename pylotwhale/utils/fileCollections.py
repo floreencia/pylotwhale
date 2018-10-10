@@ -1,14 +1,21 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Dec 16 16:41:04 2015
-@author: florencia
-"""
 from __future__ import print_function
 import os
 import glob
 import warnings
 from collections import Counter
 
+"""
+Module for creating collections and handling annotation files
+
+Some features are:
+- finding paths in directories
+-check is the items of a collection are repeated
+- creating collections by searching files in a directory
+
+A collection is a text file with paths to particular files,
+eg. audio files or annotation files
+
+"""
 
 #### File loading functions
 
@@ -27,7 +34,7 @@ def concatFile_intoList(*path2files):  # load text files and concat lines into l
 
 
 def areListItemsUnique(mylist):
-    '''checks for duplcated items in a list, if False,
+    '''checks for duplicated items in a list, if False,
     elements and their indexes are printed'''
     uniqueItems = set(mylist)
     uniqueLi = list(uniqueItems)
@@ -103,7 +110,7 @@ def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
     annotationsFiList : list of annotation files
     wavDir : directory where to find the waves
     outCollFile : out file name
-    str0 : string of the template file to be replaplazed
+    str0 : string of the template file to be replaced
     strRep : characteristic string of the file we are looking for
     '''
     with open(outCollFile, 'w') as g:
@@ -120,7 +127,7 @@ def annotationsList2wavAnnCollection(annotationsFiList, wavDir, outCollFile,
 
 def findFilePathInDir(guessFile, searchDir):
     '''
-    looks for the path of a file (base name), 
+    looks for the path of a file (base name),
     assuming this is in searchDir
     '''
     for root, dirs, files in os.walk(searchDir):
@@ -128,15 +135,16 @@ def findFilePathInDir(guessFile, searchDir):
             if name == guessFile:
                 return os.path.abspath(os.path.join(root, name))
     return False
-    
+
+
 def findFilesInThreeDir(searchDir, startFN='', endFN=''):
     """searches for all the files with a given
     end and or ending in a directory all the subdirectories
     returns a list with the filenames"""
-    filesList=[]
+    filesList = []
     for root, dirs, files in os.walk(searchDir):
         for f in files:
             if f.endswith(endFN):
                 if f.startswith(startFN):
-                     filesList.append(os.path.join(root, f))
+                    filesList.append(os.path.join(root, f))
     return filesList
