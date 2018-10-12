@@ -202,11 +202,11 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     m_instances_X = np.shape(X)[1]
     m_instances_y = np.shape(y_num)[1]
     if m_instances_y != m_instances_X:
-        print('WARNING! X and y have different'
-              'sizes ({:d} =/= {:d})'.format(m_instances_X, m_instances_y) )
+        print('WARNING! X and y have different sizes'
+              '({:.0f} =/= {:.0f})'.format(m_instances_X, m_instances_y))
     # plot labels
     cmap = colors.ListedColormap(labels_cmap)
-    axY.imshow(y_num, aspect='auto', cmap=cmap, #plt.cm.get_cmap(cmapName_L),
+    axY.imshow(y_num, aspect='auto', cmap=cmap,  # plt.cm.get_cmap(cmapName_L),
                interpolation='nearest')
 
     return fig, axX, axY
@@ -331,7 +331,7 @@ class dataXy_names(dataX):
         y_names : array with the names of the names ( # instances (m))
         attrNames : names array ( # features X 1 )
     """
-    
+
     def __init__(self, X=None, y_names=None, attrNames=None, datStr=''):
         self.X = None
         dataX.__init__(self, X=X, attrNames=None, datStr='')
