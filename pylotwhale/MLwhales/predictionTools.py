@@ -1,26 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 25 17:13:27 2015
-
-@author: florencia
-"""
 
 from __future__ import print_function, division  # py3 compatibility
 #import numpy as np
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 #import sys
 import featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
-import pylotwhale.MLwhales.MLtools_beta as myML
 import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.utils.annotationTools as annT
 
-### WSD
-# split
-# PREDICT WAV SECTIONS (SOUND TYPE)
+
+"""
+Created on Wed Nov 25 17:13:27 2015
+
+@author: florencia
+"""
+
+
+### WSD -- splitting -- PREDICT WAV SECTIONS (SOUND TYPE)
+
 
 def predictSoundSections(wavF, clf, lt, feExFun,
                          outF='default', annSections='default'):
@@ -49,14 +47,13 @@ def predictSoundSections(wavF, clf, lt, feExFun,
                                        outF=outF, annSections=annSections)
 
 
-def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, outF,
-                                annSections='default'):
-
+def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
+                                               outF, annSections='default'):
     """
     predicts the sections of a waveform and generates annotations
     walking along a waveform 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     waveform : ndarray
         sound waveform
     clf : estimator
@@ -80,12 +77,13 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun, o
     return outF
 
 
-def predictAnnotations(waveform, fs, feExFun, lt, clf): #, annSections=None):
+def predictAnnotations(waveform, fs, feExFun, lt, clf):  #, annSections=None):
     """
     predicts annotation sections of a waveform
     walking along a waveform
-    Parameters:
-    -----------
+
+    Parameters
+    ----------
     waveform : ndarray
         sound waveform
     clf : estimator
@@ -93,8 +91,9 @@ def predictAnnotations(waveform, fs, feExFun, lt, clf): #, annSections=None):
     lt : label transformer object
     feExFun : callable
         feature extraction
-    annSections: array
+    annSections : array
         sections returned, if None all labels are kept
+
     Returns
     -------
     T: ndarray (#annotations, 2)
@@ -413,20 +412,3 @@ def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
                delimiter = '\t', header=header)
     return outFile
 
-
-### GARBAGE
-
-def plConfusionMatrix(cM, labels, outFig='', figsize=None):
-    '''
-    MOOVED TO myML
-    '''
-    print("~WARNING!!! USE THE ONE IN myML")
-    myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
-
-
-def predictAndWrite(inFile, clf, lt, col=0, outFile=None, sep='\t', stop=None):
-    ''' don't use this function
-        use "predictFeatureCollectionAndWrite" instead. THIS FUNCITON WILL BE REMOVED'''
-    return predictFeatureCollectionAndWrite(inFile, clf, lt, col, outFile, sep=sep, stop=stop)
-        
-  
