@@ -351,7 +351,7 @@ def clf_y_predictions2TLsections(y, tf=None, sections='default'):
 def annDi2annArrays(sectionsD):
     """reformats sectionsD into T array with the times and L
     array with the labels"""
-    times = sorted(sectionsD.keys(), key = lambda x: x[0]) # sort annotations
+    times = sorted(sectionsD.keys(), key = lambda x: x[0])  # sort annotations
     T = np.zeros((len(times), 2))
     labels = np.empty(len(times), dtype=str)
     for i, t in enumerate(times):
@@ -361,17 +361,19 @@ def annDi2annArrays(sectionsD):
 
 
 def predictions2annotations(y, tf=None):
-    """interprets predictions as annotations: 
+    """interprets predictions as annotations
+
     Parameters
     ----------
-    y: ndarray
+    y : ndarray
         predictions
-    tf: final time of the wavform to which this predictions belong to
+    tf : final time of the wavform to which these predictions belong to
+
     Returns
     -------
-    T: ndarray (n, 2)
+    T : ndarray (n, 2)
         times
-    L: ndarray (n,)
+    L : ndarray (n,)
         labels
     """
     sectionsD = getSections(y, tf)
@@ -382,7 +384,7 @@ def predictions2txt(y, outTxt, tf, sections):
     '''
     transforms the predicted labels y into a txt annotation file
     that can be read by audacity or other audio software.
-   
+
     Parameters
     ----------
     y: predicted samples
@@ -397,10 +399,10 @@ def predictions2txt(y, outTxt, tf, sections):
         name of the output file with the annotations
     '''
 
-    sectionsD = getSections(y, tf)  ## find sections
-    ky = sorted(sectionsD.keys(), key = lambda x: x[0]) ## sort the stamps
+    sectionsD = getSections(y, tf)  # find sections
+    ky = sorted(sectionsD.keys(), key = lambda x: x[0])  # sort the stamps
 
-    with open(outTxt, 'w') as f: ## write
+    with open(outTxt, 'w') as f:  # write
         for (t0, tf) in ky:
             #print("keys:", t0, tf, sectionsD[(t0, tf)], sections)
             if sectionsD[(t0, tf)] in sections:

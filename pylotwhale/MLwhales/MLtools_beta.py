@@ -140,7 +140,7 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
 
     Returns
     -------
-    fig : matpltlib figure
+    fig : matplotlib figure
     """
 
     ## initialise figure

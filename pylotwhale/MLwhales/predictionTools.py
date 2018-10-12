@@ -1,21 +1,14 @@
-
 from __future__ import print_function, division  # py3 compatibility
-#import numpy as np
 import numpy as np
 import os
-#import sys
 import featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
 import pylotwhale.signalProcessing.audioFeatures as auf
 
-
 """
-Created on Wed Nov 25 17:13:27 2015
-
-@author: florencia
+Tools for transforming classifier predictions into annotation sections and files
 """
-
 
 ### WSD -- splitting -- PREDICT WAV SECTIONS (SOUND TYPE)
 
@@ -24,6 +17,7 @@ def predictSoundSections(wavF, clf, lt, feExFun,
                          outF='default', annSections='default'):
     '''
     predicts and generates the annotations of the given wavF walking
+
     Parameters:
     -----------
     wavF : str
@@ -43,15 +37,18 @@ def predictSoundSections(wavF, clf, lt, feExFun,
         outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
 
     waveForm, fs = sT.wav2waveform(wavF)
-    return predictSectionsFromWaveform_genAnnotations(waveForm, fs, clf, lt, feExFun,
+
+    oF = predictSectionsFromWaveform_genAnnotations(waveForm, fs, clf, lt, feExFun,
                                        outF=outF, annSections=annSections)
+    return oF
 
 
 def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
                                                outF, annSections='default'):
     """
     predicts the sections of a waveform and generates annotations
-    walking along a waveform 
+    walking along a waveform
+ 
     Parameters
     ----------
     waveform : ndarray
@@ -70,7 +67,7 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
     if annSections == 'default':
         annSections = ['c']
 
-    tf = 1.0*len(waveform)/fs
+    tf = 1.0 * len(waveform) / fs
     M0 = feExFun(waveform) #, annotations=annotLi_t)
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
@@ -96,12 +93,12 @@ def predictAnnotations(waveform, fs, feExFun, lt, clf):  #, annSections=None):
 
     Returns
     -------
-    T: ndarray (#annotations, 2)
+    T : ndarray (#annotations, 2)
         initial and final time of the annotation sections
     labels: ndarray (#anns, )
         labels of the annotation sections
     """
-    tf = 1.0*len(waveform)/fs
+    tf = 1.0 * len(waveform) / fs
     M0 = feExFun(waveform)  # annotations=annotLi_t)
     y_pred = clf.predict(M0)
     T, labels = annT.predictions2annotations(lt.num2nom(y_pred), tf)
@@ -110,7 +107,7 @@ def predictAnnotations(waveform, fs, feExFun, lt, clf):  #, annSections=None):
     return T, labels
 
 
-### WSD2 
+### WSD2
 
 def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
                          readSections, dt=0): #keepSections=None
@@ -118,6 +115,7 @@ def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
     reads the predicted sections from WSD1 to predicts
     the finer structure of the calls
     with clf trained with a smaller nTextWS
+
     Parameters
     ----------
     wavF: str
@@ -137,13 +135,13 @@ def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
     waveform, fs = sT.wav2waveform(wavF)  # load waveform
     A = annT.anns2array(annWSD1)  # load annotations
 
-    newT_list=[]
-    newL_list=[]
+    newT_list = []
+    newL_list = []
     for t0i, t0f, l0 in A[:]:  # for each ann section
         if l0 in readSections:  # if section of interest (c)
             thisWaveform = auf.getWavSec(waveform, fs, t0i - dt, t0f + dt)
             ## predict annotations
-            secT, secL = predictAnnotations(thisWaveform, fs, feExtFun, 
+            secT, secL = predictAnnotations(thisWaveform, fs, feExtFun,
                                             lt, WSD2_clf)
             newSectT = secT + t0i - dt  # relative to the orginal ann sections
             newT_list.append(newSectT)
@@ -152,6 +150,7 @@ def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
     newL = np.hstack((newL_list))
     newT = np.vstack((newT_list))
     return newT, newL
+
 
 def WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
                 readSections='default', labelsHierarchy='default'):
@@ -164,9 +163,9 @@ def WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
     lt: LabelTransformer
         to map predictions
     m: int
-        number of insatances in wavF
+        number of instances in wavF
     tf: float
-        lenght of the wavF in seconds
+        length of the wavF in seconds
     Returns
     -------
     y_pred_names: ndarray
@@ -184,12 +183,14 @@ def WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
                                                  labelsHierarchy=labelsHierarchy)
     return y_pred_names
 
+
 def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
                            readSections, keepSections='default', dt=0):
     """Generate annotations using the WSD2
     reads the predicted sections from WSD1 to predicts
     the finer structure of the calls
     with clf trained with a smaller nTextWS
+
     Parameters
     ----------
     wavF: str
@@ -210,7 +211,7 @@ def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
         time buffer for reading around the desired annotation section
     """
     if keepSections is 'default':
-        keepSections = ['c']     
+        keepSections = ['c']
     try:
         os.remove(outF)
     except OSError:
@@ -285,7 +286,7 @@ def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
     ----------
     wavF : str
     annF : str
-        path to the file with the annotationn section to predict
+        path to the file with the annotation section to predict
     clf : estimator
     featExtFun : callable
     lt : labelTransformer
@@ -393,8 +394,8 @@ def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
     '''
     ### out file handling
     if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
-    
-    try: # remove file if exists
+
+    try:  # remove file if exists
         os.remove(outFile)
     except OSError:
         pass
