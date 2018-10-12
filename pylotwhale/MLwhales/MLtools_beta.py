@@ -1,6 +1,4 @@
 from __future__ import print_function, division
-import os
-import sys
 
 from collections import Counter
 import shutil
@@ -10,23 +8,13 @@ from sklearn.externals import joblib
 from sklearn import utils as sku
 
 import numpy as np
-import scipy.io.arff as arff
-import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.ticker import NullFormatter
 from matplotlib import colors  # for plXy
 
-from subprocess import call
-import pandas as pd
 import seaborn as sns
 
-import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.signalProcessing.signalTools as sT
-
-import featureExtraction as fex
 
 """
-    Preprocessing function for doing machine learning
     florencia @ 16.05.15
 
 """
