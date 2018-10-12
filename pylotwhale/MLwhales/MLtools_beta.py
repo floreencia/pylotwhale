@@ -1,14 +1,12 @@
-
-from __future__ import print_function
+from __future__ import print_function, division
 import os
 import sys
-#import warnings
+
 from collections import Counter
 import shutil
 
 from sklearn import preprocessing
 from sklearn.externals import joblib
-#from sklearn.learning_curve import learning_curve
 from sklearn.model_selection import learning_curve
 from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
 from sklearn import utils as sku
@@ -18,7 +16,7 @@ import scipy.io.arff as arff
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
-from matplotlib import colors # for plXy
+from matplotlib import colors  # for plXy
 
 from subprocess import call
 import pandas as pd
@@ -26,18 +24,8 @@ import seaborn as sns
 
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.signalTools as sT
-#import pylotwhale.utils.whaleFileProcessing as fp
 
 import featureExtraction as fex
-
-#from sklearn.utils import shuffle
-#import time 
-#import itertools as it
-#import os
-#import ast
-
-#import sequencesO_beta as seqs
-#import matrixTools as mt 
 
 """
     Preprocessing function for doing machine learning
@@ -108,7 +96,7 @@ def removeBuggs_idx(M, axis=0):
     idx = np.isfinite(Ms)
     return(idx)
 
-    
+
 def removeBuggyInstances(M, y=None):
     '''
     removes the instances (rows) with numeric singularities nan, inf
@@ -117,15 +105,17 @@ def removeBuggyInstances(M, y=None):
     m : number of instances
     n :  number of features
     -->
-    > M : unbugged feature matrix 
+    > M : unbugged feature matrix
     > y : unbugged target array
     > idx : unbugging indexes
     '''
-    if y == None: y=np.zeros(np.shape(M)[0])
+    if y is None:
+        y=np.zeros(np.shape(M)[0])
     ## find buggy instances    
     idx = removeBuggs_idx(M, axis=1)
     return M[idx, :], y[idx], idx
-    
+
+
 def removeBuggyFeatures(M, y=None):
     '''
     removes the features (columns) with numeric singularities nan, inf

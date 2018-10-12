@@ -49,7 +49,7 @@ def get_scorer(scorer_name, **kwargs):
     myScorers={
             'f1c': make_class_f1score_fun}  # classTag=1
     if scorer_name in myScorers.keys():
-        scFun=myScorers[scorer_name] 
+        scFun=myScorers[scorer_name]
         return mt.make_scorer(scFun(**kwargs))
     else:
         return scorer_name
