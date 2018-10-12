@@ -31,8 +31,6 @@ import featureExtraction as fex
 
 """
 
-#warnings.simplefilter('always', DeprecationWarning)
-#DEPRECATION_MSG = ("use MLEvalTools")
 
 #################################################################################
 ##############################    FEATURES    ##################################
@@ -44,22 +42,22 @@ import featureExtraction as fex
 
 def rescale(M):
     '''
-    rescales the columns of a matrix so that ots values lay in [0,1]
-    substracting the mean and dividing by the range (max-min),
+    rescales the columns of a matrix so that its values lay in [0,1]
+    subtracting the mean and dividing by the range (max-min),
     also called normalisation
     '''
     return np.divide((1.0*M - np.min(M, axis=0)), np.max(M, axis=0) - np.min(M, axis=0) )
 
 
-def standarize(M):
+def standardize(M):
     '''
-    standarized the columns of a matrix, so that they have mean = 0 and std = 1
+    standardize the columns of a matrix, so that they have mean = 0 and std = 1
     '''
     return 1.0*(M - np.mean(M, axis=0))/np.std(M-np.mean(M, axis=0), axis=0)
 
 
 def colCounts2colFreqs(M):
-    '''tranform column counts to column frequencies
+    '''transform column counts to column frequencies
     by dividing the matrix columns by total counts of each column'''
     return np.divide(1.*M, 1.*M.sum(axis=0))
 
@@ -69,28 +67,28 @@ def scale(M, normfun=rescale, axis=1):
     rescales a matrix
     axis = 0 (columns)
          = 1 (rows)
-         
+
     normfun 'normalization function'
-                {rescale, standarize, colCounts2colFreqs}
-                
-    ! this function replazed normalizeMatrix()
+                {rescale, standardize, colCounts2colFreqs}
+
+    ! this function replaced normalizeMatrix()
     '''
     if axis == 1:
-         return normfun(M.T).T
-        
+        return normfun(M.T).T
+
     if axis == 0:
-         return normfun(M)
-         
-    
+        return normfun(M)
+
+
 def removeBuggs_idx(M, axis=0):
-    '''     
-    Returns the indexes for wich the 
+    '''
+    Returns the indexes for which the
     rows (instances, axis=1) or columns (features, axis=0) have finite values
     axis=0 columns
     axis=1 rows
     < M : features matrix
-    '''    
-    Ms = np.sum(M, axis=axis) 
+    '''
+    Ms = np.sum(M, axis=axis)
     idx = np.isfinite(Ms)
     return(idx)
 
@@ -108,8 +106,8 @@ def removeBuggyInstances(M, y=None):
     > idx : unbugging indexes
     '''
     if y is None:
-        y=np.zeros(np.shape(M)[0])
-    ## find buggy instances    
+        y = np.zeros(np.shape(M)[0])
+    ## find buggy instances
     idx = removeBuggs_idx(M, axis=1)
     return M[idx, :], y[idx], idx
 
@@ -120,14 +118,15 @@ def removeBuggyFeatures(M, y=None):
     < M : feature matrix, m x n  (m, number of instances)
     < y : feature array, n x 1  (n,  number of features)
     -->
-    > M : unbugged feature matrix 
+    > M : unbugged feature matrix
     > y : unbugged feature array
     > idx : unbugging indexes
     '''
-    if y == None: y=np.zeros(np.shape(M)[1])
-    ## find buggy instances    
+    if y is None:
+        y = np.zeros(np.shape(M)[1])
+    ## find buggy instances
     idx = removeBuggs_idx(M, axis=0)
-    return M[idx, :], y[idx], idx      
+    return M[idx, :], y[idx], idx
 
 ####    visualizing    ############################
 
@@ -218,18 +217,21 @@ def selectData(X, y, label):
     """Returns the data with the specified labels
     label: list like object"""
     ix = y == label
-    return  np.array(X[ix,:]), np.array(y[ix])
+    return  np.array(X[ix, :]), np.array(y[ix])
+
 
 def resample(X, y, random_state=1, **options):
     """Sample with replacement (bootstrap)
-       **options: 
+       **options:
         n_samples, int; replace, bool"""
     return sku.resample(X, y, random_state=random_state, **options)
+
 
 def shuffle(X, y, random_state=1, **options):
     """Shuffle arrays (permute)
     sample without replacement"""
     return sku.shuffle(X, y, random_state=random_state, **options)
+
 
 def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
     """Balances data Xy to a given class, 
@@ -276,21 +278,20 @@ def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
 class dataX:
     """
     features object -- unannotated data
-    < X : the data matrix  ( # instnces X #features )
-            or a tuple of data matrixes (X1, X2, ...)
+    < X : the data matrix  ( # instances X #features )
+            or a tuple of data matrices (X1, X2, ...)
     < attrNames : labels array ( # instances X 1 )
-    annotated, tells if the data set should be trated as an annotated (True)
+    annotated, tells if the data set should be treated as an annotated (True)
         containing the ground truth or not (False)
     """
 
-    def __init__( self, X=None, attrNames=None, datStr=''):       
-        #print("TEST", arffFile)
-        
+    def __init__(self, X=None, attrNames=None, datStr=''):
+
         self.load_X(X)
         self.nameAttribuites(attrNames)
-        self.datStr=datStr
+        self.datStr = datStr
         #print( len(self.attrNames), self.n_attr)# '# targets must match n'
-        
+
     def load_X(self, X):
         if isinstance(X, tuple): # stack new instances
             self.X = np.vstack(X)
@@ -301,7 +302,7 @@ class dataX:
         else: # load the first set of instances
             self.X = X
             self.shape = self.m_instances, self.n_attr = np.shape(self.X)
-                
+
     def addInstances(self, newX):
         '''adds instances'''
         m, n= np.shape(newX)
@@ -310,7 +311,7 @@ class dataX:
         else:
             assert(self.n_attr is None or n == self.n_attr), "different feature spaces {} =/= {}".format(n, self.n_attr)
             self.load_X((self.X, newX))
-        
+
     def nameAttribuites(self, attrNames):
         if self.n_attr is None: # no data
             self.attrNames = None
@@ -326,8 +327,8 @@ class dataXy_names(dataX):
     features object -- annotated data
     Parameters:
     ------------
-        X : the data matrix  ( # instnces X #features )
-            or a tuple of data matrixes (X1, X2, ...)
+        X : the data matrix  ( # instances X #features )
+            or a tuple of data matrices (X1, X2, ...)
         y_names : array with the names of the names ( # instances (m))
         attrNames : names array ( # features X 1 )
     """
@@ -336,7 +337,7 @@ class dataXy_names(dataX):
         self.X = None
         dataX.__init__(self, X=X, attrNames=None, datStr='')
         self.load_y_names(y_names) # self.y_names
-        
+
     def load_y_names(self, y_names):
         '''loads and updates y_names and the label encoder
         > self.y_names
@@ -349,7 +350,7 @@ class dataXy_names(dataX):
             self.y_names = None
         else: # load for the first time
             self.y_names = y_names
-    
+
     def addInstances(self, new_X, new_y_names):
         '''adds annotated instances
         new_X : feature matrix
@@ -358,20 +359,20 @@ class dataXy_names(dataX):
                     np.array (m,)
         '''
         try:
-            m, n = np.shape(new_X) # m (instances) x n (features)
-        except ValueError: # notthing to add new_X=None
+            m, n = np.shape(new_X)  # m (instances) x n (features)
+        except ValueError:  # nothing to add new_X=None
             return None
-            
+
         ## check dimensions
         if self.X is None: # first time we load data
             self.load_X(new_X)
             self.load_y_names(new_y_names)
-        else: # stack data
+        else:  # stack data
             assert(self.n_attr is None or n == self.n_attr), "different feature spaces {} =/= {}".format(n, self.n_attr)
             self.load_X((self.X, new_X))
-            assert(m == len(new_y_names)),  "inconsistent labeling {} =/= {}".format(m, len(new_y_names))
+            assert(m == len(new_y_names)),  "inconsistent labelling {} =/= {}".format(m, len(new_y_names))
             self.load_y_names((self.y_names, new_y_names))
-        
+
     def checkDimesions(self, A, a_names):
         m, n = np.shape(A) # m (instances) x n (features)
         if m == len(a_names):
@@ -415,8 +416,8 @@ class dataXy(dataXy_names):
     features object -- annotated data
     Parameters:
     ------------
-        X : the data matrix  ( # instnces X #features )
-            or a tuple of data matrixes (X1, X2, ...)
+        X : the data matrix  ( # instances X #features )
+            or a tuple of data matrices (X1, X2, ...)
         y_names : array with the names of the names ( # instances (m))
         attrNames : names array ( # features X 1 )
     """
