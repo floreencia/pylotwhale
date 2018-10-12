@@ -13,16 +13,17 @@ from matplotlib import colors  # for plXy
 
 import seaborn as sns
 
-
 """
+Utilities for dealing with classification features:
+datXy, label encoder, scaling functions (normalise, standardise)
+
     florencia @ 16.05.15
-
 """
 
 
-#################################################################################
-##############################    FEATURES    ##################################
-#################################################################################
+########################################################################
+##########################    FEATURES    ##############################
+########################################################################
 
 
 ####    preprocessing    ##################################
@@ -34,12 +35,13 @@ def rescale(M):
     subtracting the mean and dividing by the range (max-min),
     also called normalisation
     '''
-    return np.divide((1.0*M - np.min(M, axis=0)), np.max(M, axis=0) - np.min(M, axis=0) )
+    return np.divide((1.0*M - np.min(M, axis=0)),
+                     np.max(M, axis=0) - np.min(M, axis=0))
 
 
-def standardize(M):
+def standardise(M):
     '''
-    standardize the columns of a matrix, so that they have mean = 0 and std = 1
+    standardise the columns of a matrix, so that they have mean = 0 and std = 1
     '''
     return 1.0*(M - np.mean(M, axis=0))/np.std(M-np.mean(M, axis=0), axis=0)
 
@@ -115,6 +117,7 @@ def removeBuggyFeatures(M, y=None):
     ## find buggy instances
     idx = removeBuggs_idx(M, axis=0)
     return M[idx, :], y[idx], idx
+
 
 ####    visualizing    ############################
 
@@ -205,7 +208,7 @@ def selectData(X, y, label):
     """Returns the data with the specified labels
     label: list like object"""
     ix = y == label
-    return  np.array(X[ix, :]), np.array(y[ix])
+    return np.array(X[ix, :]), np.array(y[ix])
 
 
 def resample(X, y, random_state=1, **options):
@@ -222,8 +225,9 @@ def shuffle(X, y, random_state=1, **options):
 
 
 def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
-    """Balances data Xy to a given class, 
+    """Balances data Xy to a given class,
     classes with less data then class_label are left the same
+
     Parameters
     ----------
     class_label: str
@@ -233,13 +237,14 @@ def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
     shuffle_samples: bool
         arrays are stacked, having them arranged by label.  
         If True, arrays are shuffle before being returned
+
     Returns
     -------
     balX, baly
     """
     ## get data of the class_label
     balX, baly = selectData(X, y, class_label)
-    
+
     n_balclass = len(baly) # count samples
     ## labels of the rest of the classes
     balance_labels = set(y) - set([class_label])
@@ -256,7 +261,8 @@ def balanceToClass(X, y, class_label, random_state=1, shuffle_samples=False):
 
     ## shuffle again not to have X, y stacked by class
     if shuffle_samples is True:
-        balX, baly = shuffle(balX, baly, random_state=random_state, replace=False)
+        balX, baly = shuffle(balX, baly, random_state=random_state,
+                             replace=False)
 
     return balX, baly #np.array(balX), np.array(baly)
 
