@@ -7,8 +7,6 @@ import shutil
 
 from sklearn import preprocessing
 from sklearn.externals import joblib
-from sklearn.model_selection import learning_curve
-from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix
 from sklearn import utils as sku
 
 import numpy as np
@@ -133,45 +131,10 @@ def removeBuggyFeatures(M, y=None):
 
 ####    visualizing    ############################
 
-def arffData2Xy(arffFile):
-    '''
-    reads an arff file ( output of bextract ) and returns:
-    > the data matrix  ( #instnces X #features )
-    > labels array ( #instances X 1 )
-    '''    
-    dat, metDat = arff.loadarff(open(arffFile))
-    attrNames = metDat.names()
-    N_attr = len(attrNames)
-    M = np.array([dat[attrNames[i]] for i in range(len(attrNames[:-1])) ])
-
-    labels = dat[attrNames[-1]]
-    labSet = list(set(labels))
-    N_labels = len(labels)
-    print(N_attr, N_labels, labSet)
-
-    return M.T, labels
-
-
-def vis_dataXy(X, y, outPl='', plTitle=''):
-    '''
-    plots features (X) and labels y
-    X, features matrix transposed (n x m)
-    y, target vector (1 x m)
-    m, # instaces
-    n, # features
-    '''    
-    fig, ax = plt.subplots()  # 1 ,1,figsize=(5,len(y)/10))
-    y[y==1]=np.max(X)
-    ax.imshow(np.vstack((X, y,y,y,y)), aspect='auto', interpolation='nearest')#, cmap=plt.cm.Accent)
-    ax.set_ylabel('features')
-    ax.set_xlabel('insatances')
-    if plTitle: ax.set_title(plTitle)
-    if outPl: fig.savefig(outPl)
-
-
 
 def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     """Plot feateure matrix with labels
+
     Parameters
     ----------
     X : ndarray (n, m)
@@ -239,101 +202,14 @@ def plXy(X, y, figsize=None, cmapName_L='gray_r', cmapName_Fig='gray_r'):
     m_instances_X = np.shape(X)[1]
     m_instances_y = np.shape(y_num)[1]
     if m_instances_y != m_instances_X:
-        print('WARNING! X and y have different sizes (%d =/= %d)'%(m_instances_X, m_instances_y) )
+        print('WARNING! X and y have different'
+              'sizes ({:d} =/= {:d})'.format(m_instances_X, m_instances_y) )
     # plot labels
     cmap = colors.ListedColormap(labels_cmap)
     axY.imshow(y_num, aspect='auto', cmap=cmap, #plt.cm.get_cmap(cmapName_L),
                interpolation='nearest')
 
     return fig, axX, axY
-
-
-def vis_arff(arffFile, preproFun='standardize', outPl='', outDir='', plTitle=''):
-    
-    matrixTransf = {'rescale': rescale, 
-                   'standardize': standarize, 
-                   'unit': lambda x: x}
-    
-    if not outPl: # no out-file name
-        outPl = arffFile.replace('.arff', '-%s.png'%preproFun) 
-        if not outDir: # no out-dir
-            outPl = outPl.replace('/arff/', '/images/') 
-        else: # out Dir is given
-            outPl = os.path.join(outDir, os.path.basename(outPl))
-                
-    X, y = arffData2Xy(arffFile)
-    if not plTitle: plTitle = "(%d, %d) "%np.shape(X)
-
-    ### labels: nom --> num
-    le = preprocessing.LabelEncoder()
-    y_num = le.fit_transform(y)
-    
-    M = scale(X.T, normfun = matrixTransf[preproFun])
-    print(np.shape(M), np.shape(y_num), outPl)
-    vis_dataXy(M, y_num, outPl, plTitle)
-
-
-def wav2mf(wavFi, mfDir):
-    '''
-    creates mf colections with the given wav file
-    the collection is stored in the mfDir
-    '''
-    bN = os.path.basename(wavFi)
-    mfFi = os.path.join(mfDir, bN.replace('.wav','.mf'))
-    with open(mfFi, 'w') as f:
-        f.write(wavFi)
-    return mfFi
-    
-def mf2arff(mfFi, arffDir, baseN=None, moreOptions='Default'):
-    '''
-    uses bextract to extract the features of a collection file (.mf)
-    and stores the output in arffDir
-    < mfFi, list of collections [col1.mf, ..., col2.mf]    
-    < moreOptions = ['-m', '30', '-n'] (default)
-        -m, size of the texture window
-        -n, normalize audio file
-        see bextract for more options
-    < baseN == None, then this is automatically assigned as the base name
-            of the firs file in the mf list
-    '''
-    ## bextract options
-    if moreOptions == 'Default': moreOptions = ['-m', '30', '-n']
-    ## check we have a list of collection files
-    if (not type(mfFi) == list and type(mfFi)) == str: mfFi = [mfFi]
-    assert type(mfFi) == list, 'mfFi, !list with <col>.mf'
-    ### file handling for arff
-    ## add paths
-    mfFi = [os.path.abspath(os.path.expanduser(Fi)) for Fi in mfFi ]
-    ## base name for arff file
-    if baseN == None : baseN = os.path.basename(mfFi[0]).replace('.mf', '')
-    ## add options to the base name    
-    optStr = "_".join(moreOptions)
-    arffFi = os.path.join(arffDir, baseN + '%s.arff'%optStr)
-
-    command = ['bextract', '-fe'] + mfFi + ['-w', arffFi] + moreOptions 
-    call(command)
-    print(" ".join(command))
-
-    return arffFi
-
-
-def correctBextractLabelMess(X, y, m_cut=None, N_sections=1):
-    """
-    bextract seem to mess up with the labels when working in timeline mode
-    but this seems to occurre only in the beginnig. This function filters out
-    the first 2 (N_sections) sections
-    X, feature matrix m x n
-    y, m x 1
-    """
-    '''
-    if not m_cut:
-        le = preprocessing.LabelEncoder()
-        y_num = le.fit_transform(y)
-        m_cut = np.where(np.diff(y_num) !=0 )[N_sections]
-    '''
-    print(np.shape(X), m_cut)
-    return X[m_cut:, :], y[m_cut:]
-    
 
 
 ### Operations over X, y data objects
@@ -443,8 +319,8 @@ class dataX:
             assert len(self.attrNames) == self.n_attr, "# targets must match n"
         else: # generate names
             self.attrNames = np.arange(self.n_attr) # features + output
-      
-      
+
+
 class dataXy_names(dataX):
     """
     features object -- annotated data
@@ -592,21 +468,22 @@ class labelTransformer():
         self.le.fit_transform(y_names)
         self.classes_ = self.le.classes_
 
-    def _num2nom(self, num):  
+    def _num2nom(self, num):
         try:
             return self.le.inverse_transform(num)
         except ValueError:
             print('ERROR! y contains new labels')     
             return np.array([None])
 
+
     def num2nom(self, num):
         '''nominal --> numeric'''
-        if np.ndim(num) == 0: 
+        if np.ndim(num) == 0:
             num = np.array([num])
             return self._num2nom(num).item()
         else:
-            return self._num2nom(num)  
-            
+            return self._num2nom(num)
+
     def _nom2num(self, nom):
         '''target name (nominal) --> target (numeric)'''
         try:
