@@ -701,7 +701,7 @@ def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
             p[i,j] = dist_fun(feature_arr[i], feature_arr[j])
     return p
 
-    
+
 def pairwise_probDists_distance_df(di, dist_fun=KL_div_symm):
     """
     di: dict of nd arrays
@@ -825,7 +825,7 @@ def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
 
 def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None,
                  **CV_kwargs):  #  bw_range=None):
-    '''fit KDE estimating using cross validation to estimate the bandwith'''
+    '''fit KDE, using cross validation to estimate the bandwith'''
 
     # get model
     kde = CVbw_KDE(x, kde_param_grid=kde_param_grid, **CV_kwargs)
