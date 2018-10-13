@@ -45,3 +45,9 @@ def test_randtest4bigrmas_inSequences():
     assert (p_values.loc['a', 'b'] > 0.1)
     assert (p_values.loc['b', 'a'] > 0.1)
     assert (p_values.loc['a', 'a'] < 0.1)
+
+
+def test_normalisePDF():
+    x = np.ones(10)
+    r = (-1,1)
+    assert np.sum(normalisePDF(x, r)/len(x)*(r[-1]-r[0])) == 1

@@ -558,20 +558,42 @@ def Gstatistics(O, E):
     assert(len(O) == len(E))
     assert np.all(O > 4), "less than five occurences in this class %s"%np.min(O)
     assert np.all(E > 4), "less than five occurences in this class %s"%np.min(E)
-    df = len(O)-1
+    df = len(O) - 1
     #print(O*np.log(O/E))
     G = 2*np.sum(O*np.log(O/E))
     return G, st.chisqprob(G, df)
-    
-    
-    
+
+
 ### DISTANCES AND COMPARISONS
-    
+
+
+def normalisePDF(p, rg=None):
+    """normalises p in a given range, rg
+
+    Parameters
+    ----------
+    p : ndarray (n, )
+        PDF
+    rg : ndarray (2, )
+        range where to normalise the PDF
+        if None ==> inrange = (0, 1)
+    Returns
+    -------
+    pn : ndarray (n, )
+        normalised PDF
+
+    """
+    if rg is None:
+        rg = np.array([0, 1])
+
+    return p / np.linalg.norm(p, ord=1) * len(p) / (rg[-1] - rg[0])
+
+
 def stat_testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
     z-test for the difference of proportions
     tests the null hypothesis
-    'two tailed' H0: p1 = p2, H1: 
+    'two tailed' H0: p1 = p2, H1:
     'right tail' H0: p1 - p2 , H1: p1 > p2
     'left tail' H0: p1 < p2
     where p1 and p2 are two proportions, random variables normaly distruibuted.
