@@ -6,30 +6,17 @@ import functools
 from collections import Counter
 
 import numpy as np
-import scipy.io.arff as arff
-import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.ticker import NullFormatter
 
-#import pylotwhale.signalProcessing.audioFeatures as auf
+from sklearn.model_selection import learning_curve
+from sklearn import metrics as mt
+
 import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.MLwhales.predictionTools as pT
 
-#import pylotwhale.utils.whaleFileProcessing as fp
-#import pylotwhale.MLwhales.featureExtraction as fex
-#import pylotwhale.MLwhales.MLtools_beta as myML
-
 import MLtools_beta as myML
 import featureExtraction as fex
-
-#from sklearn.utils import shuffle
-from sklearn import preprocessing
-from sklearn.externals import joblib
-#from sklearn.learning_curve import learning_curve
-from sklearn.model_selection import learning_curve
-from sklearn import metrics as mt
-from sklearn.metrics import recall_score, f1_score, precision_score, accuracy_score, confusion_matrix, classification_report
 
 """
     Preprocessing function of machine learning
@@ -167,16 +154,22 @@ def printScoresFromCollection(feExFun, clf, lt, coll, out_file, labelsHierarchy)
         annF_bN = os.path.basename(annF)
         with open(out_file, 'a') as f:
             f.write("{}\t{}\n".format(scsO.scores2str(), annF_bN))
-        
 
-def clfGeneralizability(clf_list, wavAnnCollection, featExtFun, labelEncoder, labelSet=None):
-    '''estimates the score of a list of classifiers, one score for each wav file'''
-    clf_scores = [] #np.zeros(len(clf_list))
-    for clf in clf_list: 
-        acc, pre, rec, f1, size = coll_clf_scores(clf, wavAnnCollection, featExtFun, labelEncoder=labelEncoder, labelSet=labelSet)
+
+def clfGeneralizability(clf_list, wavAnnCollection, featExtFun,
+                        labelEncoder, labelSet=None):
+    '''estimates the score of a list of classifiers,
+    one score for each wav file'''
+    clf_scores = []  # np.zeros(len(clf_list))
+    for clf in clf_list:
+        acc, pre, rec, f1, size = coll_clf_scores(clf, wavAnnCollection,
+                                                  featExtFun,
+                                                  labelEncoder=labelEncoder,
+                                                  labelSet=labelSet)
         clf_scores.append( {"acc" : acc, "pre" : pre, "rec" : rec, "f1" : f1, "size" : size} )
     return clf_scores
-            
+
+
 def coll_clf_scores(clf, wavAnnCollection, featExtFun, labelTransformer, labelSet=None):
     '''estimates the score of a classifiers, for each wav file in the collection
     Parameters:
@@ -207,10 +200,10 @@ def coll_clf_scores(clf, wavAnnCollection, featExtFun, labelTransformer, labelSe
         A = A0[mask]
         y_pred = clf.predict(A)
         ## scores
-        acc[i] = accuracy_score(a, y_pred)
-        pre[i]=precision_score(a, y_pred)
-        rec[i]=recall_score(a, y_pred)
-        f1[i] = f1_score(a, y_pred)
+        acc[i] = mt.accuracy_score(a, y_pred)
+        pre[i]= mt.precision_score(a, y_pred)
+        rec[i] = mt.recall_score(a, y_pred)
+        f1[i] = mt.f1_score(a, y_pred)
         sizes[i] = len(a)    
         i+=1
     return acc, pre, rec, f1, sizes	
@@ -233,7 +226,7 @@ def clfScores(clf, X, y):
     '''
     y_pred = clf.predict(X)
     s = np.sum(y == y_pred)/(1.*len(y)) #clf.score(X, y)
-    cM = confusion_matrix(y, y_pred, labels=clf.classes_)
+    cM = mt.confusion_matrix(y, y_pred, labels=clf.classes_)
     P = cM.diagonal()/(np.sum(cM, axis=0)*1.)
     R = cM.diagonal()/(np.sum(cM, axis=1)*1.)
     F1 = [2.*R[i]*P[i]/(P[i]+R[i]) for i in range(len(P))]	
@@ -436,7 +429,7 @@ class clfScoresO():
         self.y = y
         self.classes = self.clf.classes_
         self.y_pred = clf.predict(X)
-        self.cM = confusion_matrix(self.y, self.y_pred, labels=self.classes)
+        self.cM = mt.confusion_matrix(self.y, self.y_pred, labels=self.classes)
     
         self.accuracy = np.sum(self.y == self.y_pred)/(1.*len(self.y))
         self.pre = self.cM.diagonal()/(np.sum(self.cM, axis=0)*1.) #for each class
@@ -470,7 +463,7 @@ class clfScoresO():
         plConfusionMatrix(self.cM, labels, outFig=outFig, figsize=figsize)
         
     def clf_report(self, y_true, y_pred, target_names=None, **kwargs):
-        return classification_report(y_true, y_pred, target_names=target_names)
+        return mt.classification_report(y_true, y_pred, target_names=target_names)
 
                
 #########################################################

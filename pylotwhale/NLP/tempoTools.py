@@ -213,7 +213,7 @@ def get_ici_i_series(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
     s1 = pd.Series( ict1_log, name=r'$\log (\tau _i)$')
     s2 = pd.Series( ict2_log, name= r'$\log (\tau _{i+%d})$'%i)
 
-    return  s1, s2
+    return s1, s2
 
 
 def get_ici_i(df_dict, timeLabel='ict_end_start', i=1):

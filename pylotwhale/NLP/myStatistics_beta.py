@@ -38,6 +38,7 @@ def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
     return p1  # 2*p1-1
 
+
 def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
                          kwargs_obs=None, **kwargs):
     """plot randomised distribution (distsM) with observable
