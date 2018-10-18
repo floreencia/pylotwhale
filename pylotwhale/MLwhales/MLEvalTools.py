@@ -19,8 +19,11 @@ import MLtools_beta as myML
 import featureExtraction as fex
 
 """
-    Preprocessing function of machine learning
-    florencia @ 09.11.16
+Tools for evaluating classifiers
+- over collections and wavefiles
+- print scores to file
+- plot confusion matrix
+- plot learning cureve
 """
 
 ############################################################################
@@ -30,16 +33,6 @@ import featureExtraction as fex
 #### scoring functions
 
 ## f1 score for one class: calls
-
-def get_scorer(scorer_name, **kwargs):
-    """NOT WORKING!!!! returns scorer from str"""
-    myScorers={
-            'f1c': make_class_f1score_fun}  # classTag=1
-    if scorer_name in myScorers.keys():
-        scFun=myScorers[scorer_name]
-        return mt.make_scorer(scFun(**kwargs))
-    else:
-        return scorer_name
 
 
 def classIndex_f1_score(y_true, y_pred, classIndex=1,
@@ -58,6 +51,7 @@ def make_class_f1score_fun(classTag=1, lt=None,
     if isinstance(lt, myML.labelTransformer):  # check whether a labelTransfomer is given
         classTag = lt.nom2num(classTag)
     return functools.partial(scoringFunction, classIndex=classTag)
+
 
 def getCallScorer(classTag=1, lt=None):
     """returns a scoring function that maximises
@@ -86,11 +80,11 @@ def get_gridSearchresults_str(gs, max_std=0.02):
     return gsResults_str
 
 def bestCVScoresfromGridSearch(gs):
-    '''retieve CV scores of the best model from a gridsearch object
-    Params:
-    -------
+    '''retrieve CV scores of the best model from a gridsearch object
+    Parameters
+    ----------
         gs : gridsearch object
-    Retunrs: (mu, std) of the bets scores
+    Returns (mu, std) of the bets scores
     --------
     '''
     mu, std = _bestCVScoresfromGridSearch(gs)
@@ -117,7 +111,7 @@ def printScoresFromCollectionFile(feExFun, clf, lt, collFi, out_file, labelsHier
     """
     coll = fex.readCols(collFi, colIndexes =(0,1)) #np.loadtxt(collFi, delimiter='\t', dtype='|S')
     printScoresFromCollection(feExFun, clf, lt, coll, out_file, labelsHierarchy)
-    
+
 
 def getScoresFromWav(wavF, annF, feExFun, clf, lt, labelsHierarchy):
     """
@@ -143,7 +137,7 @@ def printScoresFromCollection(feExFun, clf, lt, coll, out_file, labelsHierarchy)
     clf : classifier
     le : label encoder (object)
     coll: list,
-        wav ann colection [(wav_file, ann_file), (wav_file, ann_file), ...]
+        wav ann collection [(wav_file, ann_file), (wav_file, ann_file), ...]
     out_file: str,
         file where scores will be printed
     """
@@ -196,7 +190,7 @@ def coll_clf_scores(clf, wavAnnCollection, featExtFun, labelTransformer, labelSe
         annotLi_t = sT.aupTxt2annTu(annF) # read annotations
         A0, a_names, _, _ = featExtFun(waveForm, fs, annotations=annotLi_t)
         mask = np.in1d(a_names, labelSet) # filer unwanted labels
-        a = labelTransformer.nom2num( a_names[mask]) #conver labels to numeric
+        a = labelTransformer.nom2num( a_names[mask]) # convert labels to numeric
         A = A0[mask]
         y_pred = clf.predict(A)
         ## scores
@@ -221,7 +215,7 @@ def clfScores(clf, X, y):
     --------
     s
     R : recall [array]
-    P : presicion [array]
+    P : precision [array]
     F1 : [array]
     '''
     y_pred = clf.predict(X)
@@ -280,10 +274,10 @@ def printClfScores( fileN, clf, X, y, l0):
     prints the scores of the classifier (clf) over the set X y
     Parameters:
     -----------
-    fileN : file to wich we are going to append the socres
+    fileN : file to which we are going to append the scores
     Clf :  classifier (object)
     X : feature matrix ( m_instances x n_features)
-    y : groud thruth (in the bases of the classifier)
+    y : ground truth (in the bases of the classifier)
     l0 :  first line, identifier of the set
     Return:
     -------
@@ -337,8 +331,6 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
             le.inverse_transform(clf.classes_)
     outFig : name where to save fig
     '''
-    # myML.plConfusionMatrix(cM, labels, outFig='', figsize=None)
-    #font = {'size' : fontSz}; matplotlib.rc('font', **font)
         
     fig, ax = plt.subplots(figsize=figsize)#(5, 5))
     ax.imshow(cM, cmap=plt.cm.Blues, alpha=alpha, interpolation='nearest')
@@ -364,7 +356,7 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     
     if outFig: fig.savefig(outFig)    
     
-### learnig curve
+### learning curve
 
 def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1, 
                     scoring=None,
@@ -372,7 +364,7 @@ def plLearningCurve(clf, X, y, samples_arr=None, cv=10, n_jobs=1,
                     y_min = 0.8, y_max = 1.1, figsize=None):
                         
     '''plots the learning curve using sklearn's learning_curve
-    Retunrs:
+    Returns:
     train_sizes, train_scores, test_scores
     '''
     
@@ -445,7 +437,7 @@ class clfScoresO():
         returns a string with the score of a classifier
         Parameters:
         -----------
-        fln : float point precission
+        fln : float point precision
         dgt : space digits for printing format
         Return:
         -------
