@@ -7,19 +7,15 @@ Created on Sun Nov 15 13:55:12 2015
 from __future__ import print_function, division  # py3 compatibility
 import numpy as np
 #from pandas import read_csv
-import sys
-import os
 import functools
 
 from pylotwhale.signalProcessing.signalTools import wav2waveform, waveformPreprocessingFun, audioFeaturesFun
 
 import pylotwhale.signalProcessing.audioFeatures as auf
-import pylotwhale.utils.annotationTools as annT
 
 import pylotwhale.signalProcessing.effects as eff
 from pylotwhale.utils.funTools import compose2
-#import pylotwhale.MLwhales.MLtools_beta as myML
-#import pylotwhale.MLwhales.MLtools_beta as myML
+
 import MLtools_beta as myML
 
 import pylotwhale.utils.whaleFileProcessing as fp
