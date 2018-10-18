@@ -23,7 +23,7 @@ Tools for evaluating classifiers
 - over collections and wavefiles
 - print scores to file
 - plot confusion matrix
-- plot learning cureve
+- plot learning curve
 """
 
 ############################################################################
@@ -66,7 +66,7 @@ def getCallScorer(classTag=1, lt=None):
     return mt.make_scorer(make_class_f1score_fun(classTag=classTag, lt=lt))
 
 
-### Evaluate a list of classifiers over a collection   
+### Evaluate a list of classifiers over a collection
 
 
 def get_gridSearchresults_str(gs, max_std=0.02):
@@ -78,6 +78,7 @@ def get_gridSearchresults_str(gs, max_std=0.02):
             pstr = str(params).replace('\n', '')
             gsResults_str += "%d %2.1f (+/-%2.01f) \n# %r\n"% (i, mean*100, std * 2*100, pstr)
     return gsResults_str
+
 
 def bestCVScoresfromGridSearch(gs):
     '''retrieve CV scores of the best model from a gridsearch object
