@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov  2 12:44:09 2016
-
-@author: florencia
+Collects feature extraction for tools via: 
+- featureExtractionFun for signal processing
+- summarisationFun, for summarisation
 """
 from __future__ import print_function, division
 import warnings
 import functools
 import numpy as np
+from librosa.core import load as lib_load
+
 
 import pylotwhale.signalProcessing.signalTools_beta as sT0
 import pylotwhale.signalProcessing.signalTools as sT
@@ -19,40 +21,74 @@ import pylotwhale.utils.annotationTools as annT
 
 
 def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
-                 label='label'):
+                 label='label', sr=None):
     '''read annotated sections from a waveform
 
     Parameters
     ----------
-    wavFi : wav file name
-    annFi : annotations file (*.txt)
-            if None => the whole waveform is returned
-    t0Label : name of the label for the start time (used by annT.parseAupFile)
-    tfLabel : name of the label for the end time (used by annT.parseAupFile)
-    label : name of the label with the annotation label (used by annT.parseAupFile)
+    wavFi : string
+        path to wav file
+    annFi : string (*.txt)
+        path to annotations file,  if None => the whole waveform is returned
+        Annotations are assumed to be in a list of dictionaries, see annT.parseAupFile
+    t0Label : string
+        name of the dictionary label for the start time (used by annT.parseAupFile)
+    tfLabel : string
+        name of the dictionary label for the end time (used by annT.parseAupFile)
+    label : string
+        name of the dictionary label with the annotation tag (used by annT.parseAupFile)
 
     Returns
     -------
-    sectionsLi : a list with dictionaries with the label and waveform information
+    sectionsLi : list of dictionaries
+        mapping label of the annotation section to the waveform
         { <label>, <waveFormSection (np.array)> }
         [ { <label>, <waveFormSection> }, ... , { <label>, <waveFormSection> }]
     '''
 
-    waveform, fs = sT.wav2waveform(wavFi) # read wav
+    sr = loadWaveform(wavFi, 0, 0, sr=sr)[1]
+    #waveform, fs = sT.wav2waveform(wavFi)  # read wav
 
-    if annFi is None: # no annotations given
-        return([{label : os.path.basename(wavFi), 'waveform' : waveform}], fs)
+    if annFi is None:  # no annotations given
+        return([{label: os.path.basename(wavFi),
+                 'waveform': loadWaveform(wavFi, 0, None, sr=sr)[0]}], sr)
     else:
-        sectionsLi=[]
-        annLi = annT.parseAupFile(annFi) # read annotations
+        sectionsLi = []
+        annLi = annT.parseAupFile(annFi)  # read annotations
     for annDi in annLi:
         t0 = annDi[t0Label]
         tf = annDi[tfLabel]
         l = annDi[label]
-        item = {label: l, 'waveform' : getWavSec(waveform, fs, t0, tf)}
+        item = {label: l, 'waveform': loadWaveform(wavFi, t0, tf, sr=sr)[0]}
+        #getWavSec(waveform, fs, t0, tf)}
         sectionsLi.append(item)
 
-    return(sectionsLi, fs)
+    return sectionsLi, sr
+
+
+def loadWaveform(wFile, t0=0, tf=None, sr=None):
+    '''Parameters
+    -------------
+    wFile : string
+    t0 : float
+    tf : float
+        if None => load file until the end
+    sr : float
+
+    Returns
+    -------
+    waveform : numpy array
+        waveform
+    fs : float
+        sampling rate 
+    '''
+
+    try:
+        dur = tf-t0
+    except TypeError:
+        dur = None
+
+    return lib_load(wFile, offset=t0, sr=sr, duration=dur)
 
 
 def getWavSec(waveform, fs, t0, tf):
@@ -392,6 +428,10 @@ def featureExtractionFun(funName=None):
         return D[funName] # returns function name of the asked feature
 
 
+###############################################################################
+#### do you need this?
+#########################################################
+
 def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
                           featExtrFun = sT0.cepstralRep, **featExArgs):
     '''
@@ -644,10 +684,6 @@ def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0
 
     return(feat_df, targetArr)
 
-
-#### FEATURE EXTRACTION CLASSES
-
-   
 
 
 #####   FILE CONVERSIONS   #####
