@@ -18,19 +18,7 @@ from sklearn.preprocessing import scale, maxabs_scale, minmax_scale
 from scipy.io import wavfile
 import librosa as lf  # Librosa for audio
 
-#import scikits.audiolab as al
 
-
-#matplotlib.rcdefaults()
-#matplotlib.rcParams.update({'savefig.bbox': 'tight'})
-
-"""
-    Tools for manipulating audio signals
-    Module for the preprocessing of features
-    florencia @ 06.09.14
-"""
-
-warnings.simplefilter('always', DeprecationWarning)
 
 
 def audioFeaturesFun(funName=None):

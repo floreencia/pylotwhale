@@ -9,10 +9,10 @@ import scipy.signal as sig
 import warnings
 
 import numpy as np
-import matplotlib
+#import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
-import pandas as pd
+#import pandas as pd
 from sklearn.preprocessing import scale, maxabs_scale, minmax_scale
 
 from scipy.io import wavfile
@@ -20,12 +20,10 @@ import librosa  # Librosa for audio
 
 
 """
-    Tools for manipulating audio signals -wavforms-
-    * normalisation
-    * extractig features, using librosa
+    Tools for manipulating processing audio signals (waveforms) 
+    extracting features with librosa
 """
 
-#warnings.simplefilter('always', DeprecationWarning)
 
 
 def waveformPreprocessingFun(funName=None):
@@ -94,8 +92,8 @@ def audioFeaturesFun(funName=None):
 ########### moved to effects.py
     
 def standardise(y, axis=0):
-    """standarizes array along axis
-    centers and trslades array so that mu = 0 and std = 1"""
+    """standardises array along axis
+    centres and translades array so that mu = 0 and std = 1"""
     return scale(y, axis=axis)
     
 def scale2range(y, feature_range=(-1, 1), axis=0):
@@ -103,16 +101,15 @@ def scale2range(y, feature_range=(-1, 1), axis=0):
     return minmax_scale(y, feature_range=feature_range, axis=axis)
      
 def maxAbsScale(y, axis=0):
-    """normalises array didviding by the max abs value"""
+    """normalises array dividing by the max abs value"""
     return maxabs_scale(y, axis=axis)
     
-def normalizeWF(waveform ):
-    warnings.warn('use maxAbsScale', DeprecationWarning)
-    return 1.0*waveform/np.max(np.abs(waveform))
+#def normalizeWF(waveform ):
+#	return 1.0*waveform/np.max(np.abs(waveform))
     
 
 def tileTillN(arr, N, n0=0):
-    """returns an arrray of size N (>0) from tiling of arr. n0 is the starting index"""
+    """returns an array of size N (>0) from tiling of arr. n0 is the starting index"""
     #np.tile(arr, int(n/len(arr))+1)[:n]
     return arr[np.array([i for i in np.arange(n0, N + n0)%len(arr)])]
     
@@ -144,7 +141,7 @@ def generateAddEnsemble(y_template, y_add , intensity_grid=None):
     
 def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     """
-    generate an ensemble of y_template-singnals shifting the pitch of the original signal
+    generate an ensemble of y_template-signals shifting the pitch of the original signal
     normalizes both signals and adds different amplitudes of y_add to y_template
     Parameters:
     -----------
@@ -165,7 +162,7 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     
 def generateTimeStreachEnsemble(y_template, streach_grid=None):
     """
-    generate an ensemble of y_template-singnals adding y_add
+    generate an ensemble of y_template-signals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
@@ -285,7 +282,7 @@ def fitNinSqr(N):
 
 def reeScale_E(M, spec_factor = 1.0/3.0):
     """
-    Zeroes the noise by taking only the part of the spectrum with the higest energy.
+    Zeroes the noise by taking only the part of the spectrum with the highest energy.
     - spec_factor \in [0,1],
     --- 0 - max cutting energy (we don't see anything)
     --- 1 - min cutting energy (returns M without doing anything )
@@ -340,7 +337,7 @@ def reeSize_t(M, h_size = 3938):
 
 def myBinarize(rawData, Nbits = 7):
     """
-    This function binarizes a matix preserving the number of columns (time wins)
+    This function binarises a matrix preserving the number of columns (time wins)
     """
     a = np.min(rawData)*1.0
     b = 1.0*np.max(rawData)-a
@@ -353,7 +350,7 @@ def myBinarize(rawData, Nbits = 7):
 
         for j in np.arange(Nf): #row loop -- frequency
             rawPoint = rawData[j,i]
-            rawPoint = np.floor( ((rawPoint-a)/(1.0*b))*((2**(Nbits)-1)) ) # reescale the data
+            rawPoint = np.floor( ((rawPoint-a)/(1.0*b))*((2**(Nbits)-1)) ) # rescale the data
 
             for k in np.arange(Nbits): # binary loop
                 binariSet[k+j*Nbits] = np.floor(np.mod( rawPoint/(2.0**(k)), 2))
@@ -400,7 +397,7 @@ def spectral(waveform, fs, NFFT=2**9, overlap=0.5,
     """
     Extracts the power spectral features from a waveform
     < waveform :  numpy array
-    < fs : samplig rate
+    < fs : sampling rate
     < powerOfWinLen : exponent of the fft window length in base 2
     < overlap : [0,1)
     < winN : win
@@ -458,7 +455,7 @@ def cepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True,
     Parameters
     ----------
     < waveform : numpy array
-    < fs : samplig rate
+    < fs : sampling rate
     < NFFT : fft window length
     < overlap : [0,1)
     < Nceps : number of mfcc coefficients
@@ -489,7 +486,7 @@ def mfcepstral(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4, logSc=True, n_m
     Parameters:
     ----------
     < waveform : numpy array
-    < fs : samplig rate
+    < fs : sampling rate
     < NFFT : fft window length
     < overlap : [0,1)
     < Nceps : number of mfcc coefficients
@@ -510,7 +507,7 @@ def mfcepstral_nDdelta(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4,
                 order=1, logSc=True, n_mels=128, **kwargs):
 
     """
-    mfcc feature matrix and the delta orders horizontaly appended
+    mfcc feature matrix and the delta orders horizontally appended
     Parameters:
     ------------
         < waveform : numpy array
@@ -518,7 +515,7 @@ def mfcepstral_nDdelta(waveform, fs, NFFT=2**9, overlap=0.5, Nceps=2**4,
         < NFFT : fft window length in base 2
         < overlap : [0,1)
         < Nceps : int,
-            number of MFcepstral coefficients (n_mfcc) melspectral filters
+            number of MFcepstral coefficients (n_mfcc) mel-spectral filters
         < logSc : return features in logarithmic scale
         < order : orders of the derivative 0->MFCC, 1->delta, 2-> delta-delta
     Returns:
@@ -554,7 +551,7 @@ def melSpectral_nDelta(waveform, fs, NFFT=2**10, overlap=0.5, n_mels=2**4,
                        order=1, logSc=True, **kwargs):
 
     """
-    melspectrum Feature Matrix and the delta orders horizontaly appended
+    melspectrum Feature Matrix and the delta orders horizontally appended
     Parameters:
     -----------
         < waveform : numpy array
@@ -607,7 +604,7 @@ def chromogram(waveform, fs, C=None, hop_length=512, fmin=None,
     """
     Extracts the spectral features from a waveform
     < waveform : numpy array
-    < fs : samplig rate
+    < fs : sampling rate
     < NFTTpow : exponent of the fft window length in base 2
     < overlap : [0,1)
     < Nceps : number of cepstral coefficients
@@ -637,7 +634,7 @@ def chromogram(waveform, fs, C=None, hop_length=512, fmin=None,
 
 def delta(M, width=9, order=1, axis=0, trim=True):
     """
-    M :  feature matrix (m_instanes x n_features)
+    M :  feature matrix (m_instances x n_features)
     axis : int [scalar]
         the axis along which to compute deltas.
         Default is 0 (rows).
@@ -706,7 +703,7 @@ def whiten(waveForm, psd_whittener, Fs):
         Fs : sampling rate
     Retrurns:
     --------
-        whittened waveform : np.array
+        whitened waveform : np.array
     """
     Nt = len(waveForm)
     freqs = np.fft.rfftfreq(Nt, Fs)
@@ -723,7 +720,7 @@ def whiten(waveForm, psd_whittener, Fs):
 def bandEnergy(y, fs, f_band=None, nps=256, overl=None):
     """
     sum of the power spectral density within a freq interval using
-    welch's method
+    Welch's method
 
     < takes
     --------
@@ -749,7 +746,7 @@ def bandEnergy(y, fs, f_band=None, nps=256, overl=None):
 def welchD(y, fs, f_band=None, nps=256, overl=None):
     """
     sum of the power spectral density with in a freq interval using
-    welch's method
+    Welch's method
 
     < takes
     --------
@@ -807,454 +804,4 @@ def tsBandenergy(y, fs, textureWS=0.1, textureWSsamps=0, overlap=0,
     if normalize : PSts_arr = PSts_arr/np.max(PSts_arr)
     #sprint(len(PSts))
     return(PSts_arr, 1.0*step/fs)
-
-######     ANNOTATIONS     #########
-
-"""
-
-def mtl2annTu(mtlFi):
-    '''
-    extracts the labels from an mtl file and retun a list of
-    (sample, label) pairs
-                    where sample is the first sample with the given label
-    '''
-    with open(mtlFi, 'r') as f:
-        li = f.read().splitlines()[3:]
-        st = np.array([int(item) for item in li[::4]])
-        la = li[3::4]
-    return zip(st, la)
-
-def aupTxt2annTu(txtFi, gap='b', filterLabSet=None, l_ix=2 ):
-    '''
-    extracts the labels from an annotations file and retuns a list filling all time gaps
-    with 'b' (backgroun noise)
-    < txtFi : annotations file name (t0 \t tf \t label)
-    < gap : name of the filling gap label
-    < filterLabset :  list with the names of the labels to filter out
-    < l_ix : index of the label to filter (2 --> sound_label)
-    ------>
-    > annTu : list of (sample, label) pairs
-                    where sample is the first sample with the given label
-
-    >>> WARNING!: ASSUMES NO OVERLAP BETWEEN THE LABELES <<<
-    >>> ACHTUNG!: NEVER FILTER ANNOTATIONS AFTER THIS STEP <<<
-    '''
-    t0 = 0
-    annTu=[(t0, gap)]
-    with open(txtFi, 'r') as f:
-        lines = f.read().splitlines()
-
-    if filterLabSet: # filterout unwanted labels (still in the aup txt format)
-            lines = [li for li in lines if li.split('\t')[l_ix] not in filterLabSet]
-
-    for li in lines: # transform annotations into the tu-li format (for later processing)
-        t0, tf, label = li.split('\t')
-        annTu.append(( float(t0.replace(',','.')), label))
-        annTu.append(( float(tf.replace(',','.')), gap))
-    return annTu
-
-
-def findLabel( stamp, stampLabelTu, i=0):
-    '''
-    Returns the label asociated with the given (time)stamp
-    searching in the stampLabelTu
-    Parameters:
-    -----------
-    < stamp : stamp we are interested on
-                can be specified either in seconds or in frame index
-                depending on the units of the stampLabelTu
-    < stampLabelTu : list of (stamp, label) pairs
-                first stamp with the label "label"
-                the stamps are sorted
-    < i : index from which we start searching
-    Returns:
-    --------
-    > label, label of the "stamp"
-    > i, index of the label
-    '''
-    s, l = zip(*stampLabelTu)
-
-    ## to big stamp
-    if stamp >= s[-1]:
-        return l[-1], None
-
-    ## search stamp
-    while s[i] < stamp:
-        i+=1
-
-    ## first stamp with the wanted label
-    if s[i] > stamp: i-=1
-    return l[i], i
-
-def setLabel(idx, annotTu):
-    s, l = zip(*annotTu)
-    i=0
-    while s[i] < idx and i < len(s)-1 :
-        i+=1
-
-    return l[i-1], i#annoTu[]
-
-def tuLi2frameAnnotations(tuLiAnn, m_instances, tf):
-    '''
-    transforms annotations
-        list of tuples into --> instances annotations
-    Parameters:
-    tLiAnn : list of tuples (<start_time/start_frame_index>, <label>)
-    m_instances : number of instances to annotate
-    tf : final time/index of the file being annotated
-    '''
-    tstamps = np.linspace(0, tf, m_instances + 2 )[1:-1] # generate the time stamps of the instances
-    targetArr = np.zeros(m_instances, dtype=object) # inicialize the target array
-    i=0
-    for ix in np.arange(m_instances):
-        l, i = findLabel(tstamps[ix], tuLiAnn, i)
-        targetArr[ix] = l
-    return targetArr
-
-#### FEATURE EXTRACTION and processing #####
-
-def featureExtractionFun(funName=None):
-    '''
-    Dictionary of feature extracting functions
-    that return a dictionary of features
-    ------
-    > feature names (if None)
-    > feature function
-        this functions take the waveform and return an instancited feature matrix
-        m (instances) - rows
-        n (features) - columns
-    '''
-    D = {#'welch' : welchD,
-        #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'spectral' : spectralRep,
-        'spectralDelta' : functools.partial(spectralDspecRep, order=1),
-        'cepstral' : cepstralRep,
-        'cepsDelta' : functools.partial(cepstralDcepRep, order=1), # MFCC and delta-MFCC
-        'cepsDeltaDelta' : functools.partial(cepstralDcepRep, order=2),
-        'chroma' : chromaRep,
-        'melspectroDelta' : melSpecDRep,
-        'melspectro' : functools.partial(melSpecDRep, order=0)
-        }
-
-    if funName == None: # retuns a list of posible feature names
-        return D.keys()
-    else:
-        return D[funName] # returns function name of the asked feature
-
-def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
-                          featExtrFun = cepstralFeatures, **featExArgs):
-    '''
-    Combines feature extraction with annotations
-        --->>> No explicit texturiztion <<<--- (see waveform2featMatrix)
-
-    Params
-    ------
-    < waveform :  waveform array
-    < fs :  sampling rate of the waveform
-    < annotations : list with the time stamp, label pairs. The stamp must have
-                second units, and this indicates the firt sample with the
-                given label (stamp, label) list
-    < featExtract : feature extractor function
-                        {cepstralFeatures, logfbankFeatures }
-    < **featArgs : arguments for estimating the features (see featExtract)
-    Return
-    ------
-    > M : feature matrix ( n (features) x m (insatances) )
-    > targetArr : target vector
-    > featNames : array with the names of the features
-
-    Example
-    ----------
-
-    NFFTexp = 9
-    NFFT = 2**NFFTexp
-    lFreq=0 #1000
-    analysisWS=0.025
-    analysisWStep=0.01
-    numcep=13
-    NFilt=26
-    preemph=0.97
-    ceplifter=22
-    featConstD = { "analysisWS": analysisWS, "analysisWStep" : analysisWStep,
-                "NFilt" : NFilt, "NFFT" : NFFT, "lFreq" : lFreq,
-                "preemph" : preemph,
-                "ceplifter" : ceplifter, "numcep" : numcep }
-
-    featExtract = cepstralRep
-    featConstD["featExtract"] = featExtract
-
-    M0, y0_names, featN =  featMatrixAnnotations(waveForm, fs,
-                                                 annotations=annotLi_t,
-                                                 **featConstD)
-
-    '''
-    ## feature extraction
-    if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
-    M, featNames, tf, featStr = featExtrFun(waveform, fs, **featExArgs)
-
-    m_instances, n_features = np.shape(M)
-    print("m", m_instances, "n", n_features, tf)
-
-    ## ANNOTATIONS
-    ## estimate the time stamps from the instances
-    tstamps = np.linspace(0, tf, m_instances + 2 )[1:-1]
-    ## inicialize the labels (target array)
-    targetArr = np.zeros(m_instances, dtype=object)
-    print("target array", np.shape(targetArr))
-    ## determine the annotAtions of the extracted instances
-    if annotations:
-        i=0
-        for ix in np.arange(m_instances):
-            l, i = findLabel(tstamps[ix], annotations, i)
-            targetArr[ix] = l
-    # Pxx, s2fr, s2time, im = plt.specgram(waveform, NFFT=2**8, Fs = fs)#, detrend=plt.mlab.detrend)#, pad_to=50 )
-
-    if NanInfWarning:
-        print("buggi instances:", np.max(M), np.min(M))
-
-    return M, targetArr, featNames, featStr
-
-
-def texturizeFeatures(M, nTextWS=100, normalize=True):
-    '''
-    computes the mean and the std over the features of M over a texture window of size nTextWS
-    M : feature matrix (n_features x instances)
-            tf : length of the recording in seconds
-    nTextWS :   int - size of the texture window in number of samples (walk)
-                array - or vector with the index values (split)
-    normalize : if True, normalizes the instances
-    ------>
-    fM : texturized feature matrix
-    t : time array
-    '''
-
-    mt, nf = np.shape(M)
-
-    if isinstance(nTextWS, int): # walk
-        ind = np.arange(0, mt - nTextWS + 1, nTextWS)
-        m_instances = len(ind)
-        fM = np.zeros((m_instances, 2*nf))
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i] + nTextWS, : ])
-            if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
-            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-        return fM
-
-    elif isinstance(nTextWS, np.ndarray): # spliting indexes
-
-        ind = nTextWS # slicing indexes array
-        #print(ind)
-        m_instances = len(ind)-1 # #(instances) = #(slicing indexes) - 1
-        fM = np.zeros((m_instances, 2*nf))
-
-        if normalize : M /= np.max(np.abs(M), axis=0) # the whole matrix
-
-        for i in np.arange(m_instances):
-            thisX = np.array(M[ind[i] : ind[i+1]+1, : ])
-            #print(i, ind[i], "M", "%.3f"%M[ind[i],0], "%.3f"%thisX[0,0],
-            #"\t", ind[i+1], "%.3f"%M[ind[i+1], 0],#, np.max(np.abs(thisX)))
-             #       "%.3f"%thisX[-1,0])#, np.mean(thisX), np.std(thisX))
-
-            fM[i,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-
-
-        #thisX = M[ind[-2] : , : ]
-        #print("f", ind[-2], "M", M[ind[-2], 0], thisX[0,0], ind[-1], M[ind[-1], 0], # , np.max(np.abs(thisX))
-               #thisX[-1,0])#, np.mean(thisX), np.std(thisX))
-
-        #if normalize : thisX /= np.max(np.abs(thisX)) #normalize each instance
-
-        #fM[-1,:] = np.hstack( ( np.mean(thisX, axis=0), np.std(thisX, axis=0) ) )
-        #print("FINAL ROW",i, np.mean(thisX, axis=0), np.std(thisX, axis=0))
-
-        return fM
-
-    #print(np.shape(fM))
-
-
-    #t = np.linspace(0, tf, n)
-
-
-
-def waveform2featMatrix(waveform, fs, textWS=0.2, normalize=True, Nslices=False,
-                        annotations=None, nTextWS=False,
-                        featExtrFun='cepsDelta', **featExArgs):
-    '''
-    1. extract audio features
-    2. texturizes them
-        (computing the mean and std over a texture window, see texturizeFeatures)
-    3. handle annotations
-    Parameters
-    ----------<
-    < waveform :  waveform array
-    < fs :  sampling rate of the waveform
-    < textWS : size of the texture window 
-        nTextWs is assigned here from this value.
-        instead on can set Nslices
-    < annotations : list with the time stamp, label pairs. The stamp can be in
-                samples or time units, and this indicates the first sample with the
-                given label (stamp, label) list
-    < featExtrFun : feature extraction function or name (see FeatureExtractionFun)
-    < **featExArgss : arguments to be used on the feature extraction
-                        e.g. - NFFT, overlap, etc.
-                            -- Nceps
-    < Nslices : sets textWS so that the waveform is sliced in Nslices equal length segments
-    Returns
-    --------->
-    > M : feature matrix ( m x n )
-    > targetArr : target vector
-    > featNames : feature names
-    > featStr : string with feature extraction settings
-    '''
-    ## feature extraction
-    if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
-    M0, featNames0, tf, featStr  = featExtrFun(waveform, fs, **featExArgs)
-    m0 = np.shape(M0)[0] ## number of frames
-
-    ## set the textWS
-    if Nslices is False and nTextWS is False: ### WALKING - texture window size given
-        nTextWS_0 = 1.0*m0*float(textWS)/tf
-        nTextWS = int(nTextWS_0) ###
-        assert nTextWS >= 1, 'the texture window is too small {:.2f}'.format(nTextWS_0)
-        slicingIdx = nTextWS # integer
-    elif isinstance(Nslices, int) : # SPLITTING - slice the featMtx into Nslices!
-        slicingIdx = flatPartition(Nslices+1, m0) # numpy array
-        #print("TEST",slicingIdx)
-        assert slicingIdx[-1] > 1, 'the texture window is too small %d'%slicingIdx[-1]
-        textWS = slicingIdx[1] - slicingIdx[0]
-        nTextWS = int(1.0*m0*float(textWS)/tf) ###
-    elif isinstance(nTextWS, int): # walk!, number of frames given
-        slicingIdx = nTextWS # integer
-        textWS = 1.0*nTextWS*tf/m0
-    else:
-        assert False, 'you must give a valid summarization'
-
-    featStr+='-txWin%dms%d'%(textWS*1000, nTextWS)
-    if normalize: featStr+='-TxWinNormalized'
-
-    ## texturize features
-    M = texturizeFeatures(M0, nTextWS=slicingIdx, normalize=normalize)
-    featNames = [str(fn) + 'mu' for fn in featNames0] + [str(fn) + 'std' for fn in featNames0]
-    m_instances, n_features = np.shape(M)
-
-    if annotations: ## generate the targets for the instances
-        targetArr = tuLi2frameAnnotations(annotations, m_instances, tf)
-    else:
-        targetArr = np.zeros(m_instances, dtype=object)
-
-    return M, targetArr, featNames, featStr
-
-
-def waveform2comboFeatMatrix(waveform, fs, textWS=0.2, normalize=True,
-                        annotations=None,
-                        featExtrFunLi=None):
-    '''
-    Combined feature extraction
-    like waveform2featMatri() but combining different feature extraction methods
-    Parameters
-    ---------------
-    < waveform :  waveform array
-    < fs :  sampling rate of the waveform
-    < textWS : size of the texture window [ms]
-        nTextWs is assigned here from this value.
-    < annotations : list with the time stamp
-    < featExtrFun : list of features to be used
-                e.g. ['spectral', 'cepstral', 'chroma']
-    Returns
-    --------->
-    > M : feature matrix ( m_instances x n_features )
-    > targetArr : target vector
-    > featNames : feature names
-    > featStr : string with feature extraction settings
-    ----
-    '''
-
-    if featExtrFunLi == None: #use all the posible features
-        featExtrFunLi = featureExtractionFun(None)
-
-    feat = featExtrFunLi[0]
-    print(feat)
-    X, tArr, fNs, fStr = waveform2featMatrix(waveform, fs, textWS=textWS,
-                                normalize=normalize, annotations=annotations,
-                                featExtrFun=featureExtractionFun(feat))
-
-    for feat in featExtrFunLi[1:]:
-        print(feat)
-        M, targetArr, featNames, featStr = waveform2featMatrix(waveform, fs, textWS=textWS,
-                                normalize=normalize, annotations=annotations,
-                                featExtrFun=featureExtractionFun(feat))
-        X = np.hstack((X, M))
-        #tArr = np.hstack((tArr, featNames))
-        fNs = np.hstack((fNs, featNames))
-        fStr += featStr
-
-    return X, tArr, fNs, fStr
-
-
-
-def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0,
-                        overlap=0, normalize=True, featExtr='welch', **kwargs):
-    '''
-    returns  a time series with the spectral energy every textureWS (seconds)
-    overlap [0,1)
-    < y : signal (waveform)
-    < fs : sampling rate
-    < annotations : annotations tuple
-    * optional
-    < textureWS : texture window in seconds
-    < textureWSsamps : texture window in number of samples (This has priority over textureWS)
-    < normalize : --- not working ---
-    < overlap : [0,1)
-    < **kwargs : of the featExtract metod
-    -->
-    > feat_df : time series of the powerspectral density
-    > targetArr : time interval of the texture window
-    '''
-
-    ## set set (size of the texture window in samples)
-    if textureWS: step = 2**np.max((2, int(np.log(fs*textureWS)/np.log(2)))) # as a power of 2
-    if textureWSsamps: step = textureWSsamps
-
-    featExtrFun = featureExtractionFun(featExtr)
-
-    overl = int(step*overlap)
-    feat_df = pd.DataFrame()
-    targetArr=[]
-    ix0 = 0
-    ix = step
-
-    print("step:", step, "overlap", overl, "len signal", len(y),
-          "step (s)", 1.0*step/fs)
-    while ix < len(y):
-        yi = y[ix0:ix] # signal section
-        ix0 = ix - overl
-        ix = ix0 + step
-        di = featExtrFun(yi, fs)
-        feat_df = feat_df.append(di, ignore_index=True) # append the energy
-        if annotations : targetArr.append(setLabel(ix0 + step/2, annotations))
-
-    return(feat_df, targetArr)
-
-
-
-#####   FILE CONVERSIONS   #####
-
-
-def mf2wavLi(mf_file):
-    '''
-    marsyas collection (mf) --> list of waves
-    reads the list of wav files in a marsyas collecion file and returns them
-    in a list
-    '''
-    wF_li = []
-
-    with open(mf_file) as f:
-        for line in f:
-             wavF = line.split('.wav')[0]+'.wav' # parse wav file name
-             wF_li.append(wavF)
-
-    return wF_li
-
-"""
 
