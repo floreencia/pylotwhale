@@ -3,10 +3,8 @@
 from __future__ import print_function, division
 import functools
 
-import sys
 import os.path
 import scipy.signal as sig
-import warnings
 
 import numpy as np
 #import matplotlib
@@ -34,7 +32,7 @@ def waveformPreprocessingFun(funName=None):
     ------
     > feature names (if None)
     > feature function
-        this functions take the waveform and return an instancited feature matrix
+        this functions take the waveform and return an instantiated feature matrix
         m (instances) - rows
         n (features) - columns
     '''
@@ -47,7 +45,7 @@ def waveformPreprocessingFun(funName=None):
         'whiten': whiten        
         }
 
-    if funName in D.keys(): # retuns a list of posible feature names
+    if funName in D.keys(): # returns a list of possible feature names
         return D[funName]
     else:
         return D
@@ -60,7 +58,7 @@ def audioFeaturesFun(funName=None):
     ------
     > feature names (if None)
     > feature function
-        this functions take the waveform and return an instancited feature matrix
+        this functions take the waveform and return an instantiated feature matrix
         m (instances) - rows
         n (features) - columns
     '''
@@ -78,7 +76,7 @@ def audioFeaturesFun(funName=None):
         'rms': librosa.feature.rmse
         }
 
-    if funName in D.keys(): # retuns a list of posible feature names
+    if funName in D.keys(): # returns a list of possible feature names
         return D[funName]
     else:
         return D # returns function name of the asked feature
@@ -93,7 +91,7 @@ def audioFeaturesFun(funName=None):
     
 def standardise(y, axis=0):
     """standardises array along axis
-    centres and translades array so that mu = 0 and std = 1"""
+    centres and translates array so that mu = 0 and std = 1"""
     return scale(y, axis=axis)
     
 def scale2range(y, feature_range=(-1, 1), axis=0):
@@ -103,9 +101,6 @@ def scale2range(y, feature_range=(-1, 1), axis=0):
 def maxAbsScale(y, axis=0):
     """normalises array dividing by the max abs value"""
     return maxabs_scale(y, axis=axis)
-    
-#def normalizeWF(waveform ):
-#	return 1.0*waveform/np.max(np.abs(waveform))
     
 
 def tileTillN(arr, N, n0=0):
@@ -121,7 +116,7 @@ def addToSignal(y1, y2, noiseIndex):
     
 def generateAddEnsemble(y_template, y_add , intensity_grid=None):
     """
-    generate an ensemble of y_template-singnals adding y_add
+    generate an ensemble of y_template-signals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
@@ -152,28 +147,27 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     if shift_grid is None:
         shift_grid = np.linspace(-2, 2, 5)
 
-    #print(len(intensity_grid), len(y_template))
     Y = np.zeros((len(shift_grid), len(y_template)))
     for i in range(len(shift_grid)):
         Y[i,:] = librosa.effects.pitch_shift(y_template, fs, shift_grid[i])
-        #y_template + intensity_grid[i]*tileTillN(y_add, len(y_template), np.random.randint(0,len(y_template)))
+
     
     return Y    
     
-def generateTimeStreachEnsemble(y_template, streach_grid=None):
+def generateTimeStretchEnsemble(y_template, stretch_grid=None):
     """
     generate an ensemble of y_template-signals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
     """
-    if streach_grid is None:
-        streach_grid = np.linspace(0.8, 1.2, 5)
+    if stretch_grid is None:
+        stretch_grid = np.linspace(0.8, 1.2, 5)
      
     #print(len(intensity_grid), len(y_template))
-    Y = []#np.zeros((len(streach_grid), len(streach_grid)))
-    for i in range(len(streach_grid)):
-        Y.append(librosa.effects.time_stretch(y_template, streach_grid[i]))
+    Y = []#np.zeros((len(stretch_grid), len(stretch_grid)))
+    for i in range(len(stretch_grid)):
+        Y.append(librosa.effects.time_stretch(y_template, stretch_grid[i]))
     
     return Y 
 
@@ -302,7 +296,7 @@ def reeScale_E(M, spec_factor = 1.0/3.0):
 
 def selectBand(M, fr_0 = 0, fr_f = 24000, v0_cut = 1.0*1000, vf_cut = 20.0*1000):
     """
-    selects a band on frquencies from the matrix M
+    selects a band on frequencies from the matrix M
     fr_0, initial frequency of the matrix
     fr_f, final frequency of the matrix, sampR/2
     cutting frequencies
@@ -699,9 +693,9 @@ def whiten(waveForm, psd_whittener, Fs):
     Parameters:
     ----------
         waveForm : numpy array
-        psd_whittener : power spectrum with the frequencies to use for whittening
+        psd_whitener : power spectrum with the frequencies to use for whitening
         Fs : sampling rate
-    Retrurns:
+    Returns:
     --------
         whitened waveform : np.array
     """
