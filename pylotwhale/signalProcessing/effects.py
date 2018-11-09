@@ -1,25 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, division
+import sys
+import os.path
 import numpy as np
 import functools
 
-### Audio feature modules
-import librosa as lf 
+import librosa as lf
 
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
-import pandas as pd
-
-from scipy.io import wavfile
-#import scikits.audiolab as al
-import sys
-import os.path
-import scipy.signal as sig
-
-import pylotwhale.utils.annotationTools as annT
-#matplotlib.rcdefaults()
-#matplotlib.rcParams.update({'savefig.bbox' : 'tight'})
 
 """
     Module for waveform effects
@@ -39,12 +26,12 @@ def normalizeWF(waveform):
 
 
 def tileTillN(arr, N, n0=0):
-    '''returns an arrray of size N (>0) 
+    '''returns an arrray of size N (>0)
     from tiling of arr. n0 is the starting index'''
     #np.tile(arr, int(n/len(arr))+1)[:n]
     return arr[np.array([i for i in np.arange(n0, N + n0)%len(arr)])]
 
- 
+
 def addWhiteNoise(y, param=1.0):
     """
     adds white noise with amplitude 'param" to y
@@ -85,14 +72,14 @@ def waveformEffectsDictionary(funName=None):
             this functions take the waveform an alteration if the later
     '''
     D = {
-        'addWhiteNoise' : addWhiteNoise,# param : amplitud of the white noise waveform 
+        'addWhiteNoise' : addWhiteNoise,# param : amplitude of the white noise waveform 
         'addSignals' : addToSignal,
         'freqShift' : freqshift, # y, Fs, fshift=100
         'timeStreach' : lf.effects.time_stretch, # time_stretch(y, 1.5)
         'pitchshift' : lf.effects.pitch_shift
         }
 
-    if funName == None: # retuns a list of posible feature names
+    if funName == None: # returns a list of possible feature names
         return D.keys()
     else:
         return D[funName]
@@ -105,8 +92,8 @@ def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=Non
     Generates an ensemble of signals from y_template 
     using the parameters in generate_data_grid
     !!! only works for white noise addition
-    Params:
-    -------
+    Parameters
+    ----------
         y_template : waveform (np.array)
         effect : name of the effect to use (string)
         generate_data_grid : parameter grid for the effect (np.array)
@@ -115,7 +102,7 @@ def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=Non
     -------
         Y : waveform ensemble (np.array), one waveform per row
     '''
-    
+
     if generate_data_grid is None: generate_data_grid = np.ones(1)
     if effectName is None: 
         effectFun = waveformEffectsDictionary("addWhiteNoise")
@@ -131,7 +118,7 @@ def generateWaveformEnsemble(y_template, effectName=None, generate_data_grid=Non
 
 def generateAddEnsemble(y_template, y_add, intensity_grid=None, normalize=True):
     '''
-    generate an ensemble of y_template-singnals adding y_add
+    generate an ensemble of y_template-signals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
@@ -153,7 +140,7 @@ def generateAddEnsemble(y_template, y_add, intensity_grid=None, normalize=True):
     
 def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
     '''
-    generate an ensemble of y_template-singnals shifting the pitch of the original signal
+    generate an ensemble of y_template-signals shifting the pitch of the original signal
     normalizes both signals and adds different amplitudes of y_add to y_template
     Parameters:
     -----------
@@ -175,7 +162,7 @@ def generatePitchShiftEnsemble(y_template, fs, shift_grid=None):
 
 def generateTimeStreachEnsemble(y_template, streach_grid=None):
     '''
-    generate an ensemble of y_template-singnals adding y_add
+    generate an ensemble of y_template-signals adding y_add
     normalizes both signals and adds different amplitudes of y_add to y_template
     Returns:
     Y : a matrix, with the sum of y_template and y_add in each row
@@ -189,9 +176,4 @@ def generateTimeStreachEnsemble(y_template, streach_grid=None):
         Y.append(lf.effects.time_stretch(y_template, streach_grid[i]))
     
     return Y 
-    
-    
-
-##### wav files
-
 
