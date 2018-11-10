@@ -1,23 +1,15 @@
-#!/usr/bin/python
-
 from __future__ import print_function, division
-#import sys
+
 import numpy as np
-#import os
+
 from collections import Counter
 from copy import deepcopy
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-
-import pylotwhale.utils.dataTools as daT
 from scipy.stats import entropy
 
-#import pylotwhale.NLP.ngramO_beta as ngr
-
-
-#import scikits.audiolab as au
-#import warnings
+import pylotwhale.utils.dataTools as daT
 
 
 """
@@ -44,7 +36,6 @@ def y_histogram(y, range=(0,1.5), Nbins=None, oFig=None, figsize=None,
         xloc = plt.MaxNLocator(max_xticks)
         ax.xaxis.set_major_locator(xloc)
 
-    
     ## savefig
     if isinstance(oFig, str): fig.savefig(oFig, bbox_inches='tight')
     #print(oFig)
@@ -57,12 +48,12 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
     '''violin plot of the ict of a my_bigrams
     Parameters:
     -----------
-        df0 : pandas dataframe wirth ict column
+        df0 : pandas dataframe with ict column
         mu_bigrams : sequence to search for
-        ignoteKeys : 'default' removes  ['_ini', '_end']
+        ignoreKeys : 'default' removes  ['_ini', '_end']
         label : type of sequence
         oFig : output figure
-        violinInner : viloin lor parameter
+        violinInner : violin loc parameter
         yrange : 'default' (0, mu*2)
     '''
 
@@ -82,7 +73,6 @@ def pl_ic_bigram_times(df0, my_bigrams, ignoreKeys='default', label='call', oFig
             bigrNames.append(seq)
 
     kys = ["{}{}".format(a,b) for a, b in bigrNames ]
-    #sns.violinplot( bigrTimes, names=kys, inner=violinInner)
     sns.boxplot( bigrTimes, names=kys)
 
     if yrange == 'default':
@@ -100,9 +90,9 @@ def pl_calling_rate(df, t_interval=10, t0='t0', xL='time, [s]', yL=r'$\lambda$',
     ti = 0
     ## define time bins
     times_arr = np.arange(t_interval, call_t[-1]+t_interval, t_interval)
-    ## inicialise the calling rate for each time bin with zeros
+    ## initialise the calling rate for each time bin with zeros
     call_rate = np.zeros(len(times_arr))
-    for (i, tf) in enumerate(times_arr): # count the number of calls in each timebin
+    for (i, tf) in enumerate(times_arr): # count the number of calls in each time bin
         call_rate[i] = len(call_t[np.logical_and(call_t > ti, call_t < tf)])
         ti = tf
 
@@ -157,7 +147,7 @@ def pl_ictHist_coloured(ict, ict_di, bigrs, Nbins, rg=None,
 ### ICIs
 
 def check_finiteness(s1, s2):
-    """fileters non finete elements in either of both series"""
+    """filters non finite elements in either of both series"""
     assert(len(s1) == len(s2))
     mask = np.logical_and(np.isfinite(s1), np.isfinite(s2))
     x = s1[mask]
@@ -269,19 +259,19 @@ def window_times(onset_times, t0, tf):
 
 
 def binary_time_series(onset_times, Dt=0.1):
-    """converts oneset times into a time-continuous binary array
+    """converts onset times into a time-continuous binary array
     having the time stamp of the last element as length of the time vector
     Parameters
     ----------
     ev_times: ndarray
         onset times
     Dt: int
-        time samplig interval, 1/sampling rate
+        time sampling interval, 1/sampling rate
     t_end: float
     Returns
     -------
     t_vec: ndarray
-        times aray
+        times array
     IO: ndarray
         a binary array with ones at the onset positions
     Fs: float
@@ -298,9 +288,9 @@ def binary_time_series(onset_times, Dt=0.1):
 
 
 def binarise_times_in_window(times, t0, tf, Dt=0.1):
-    """Crates binary sigal from onset times
+    """Crates binary signal from onset times
     by windowing every Dt
-    Make sure all provided paramters have thesame units.
+    Make sure all provided parameters have the same units.
 
     Parameters
     ----------
@@ -344,7 +334,7 @@ def KLdivergence(feature_arr):
 
 def nPVI(IOI):
     """
-    quantifies the temporal variablility in speech rhythm [Grabe & Low, 2002]
+    quantifies the temporal variability in speech rhythm [Grabe & Low, 2002]
     """
     n = len(IOI)
     diff = np.abs(np.diff(IOI))
