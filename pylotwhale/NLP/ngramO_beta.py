@@ -14,7 +14,7 @@ from nltk.probability import ConditionalProbDist, MLEProbDist
 import pylotwhale.utils.dataTools as daT
 import pylotwhale.NLP.annotations_analyser as aa
 
-import matrixTools as mt
+import pylotwhale.utils.matrixTools as mT
 
 """
     Module for doing statistics on ngrams; counting ngrams, conditional frequencies
@@ -53,17 +53,17 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
     ax.set_ylabel(yL)
     if plTit: ax.set_title(plTit)#, size = 16)
     
-    print np.nanmax(y), y0
+    #print np.nanmax(y), y0
     if yTickStep: ax.set_yticks(np.arange(0, int(maxY), yTickStep))
     
     if isinstance(plLegend, list):
         if len(plLegend) == len(p): # set labels
             ax.legend( tuple(p), tuple(plLegend) )
-            print "LABELS:", plLegend
+            #print "LABELS:", plLegend
 
     if figN: 
         fig.savefig(figN, bbox_inches='tight')
-        print figN
+        #print figN
 
 ##### NLTK - pandas - related ngram code  #####
 
@@ -778,7 +778,7 @@ class bigramProbabilities():
         return A.sum()
     
     def bigrams_occurrences(self, A):
-        return mt.countMatrixEntrances(A)
+        return mT.countMatrixEntrances(A)
 
     def __reducedMatrix(self, A, n_tresh = 5):
         """

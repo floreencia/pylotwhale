@@ -1,4 +1,4 @@
-#!/usr/mprg/bin/python
+from __future__ import print_function, division
 
 import numpy as np
 import pylab as pl
@@ -10,7 +10,6 @@ import ast
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import functools
-
 
 
 """
