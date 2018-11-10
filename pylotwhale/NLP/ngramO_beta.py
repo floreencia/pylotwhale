@@ -1,106 +1,35 @@
-#!/usr/mprg/bin/python
+from __future__ import print_function, division
 
-import numpy as np
-#import pylab as pl
-import matplotlib.pyplot as plt
-import seaborn as sns
 import sys
-#import time
+import numpy as np
+import matplotlib.pyplot as plt
 import itertools as it
 from collections import Counter, defaultdict
 
-#import os
 import ast
 import pandas as pd
 import nltk
 from nltk.probability import ConditionalProbDist, MLEProbDist
-import pylotwhale.utils.dataTools as daT
 
+import pylotwhale.utils.dataTools as daT
 import pylotwhale.NLP.annotations_analyser as aa
 
-#import sequencesO_beta as seqs
-sys.path.append('/home/florencia/whales/scripts/')
-import matrixTools as mt 
+import matrixTools as mt
 
 """
-    Module for doing statistics on ngrams
+    Module for doing statistics on ngrams; counting ngrams, conditional frequencies
+    and conditional probabilities
     florencia @ 16.05.14
-
 """
 
 
 ############################    PLOTTING    ################################
 
-def plBigramM(A, i2c, groupN='', figDir='', shuffl_label=0,
-              Bname='bigram', ext='eps', plTitle='', clrMap='winter_r',
-              labSize='18', cbarLim=(1, None), cbarOrientation='vertical',
-              cbarTicks=False, cbarTickLabels=False, cbar=True, outFig='',
-              figsize=None):
-    """
-    plots a bigram matrix
-    A : bigram matrix
-
-    OPTIONAL PARAMETERS
-    * figDir, if you whant to save the image, give the directory
-    * cbarLim, tuple that with the limits of the cbar i.e. (0,1) for
-        probabilities. False sets the default limits, the min and the max of the matrix.
-    * cbarTick, location of the ticks in the cbar (list) i.e. [0, 0.5, 1]
-    * cbarTickLabs, tick labes of the cbar (list)
-
-    > shuffl_label -- doesen't shuffles the data (since yhis method pnly plots) but includes the shuffle lable in the name of the file
-    > xM and yM, if False plot all
-    """
-    if(shuffl_label):
-        Bname = Bname+'_shuffled'
-    
-    '''
-    if not xM: xM = len(i2c) # masked labels
-    if not yM: yM = len(i2c) #masked labels
-    '''
-
-    fig, ax = plt.subplots(figsize=figsize)
-
-    cmap = plt.cm.get_cmap(clrMap, 11)    # 11 discrete colors
-    cmap.set_under('white') #min
-    cmap.set_bad('white') #nan
-
-    cax = plt.imshow(A, interpolation='nearest', cmap=cmap,
-                    extent = [0, len(i2c), 0, len(i2c)], origin='bottom')
-
-    #ax.set_xlim((0,xM))
-    #ax.set_ylim(0,yM)
-    xM = len(i2c)  # masked labels
-    yM = len(i2c)  # masked labels
-    ax.set_yticks(np.arange(len(i2c[: yM + 1])) + 0.5)  # flo -> +0.1)
-    ax.set_yticklabels(i2c[:yM+1])
-    ax.set_xticks(np.arange(len(i2c[: xM + 1])) + 0.5)
-    ax.set_xticklabels(i2c[:xM+1], rotation=90)
-    if plTitle: ax.set_title(plTitle)
-    # COLOUR BAR
-    if isinstance(cbarLim, tuple): cax.set_clim(cbarLim)  # cmap lims
-
-    if cbar: 
-        cbar = fig.colorbar(cax, extend='min')
-        if isinstance(cbarLim, tuple): cbar.set_clim(cbarLim)  # cbar limits
-        if isinstance(cbarTicks, list): cbar.set_ticks(cbarTicks)
-        if isinstance(cbarTickLabels, list): cbar.set_ticklabels(cbarTickLabels)
-    '''
-    if figDir: 
-        figN = os.path.join(figDir, Bname+'%s.'%groupN + ext)
-        pl.savefig(figN, bbox_inches = 'tight')
-        print len(i2c), "\nout:%s"%figN
-    '''
-        
-    if outFig: 
-        fig.savefig(outFig, bbox_inches = 'tight')
-        print len(i2c), "\nout:%s"%outFig
-
-
 def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams', 
               plTit='', plLegend=0, maxNyTicks=0, yTickStep=50 ):
     """
     plots stocked histograms
-    i.e. the number of bigrams repetiotions/differences
+    i.e. the number of bigrams repetitions/differences
     y can be an array of the bar values of the plot
     * plLegend list with legends of the plots, i.e ['different call', 'repetition'] 
     * maxNyTicks - maximum number of y ticks. 0- default (matplotlib decides)
@@ -112,7 +41,7 @@ def barPltsSv(y, labs, figN='', figSz=(10, 3), yL='# bigrams',
     ax = fig.add_subplot(111)
     y0 = np.zeros(len(y[0]))
     p = []
-    maxY = 0 # for ajusting the y scale
+    maxY = 0 # for adjusting the y scale
     for i in range(len(y)):
         assert(len(y0) == len(y[i])) #all the arr must have the same dimension
         p.append(ax.bar( range( len(y[i]) ), y[i], color = colors[i], bottom = y0))
@@ -192,7 +121,6 @@ def bigramsdf2bigramsMatrix(df, conditionsList=None, samplesList=None):
     if conditionsList is None: conditionsList = df.columns
     if samplesList is None: samplesList = df.index
 
-    #bigrsDF = df[conditionsList].loc[samplesList]
     bigrsDF = df[samplesList].reindex(conditionsList)
     conds = bigrsDF.index.values
     samps = bigrsDF.columns.values
@@ -225,7 +153,7 @@ def cfdBigrams2countsMatrix(bigramsDict, conditionsList=None, samplesList=None):
     conds : labels of the rows of the matrix
     samps : labels of the columns of the matrix
     '''
-    ## copy values of the cfd not to affect the mutable cfd outsede
+    ## copy values of the cfd not to affect the mutable cfd outside
     bigramsD = dict(bigramsDict)
     # When given conditionsList and/or samplesList
     # make sure all keys are present in bigramsDict
@@ -283,11 +211,12 @@ def get_insignificant_bigram_indices(p_values, pc=0.1):
     for (r, c), p_val in np.ndenumerate(p_values):
         if p_values[r, c] > pc:
             index_list.append((r, c))
-    return index_list    
+    return index_list
 
 
 ### + CONDITIONAL PROBABILITIES
-    
+
+
 def condFreqDictC2condProbDict(condFreqDict, conditions=None, samples=None):
     '''estimates the conditional probabilities (dict) form cond freq dist'''
     
@@ -318,7 +247,7 @@ def kykyDict2matrix(kykyDict, conditions, samples):
     M : 2darray
         values
     conds : labels of the rows of the matrix
-    samps : labels of the columns of the matrix  
+    samps : labels of the columns of the matrix
     '''
     df = kykyDict2DataFrame(kykyDict)
     return bigramsdf2bigramsMatrix(df, conditionsList=conditions, samplesList=samples)
@@ -367,10 +296,10 @@ def kykyDict2DataFrame(kykyDict, fillna=0):
     Parameters
     ----------
     kykyDict : dict
-        dict of conunts dict, e.g. cfd or a cpd
+        dict of counts dict, e.g. cfd or a cpd
         D[condition][sample] = n
         P (sample = row | condition = column),
-        columns are the condition, rows are sampes
+        columns are the condition, rows are samples
     fillna : int, float, str
         value used to fill empty cells
     Returns
@@ -457,7 +386,7 @@ def dictOfBigramIcTimes(listOfBigrams, df, ict_XY_l=None, label='call', ict_labe
     df : pandas data frame
     ict_XY_l : dictionary of lists
         bigrams as keys and the ict of the bigrams as values
-    label : type of squence, or name of the column in df where to look for the sequences
+    label : type of sequence, or name of the column in df where to look for the sequences
     ict_label : str
         name of the column
     Return
@@ -535,7 +464,7 @@ def dfDict_to_bigram_matrix(df_dict, Dtint, timeLabel='ici', callLabel='call',
     calls0 = []
     for t in df_dict.keys():  # for reach tape
         thisdf = df_dict[t]
-        # define the sequeces
+        # define the sequences
         sequences = aa.seqsLi2iniEndSeq(aa.df2listOfSeqs(thisdf, Dt=Dtint,
                                                          l=callLabel,
                                                          time_param=timeLabel),
@@ -630,7 +559,7 @@ def getElementsLargerThan(array1D, N_tresh, sort='yes'):
     Index selector
     returns the indexes of the items with a value larger than N_tresh
     < array 1D is the array that we will use as a condition to sort the indexes
-    * the elements can be sorted decedengly by:
+    * the elements can be sorted descendingly by:
       - the elements can be sorted descendingly with the values of array1D, or not
     """
     if(sort == 'yes'):
@@ -638,14 +567,14 @@ def getElementsLargerThan(array1D, N_tresh, sort='yes'):
         return np.array([i[0] for i in sorted(enumerate((array1D)), key = lambda x: x[1], reverse = True ) if i[1] > N_tresh])
         # enumerate, enumerates the elements in the list
         # then we sort them according to the second element, the value of the array
-        # and filter out elemenst with a value smaller than N_tresh
+        # and filter out elements with a value smaller than N_tresh
     else:
         return np.array([i for i in range(len(array1D)) if array1D[i] > N_tresh]) #iterate over the elements of the array
     
 
 def elements22Dindexes( items_idx ):
         """
-        items to 2 dimentional index array
+        items to 2 dimensional index array
         converts the items indexes into 2dim indexes
         > i, row indexes
         > j, column indexes
@@ -673,18 +602,17 @@ def reduceDict(anti_di, items_idx):
     di - dictionary with the call labels
     anti_di
     """
-    red_di = {anti_di[item] : item for item in items_idx}
+    red_di = {anti_di[item]: item for item in items_idx}
     return red_di
 
 
 def call2mkUpIx(mkUp_arr, c2i, call):
     """
     == get makeup indexes from call ==
-    When sellecting the calls to work with (make-upping), i.e. the most frequent
-    whe work with the make up indexes that evaluate the i2c list in a way that
-    the bigrams are sorted in the desired way (see getElementsLArgerThan()).
-    However, sometimes we whant to mak up the indexes according to the 
-    name of the call, i.e. eliminate the index that corresonds to tha pseudo-call
+    When selecting the calls to work with (make-upping)
+    bigrams are sorted in the desired way (see getElementsLargerThan()).
+    However, sometimes we want to make up the indexes according to the 
+    name of the call, i.e. eliminate the index that corresponds to the pseudo-call
     __INI or __END. In this case we need to map the "call" back to the make-up
     index. and this is what this function.
     < mkUp_arr, 1D *numpy array* with the makeup-indexes
@@ -719,8 +647,8 @@ def rmCallFromMkUpArr(mkUp_arr, c2i, call ):
 def binomialProportions(i, j, M):
     """
     Binomial distribution (p1, p2) of the (i,j)-bigrams given the bigrams matrix.
-    Where p1 is the numeber of times the bigram (i, j) was obseved and 
-    p2 is the number to times a call differnt form j, followed i.
+    Where p1 is the number of times the bigram (i, j) was observed and 
+    p2 is the number to times a call different form j, followed i.
     p1 = #(i, j)
     p2 = #(i, not j)
     > (p1, p2)    
@@ -729,7 +657,7 @@ def binomialProportions(i, j, M):
     
 def df_li2mtx(df, N, i):
     """
-    take the i-th line of the a data frame with colums (n, m) (i.e. the 
+    take the i-th line of the a data frame with columns (n, m) (i.e. the 
     shuffled probabilities dataFrame) and transform it into a matrix
     < df, data frame with (n, m) column names (ex. shuffledProbDist_NPWVR-seqsData...)
     < N, number of call types. len(i2c) = len(c2i)
@@ -761,7 +689,7 @@ class bigramProbabilities():
         self.MPrepetitionCallSet = self.__MPCrepetitionSet()
         self.MPdiffCallSet = self.__MPCdiffCallSet()
         self.numberOfBigrams = self.countBigrams(self.freqMatrix)
-        #self.bigramsOccurrences = self.bigrams_occurrences(self.freqMatrix)
+
                 
 
     def __lineNormalized(self, A):
@@ -834,14 +762,14 @@ class bigramProbabilities():
 
     def __MPCrepetitionSet(self):
         """
-        retuns the set of calls whose MPC is the same as the previous call
+        returns the set of calls whose MPC is the same as the previous call
         """
         subSet = [i for i in np.arange(len(self.mostProbableC)) if i == self.mostProbableC[i] ]
         return subSet
 
     def __MPCdiffCallSet(self):
         """
-        retuns the set of calls whose MPC is the same as the previous call
+        returns the set of calls whose MPC is the same as the previous call
         """
         subSet = [ i for i in  np.arange(len(self.mostProbableC)) if i != self.mostProbableC[i] ]
         return subSet
@@ -854,7 +782,7 @@ class bigramProbabilities():
 
     def __reducedMatrix(self, A, n_tresh = 5):
         """
-        this fiction returns a reduced for of the bigram matrix. Only those elemnts with less more that n_tresh counts.
+        this fiction returns a reduced for of the bigram matrix. Only those elements with less more that n_tresh counts.
         """
         
     def getElementsLargerThan(self, array1D, N_tresh):
@@ -866,7 +794,7 @@ class bigramProbabilities():
     
     def elements22Dindexes(self, items_idx):
         """
-        items to 2 dimentional index array
+        items to 2 dimensional index array
         converts the items indexes into 2dim indexes
         """
         M_elements = list(it.product(*[items_idx, items_idx]))
@@ -881,397 +809,3 @@ class bigramProbabilities():
         """
         (i,j,Ndim) = elements22Dindexes(items_idx)
         return A2D[i, j].reshape(Ndim, Ndim)
-
-
-
-'''
-class chart2sec:
-    """
-    this objec transform a chart into a sequence archive
-    """
-    def __init__(self, inF, cut_time):
-        print "creatinng a chart object"
-    
-        f = open(inF, 'r')
-        str1 = file.read(f) # reading file
-        newStr = str1.rstrip() # remove last \n
-
-    def __dayTapeDictIni(self):
-
-
-### INICIALIZATIONS
-        dayTape = {}
-        
-### READ FILE
-        lines = str1.split('\n') # vector of lines
-        Nlines = len(lines)
-        tStamp = np.zeros([Nlines,1])
-        
-        lIndex = 0
-        for j in lines: #inicialize dictionary, leve put the last element
-            col = j.split('\t') # vector of the elements in the line       
-            if(len(col)>1):
-                dayTapeL = ''.join([col[2],col[1]])
-                dayTape[dayTapeL] = []
-                hora, minuto, segundo = col[0].split('_')
-                tStamp[lIndex] = int(hora)*60*60 + int(minuto)*60 + int(segundo)
-                lIndex += 1
-            #print int(hora), int(minuto), segundo
-            #timeStamp[lIndex] = 
-            #print dayTapeL
-            else:
-                lIndex += 1
-                print j
-                
-                lIndex = 0
-                for j in lines: #create dictionary with the elements with the same day and tape label
-                    col = j.split('\t') # vector of the elements in the line
-                    
-                    if(len(col)>1):
-                        dayTapeL = ''.join([col[2],col[1]])
-                        dayTape[dayTapeL].append(lIndex)
-                        lIndex+=1
-                    else:
-                        lIndex+=1
-                        print j
-
-
-class bigram:
-    """
-    Creates an object with pca properties
-    Inicialize it with an array 
-    """
-
-    def __init__(self, data, constrain = ["day", "tape"]):
-       """
-       creates an object with the PCA relevant properties
-       """        
-       self.__data = data
-       [wg , vec] = self.full_pca(self.__data)
-       self.__weights = wg
-       self.__vectors = vec
-       Dim = len(wg) + 1
-       self.colorVec=['b','g','r','c','m','y','k','w']
-
-'''
-
-'''
-    def full_pca(self, data):
-
-        """
-        Performs the complete eigendescomposition of the covatiance matrix
-        traslading the data so that <x>=0
-        """
-       # print "sin trasladar los datos a media cero"
-        cov = np.cov(data.T)
-#        cov = np.cov(data.transpose())
-        w,u = eigh(cov, overwrite_a = True)
-        return w[::-1], u[:,::-1]    
-
-    def weights(self):
-        return self.__weights
-
-    def vectors(self):
-        return self.__vectors
-
-    def dataInMyBasis(self, data0, basisDim = -1 ):
-        """
-        this function gives the data in the main features PCA basis
-        args:
-        * data0 =  the matrix with te data
-        * basisDim =  number by default we set it to the complete basis
-        """
-        fV = self.__vectors[:, 0:basisDim]        
-        nD = np.dot(data0, fV )
-        #print "data0=", np.shape(data0), "data1", np.shape(fV)
-        return nD
-    
-   
-
-    def featureVector(self, Ifraction):
-        """
-        gets the feature basis, the vectors whos weight is above th
-        args:
-        * inverse of fraction the basis vector we want to keep (>1)
-        """
-
-        if Ifraction > 1:
-            Ifraction = 1/Ifraction
-
-        PCDim =  len(self.__weights)*Ifraction
-        print "\nreturning a", PCDim, "dimensional basis\n"
-        return self.__vectors[:,:PCDim]
-
-
-    def dataInPCBasis(self, data0, basisDim = dim): #self.__dim):
-        """
-        this function gives the data in the main features PCA basis
-        args:
-        * data0 =  the matrix with te data
-        * basisDim =  number of elements
-        """
-        nD = np.dot(data0, self.__vectors[:, 0:basisDim-1] )
-        #print "data0=", np.shape(data0), "data1", np.shape(fV)
-        return nD
-
-    def newDataOld(self,Ifraction):
-        """
-        this function gives the data in the main features PCA basis
-        """
-        
-        fV = self.featureVector(Ifraction)
-        nDt = np.dot( np.transpose(fV), np.transpose(self.__data) )
-        nD = np.dot(self.__data, fV )
-#        print nDt.T-nD
-        return nD
-
-    def fullNewData(self):
-        """
-        returns all the data in the PC basis
-        """
-        ffV = self.__vectors
-        fnD = np.dot(np.transpose(ffV), np.transpose(self.__data))
-        return fnD
-
-    def multiBarPl(self, plMatrix, plScriptName): ### under construction
-        """
-        plMAtrix has nD rows and nF columns
-        nD = dimension of the complete space
-        nF = number of features 
-        """
-        myfile = open(plScriptName, 'w')
-        myfile.write("#!/usr/bin/python\n\n")
-        myfile.write("import pylab as pl\n\n")
-        nD, nF = plMatrix.shape
-
-        for i in np.arange(nF):
-            myfile.write("pl.subplot(%d,1,%d)\n" %(nF, i+1))
-
-            x = np.arange(len(plMatrix[:,i]))
-            print "equis: ", x
-            myfile.write("pl.bar") #, plMatrix[:,i] ))
-
-    def nLargestStdValuesAndIdx(self, n):
-        """
-        Args:
-        * n, the n largest elemts of the 1 dim array (obje 
-
-ct)
-        Returns:
-        * x,y = the largest values and their indexes
-        """
-        std_dev = self.__data.std(axis=0)
-        my_nLargest = np.sort(std_dev)[-n:]
-        my_nLargest_idx = np.where( std_dev >= my_nLargest[0] )
-        return my_nLargest, my_nLargest_idx
-
-    def plInMyBasis(self, TheDatas, plot_name):
-        
-        for i in np.arange(len(TheDatas)):
-            newData = self.dataInMyBasis( TheDatas[i], 2 )
-            pl.plot(newData[:,0], newData[:,1], "%so"% self.colorVec[ i%len(self.colorVec) ], label = '%d'%i, alpha=0.4 )
-         #   print "i", i, "de", len(TheDatas),"\ncolor:" , "%so"% self.colorVec[ i%len(self.colorVec) ], label='data%d'%i,"\nnewdata" , np.shape(newData)
-            
-        pl.legend(loc='upper right')
-        pl.savefig(plot_name+".ps")
-        pl.clf()
-        print "%s.ps"%plot_name
-
-
-    def plInMyBasis0(self, TheDatasNames, plot_name):
-### plots the data in the self basis
-        
-        TheDatas=[]
-        print "\nLEN", len(TheDatasNames), TheDatasNames, "\n "
-
-        for i in np.arange(len(TheDatasNames)):
-            print i,"file name", TheDatasNames[i], "\n "
-            TheDatas.append( np.loadtxt( TheDatasNames[i] ) )
-            newData = self.dataInMyBasis( TheDatas[i], 2 )
-            
-            pl.plot(newData[:,0], newData[:,1], "%so"% self.colorVec[ i%len(self.colorVec) ], label = TheDatasNames[i].split('/')[-2], alpha=0.4 )
-
-        pl.title(TheDatasNames[i].split('/')[-1])         
-        pl.legend(loc='lower right')
-        pl.savefig(plot_name+".eps")
-        pl.clf()
-        
-        print "%s.eps"%plot_name
-#        return myPCApl
-
-    def saveDataInMyBasis(self, TheDatasNames, file_name, basis_dimension):
-        """ save the data in the self basis """
-        
-        TheDatas=[]
-        newData=[]
-      #  print "\nLEN", len(TheDatasNames), TheDatasNames, "\n "
-
-        for i in np.arange(len(TheDatasNames)):
-            print i, TheDatasNames[i], "\n "
-            TheDatas.append( np.loadtxt( TheDatasNames[i] ) )
-            newData = self.dataInMyBasis( TheDatas[i], basis_dimension) 
-
-            data_name = TheDatasNames[i].split('/')[-2]
-            out_name = file_name+data_name+'dim_'+str(basis_dimension)+'.dat'
-            print "out file: %s.ps"%out_name
-            np.savetxt(out_name, newData) 
-            del newData
-            
-
-class pca0mean(pca):
-
-    """
-    Creates a subobject with pca properties
-    Inicialize it with an array 
-    """
-
-    def __init__(self, data):
-        """
-        creates an object with the PCA relevant properties
-        """  
-	pca.__init__(self, self.z_mean(data))#, z_mean(self,self.__data)):	      
-        print "zero mean \n" 
-#        print "you created a PCA object from\
- #a",np.shape(data),"dimensional data\n zero mean\n", 
-   #     [wg , vec] = self.full_pca(self.__data)
-  #      self.__weights = wg
- #       self.__vectors = vec
-        
-   
- def z_mean(self,data):
-#    def z_mean(self):
-
-        """
-        this method traslades the data so that the mean of each columnn is zero
-        """
-        mu = data.mean(axis=0)
-        data0 = data-mu
-        return data0
-
- 
-
-'''
-'''
-def repetitionPL(self, A):
-nC = np.shape(A)[1]
-P = np.zeros(nC)
-N = np.zeros(nC)
-for i in range(nC):
-if A[:,i].sum() != 0:
-P[i] = 1.0*A[i,i]/A[:,i].sum()
-N[i] = A[:,i].sum()
-else:
-print i, "zero L"            
-return P, N
-
-def diffPR(self, A):
-nC = np.shape(A)[1]
-P = np.zeros(nC)
-for i in range(nC):
-if A[:,i].sum() != 0:
-P[i] = 1 - 1.0*A[i,i]/A[:,i].sum()
-else:
-P[i] = 0
-
-return P
-
-def diffPL(self, A):
-nL = np.shape(A)[0]
-P = np.zeros(nL)
-for i in range(nL):
-if A[i,:].sum() != 0:
-P[i] = 1 - 1.0*A[i,i]/A[i,:].sum()
-return P
-
-'''
-'''
-
-class bigram:
-    """
-    this class reads a sequence file and return the unnormalized bigram matrix
-    """
-    def __init__(self, fName):
-        print "bigram object"
-        f = open(fName, 'r')
-        fStr = file.read(f)
-        fStr = fStr.strip() #chomp
-        self.sentences = fStr.split('\n')
-        self.words = self.vocabulary().keys() # index to word
-        self.vocabularySize = len(self.words)
-        self.index = self.word2Index() # word to index
-        self.fullBiG = self.fullBiGMatrix()
-
-    def vocabulary(self):
-        """
-        creates a dictionary of the words and sets to it the frequency
-        """
-        vocFrec = {}
-        vocFrec['0INI'] = 0
-        vocFrec['0FIN'] = 0
-
-        for i in self.sentences: # inzialize dictionary
-            palabras = i.split(' ')
-            for j in palabras:
-                vocFrec[j]=0
-                
-        # WORD FREQUENCY
-        for i in self.sentences:
-            vocFrec['0INI']+=1
-            vocFrec['0FIN']+=1
-            palabras = i.split(' ')
-            for j in palabras:
-                vocFrec[j]+=1
-                
-        return vocFrec
-
-    def word2Index(self):
-        """
-        creates a maping from the call to the bigram matrix index
-        """
-        w2i = { self.words[j] : j  for j in range(self.vocabularySize)} #inicialize dictionary
-        return w2i
-
- m   def fullBiGMatrix(self):
-        """
-        returns the bigram matrix
-        """
-        #  INICIALIZE 2-GRAM DICTIONARY
-
-        print "full bigram"
-        A = np.zeros((self.vocabularySize, self.vocabularySize))
-#        adj2G = []
-        
-        for i in self.sentences:
-            palabras = i.split(' ')
-            preWord = '0INI'
-
-            for j in palabras:
-               # print j, self.index[j], preWord
-                A[ self.index[preWord], self.index[j] ] += 1
-                preWord = j
-        
-            A[ self.index[preWord], self.index['0FIN'] ] += 1
-                
-        return  A
-
-
-    def BiGMatrix(self):
-        """
-        returns the bigram matrix effective unormalized bigram matrix
-        having zeroed the INI line and the FIN column
-        """        
-        print "effective bigram"
-        
-        #  INICIALIZE 2-GRAM DICTIONARY
-        biGmat = 1*self.fullBiG #multiply for one so that it creates a new memory instance. Remember that we equaling to variables, python asigns the same memory space. So eveting that is done to one of the variable will also apply for the other one.
-        biGmat[self.index["0INI"], :] = 0
-        biGmat[:, self.index["0FIN"]] = 0
-                
-        return  biGmat
-
-
-
-'''
-
-
-
