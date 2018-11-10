@@ -1,5 +1,3 @@
-#!/usr/mprg/bin/python
-
 from __future__ import print_function
 import numpy as np
 import pandas as pd
@@ -16,8 +14,8 @@ import pylotwhale.utils.dataTools as daT
 def df2X_stry(df, groupingKey='tape', call='note', sep=' '):
     """returns the feature list from a dataframe grouping
     the value of the grouping key
-    Parameteres
-    -----------
+    Parameters
+    ----------
     df: pandas dataframe
     groupingKey: str
     call: str
@@ -55,15 +53,15 @@ def df2Xy(df, groupingKey='tape', call='note', sep=' ',
 def df2groupedCorpus(df, groupingKey='tape', call='note', sep='\s'):
     """returns the feature list from a dataframe grouping  
     the value of the grouping key
-    Parameteres
-    -----------
+    Parameters
+    ----------
     df: pandas dataframe
     groupingKey: str
     call: str
     Returns
     --------
     X_str: list of strings (n_instances)
-        feateure matrix to use as input of CountVectorizer
+        feature matrix to use as input of CountVectorizer
     y: list, (n_instances)
         labels of the instances from the grouping key
     """
@@ -72,7 +70,7 @@ def df2groupedCorpus(df, groupingKey='tape', call='note', sep='\s'):
     X_str = [] # feature list
     y = [] # group label
     for ky in df_dict.keys():
-        y.append(ky) # gro
+        y.append(ky) # group
         X_str.append(sep.join( df_dict[ky][call].values))
     return X_str, y
 
