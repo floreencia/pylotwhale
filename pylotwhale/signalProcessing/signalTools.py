@@ -22,8 +22,6 @@ import librosa  # Librosa for audio
     extracting features with librosa
 """
 
-
-
 def waveformPreprocessingFun(funName=None):
     '''
     Dictionary of feature extracting functions
@@ -85,8 +83,7 @@ def audioFeaturesFun(funName=None):
 #####           waveform manipulations                #####
 ###########################################################
 
-    
-#### WAVEFORM MANIPULATIONS        
+#### WAVEFORM MANIPULATIONS
 ########### moved to effects.py
     
 def standardise(y, axis=0):

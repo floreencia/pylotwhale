@@ -28,7 +28,7 @@ def audioFeaturesFun(funName=None):
     ------
     > feature names (if None)
     > feature function
-        this functions take the waveform and return an instancited feature matrix
+        this functions take the waveform and return an instantiated feature matrix
         m (instances) - rows
         n (features) - columns
     '''
