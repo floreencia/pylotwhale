@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Nov 27 18:05:03 2015
-#!/usr/bin/python
-@author: florencia
-
 Runs call classification experiments generating artificial data and trying
 different parameters
 """
@@ -227,17 +222,17 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
                          param=None):
     """ . . . . . USE callClfExperiment instead  to be deprecated!!! . . . . .
     Runs clf experiments in the old way
-    using T_setings instead of Tpipe
+    using T_settings instead of Tpipe
     Parameters
     ----------
         train_coll: list
         test_coll: list
         lt: ML.labelTransformer
         T_settings: list of tuples
-        labelsHierachy: list of strings
+        labelsHierarchy: list of strings
         cv: cv folds
-        estimators: list
-            for pipline
+        pipe_estimators: list
+            for pipeline
         gs_grid: list
         filterClfClasses: list
             can use lt.classes_
@@ -246,7 +241,7 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
         predictionsDir: str
         scoring: string or sklearn.metrics.scorer
         param: float
-            value of the param in experimet, for printing
+            value of the param in experiment, for printing
     """
 
     Tpipe = fex.makeTransformationsPipeline(T_settings)
@@ -286,17 +281,6 @@ def runCallClfExperiment(wavColl, lt, T_settings, out_fN, testFrac,
         out_file.write("{:.2f}, {:.2f}, {:.2f}, {:.2f}\n".format(acc*100, P*100, R*100, f1*100))
 
     return clf_best.fit(X, y)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

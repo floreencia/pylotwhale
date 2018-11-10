@@ -320,7 +320,7 @@ def runExperiment(train_coll, test_coll, lt, T_settings, labsHierarchy, out_fN,
         T_settings: list of tuples
         labelsHierachy: list of strings
         cv: cv folds
-        extimators: list
+        pipe_estimators: list
             for pipline
         gs_grid: list
                     
