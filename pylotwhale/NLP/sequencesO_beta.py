@@ -2,7 +2,6 @@ from __future__ import print_function, division
 
 import numpy as np
 import pylab as pl
-#import sys
 import os
 import pandas as pd
 import random
@@ -16,9 +15,9 @@ import functools
     Module for for the definition of sequences
     florencia @ 06.05.14
 
-    Starting from a data frame and leading to the bigram counts.
+    Starting from a dataframe and leading to the bigram counts.
     -- data frame --> data frames by recording (groupByRec + sortedRecDatFr)
-    -- data frame --> time iterval distribution (plTimeIntervals)
+    -- data frame --> time interval distribution (plTimeIntervals)
     -- data frame --> sequences ()
     -- sequences --> bigram counts
 
@@ -29,91 +28,10 @@ import functools
 #####                     plotting                    #####
 ###########################################################
 
-
-def plTimeIntervals(datB, plTitle='', outFig='', shuffl=0,
-maxNTicks=False, TLims=(0, 19), frac=0, xLabel='ict [s]', yLabel='N'):
-    """
-    time interval distributions
-    takes:
-    < datB, data frame we whant to look into the time stamps
-    < groupN, this is only given for the naming of the output plot
-    < outFig, can be: outDir+"timeDistHist_%s.eps"%groupN
-    * frac, display a line at the value of T below which frac*100%
-            of the call pars are semarated, e.e, frac =0.75
-
-    and returnsplots an histogram in the image folder
-
-    """
-    rec_datFrames, recs = sortedRecDatFr(datB, shuff=shuffl)  # recording data frames
-
-    # time interval histogram
-    interDist = {rec: rec_datFrames[rec].intervals.values for rec in rec_datFrames}  # intervals dictionary by recording
-
-    # interval ditribution
-    allT = list(interDist.values())  # all interval values
-    allT = np.asarray([item for subli in allT for item in subli])  # flattern the intervals
-    allT.reshape((len(allT), 1))  # reshape for dictionary
-    allT = allT[~np.isnan(allT)]  #filter nans out
-    print( np.shape(allT), allT.min(), allT.max())
-
-     # histogram
-    fig, ax = plt.subplots(figsize=(6,3))
-    cax = ax.hist(allT[~np.isnan(allT)], bins=allT.max(), color =([0, 0.49, 0.47]))
-    ax.set_xlim(TLims)
-    ax.set_xlabel(xLabel)
-    ax.set_ylabel(yLabel)
-    if maxNTicks: plt.locator_params(nbins=maxNTicks)
-
-    if frac:
-        Cumx = np.cumsum(cax[0])
-        Tot = sum(cax[0])
-        tbins = cax[1]
-        ax.axvline(x=sum(Cumx <= Tot * frac), linewidth=4, color=(1, 0.1, 0.0))#[(0, 0.7, 0.9)])
-        print("line at", sum(Cumx <= Tot * frac))
-
-    if plTitle: ax.set_title(plTitle)
-
-    if outFig: fig.savefig( outFig, bbox_inches='tight')
-    print("outFig:", outFig)
-
-    #return fig, ax
-
-
-def plTape(t, yRaw, plName='', scaleF = 20, lw = 0.05, title=''):
-    """
-    plots the calls vs. time
-    """
-    assert(len(t) == len(yRaw))
-
-    freq_call = sorted([(yRaw.count(ucall), ucall) for ucall in
-             np.unique(yRaw)], reverse=True, key=lambda x: x[0])  # sort calls
-    i2c_tape = [thisCall[1] for thisCall in freq_call]
-    c2i_tape = {i2c_tape[ix]: ix for ix in range(len(i2c_tape))}  # c2i
-    #print np.unique(yRaw), c2i_tape, i
-    #sys.exit()
-    y = [c2i_tape[item] for item in yRaw]
-    #print y[:5], i2c_tape, c2i_tape
-    # plot
-
-    #if not tapeN: tapeN = "%s%s%s"%(i2c_tape[0],len(i2c_tape), i2c_tape[-1])
-    #figN = outDir+"tape_%s.pdf"%tapeN
-    print(((t[-1] - t[0])/scaleF, np.min([np.max([1, len(freq_call) / 2]), 3])))
-    fig = pl.figure(figsize=((t[-1] - t[0]) / scaleF, np.min([np.max([1, len(freq_call) / 2]), 3])))
-    ax = fig.add_subplot(111)
-    pl.plot(t, y, marker='|', lw=lw, markeredgewidth=1.5)
-    ax.set_ylim(-0.5, len(c2i_tape))  # +0.1)
-    ax.set_xlim(t[0] - 5, t[-1] + 5)
-    ax.set_yticks(np.arange(len(c2i_tape)))
-    ax.set_yticklabels(i2c_tape, fontsize=8)
-    ax.set_xlabel('time [s]')
-    ax.set_title(title)
-    if plName: pl.savefig(plName, bbox_inches='tight')
-
-
 def scattTape(t, yRaw, quality, plName='', scaleF=20, title=''):
     """
-    Scatter plot of the calls in a tape, sorted acendinfgly with the
-    frequence of the callS. the coulors represent the quality of the recording.
+    Scatter plot of the calls in a tape, sorted ascendingly with the
+    frequency of the calls. Colours represent the quality of the recording.
     yRaw must be a list
     """
     assert(len(t) == len(yRaw))
@@ -143,7 +61,7 @@ def scattTape(t, yRaw, quality, plName='', scaleF=20, title=''):
 
 def ngramsHist(df0, tau, histSize=500):
     '''
-    This funcitons created an histogram of bigram sizes
+    These functions created an histogram of bigram sizes
     '''
     liS = df2listOfSeqs(df0, timeT = tau)
     ngrams = np.zeros(histSize)
@@ -168,18 +86,17 @@ def plNgrams(df0, tau, outFN='', xLim=None, yScale='log',
     ax.set_ylabel(yLabel)
     ax.set_xlabel(xLabel)
     if outFN: fig.savefig(outFN, bbox_inches = 'tight')
-    print( outFN )
+    print(outFN )
     return ngrams
-    
-    
+
+
 def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
                   tickLabsDict='', outplN='', plTitle='', xL='N', yL=r'$\tau$',
                   figureScale=(), extendCbar='both', extent=None):
-    
     '''
-    draws a beautiful color plot
+    draws a beautiful colour plot
     tickLabsDict     dictionary where the keys are the label of the cba ticks
-                    and the vallues a re te postions
+                    and the values a re te positions
     Parameters:
     ------------                    
         X : 2d numpy array
@@ -192,8 +109,8 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
 
     fig, ax = plt.subplots()
 
-    #colors setting
-    cmap = plt.cm.get_cmap('jet', clrBarGaps)    # discrete colors
+    #colours setting
+    cmap = plt.cm.get_cmap('jet', clrBarGaps)    # discrete colours
     cmap.set_under((0.9, 0.9, 0.8)) #min
     cmap.set_over((1, 0.6, 0.6)) #max
     #cmap.set_nan((1, 0.6, 0.6)) #nan
@@ -209,7 +126,7 @@ def fancyClrBarPl(X, vmax, vmin, maxN=10, clrMapN='jet', clrBarGaps=15,
 
     #clrbar
     cbar = fig.colorbar(cax, extend=extendCbar) #min, max, both
-    cbar.set_clim((vmin, vmax)) # normalize cbar colors
+    cbar.set_clim((vmin, vmax)) # normalize cbar colours
     if not tickLabsDict: 
         tickLabsDict = {vmin: vmin, int(vmax/2):int(vmax/2), vmax:vmax} # tick labels
     cbar.set_ticks(tickLabsDict.values())        
@@ -235,16 +152,16 @@ def constrainDF(df0, constrainType, constrainLi, baseName=''):
     '''
     Apply one constrain to a data base
     > df0 : constrained database
-    > constrainType : a traing indicating the constrain
+    > constrainType : a string indicating the constrain
     ----------      
     < df0 : in data frame
-    < contrainType : name of the column where constrai will be applyed
-    < constrainLi : list of contrains ['B', 'C']
-    < baseName : a string to which we'll indicate the added contrain
+    < contrainType : name of the column where constrain will be applied
+    < constrainLi : list of constrains ['B', 'C']
+    < baseName : a string to which we'll indicate the added constrain
     '''
     if not isinstance(constrainLi, list) or isinstance(constrainLi, tuple):
         constrainLi = [constrainLi]
-    
+
     baseName += '_%s'%constrainType
     boolarr = np.zeros(len(df0), dtype=bool)
     
@@ -258,19 +175,19 @@ def constrainDF(df0, constrainType, constrainLi, baseName=''):
     
 def constrainDataFrame(df0, constDict, baseN = '', reindex=False):
     '''
-    this functions constrains a data frame accordingly with the 
+    constrains a data frame accordingly with the 
     given constrain dictionary
     Apply one constrain to a data base
     Params:
     -------
     < df0 : in data frame
-    < constDict : constains dictionary 'col_name' : [values]
+    < constDict : constrains dictionary 'col_name' : [values]
     < baseN : string to which we'll append the constrain string
-    < reindex : if True, the indexes fo the returned array will 
+    < reindex : if True, the indexes for the returned array will 
                 renewed for newly fresh natural numbers
     ------->
     > df : constrained dataframe
-    > baseN : a traing indicating the constrain
+    > baseN : a training indicating the constrain
     '''
     
     df = df0.copy()
@@ -314,7 +231,7 @@ def df2timeStamps(df, txtFN,
         else:
             tfs = thisdf[ tf_col ]  
         cs = thisdf[ label_col ] # c3
-        anndf = pd.concat([t0s, tfs, cs], axis=1) # conncat series
+        anndf = pd.concat([t0s, tfs, cs], axis=1) # concat series
         anndf.to_csv(annotFN, sep='\t', header=False, index=False)
         
 
@@ -327,9 +244,9 @@ def groupByRec(dataFr, categ='recording'):
     groups data by recording
     returns:
     > 1 dictionary: recordings --> indexes of the recordings in same rec
-    > 2 an array of with the recordig names
+    > 2 an array of with the recording names
     """
-    recSetsD = dataFr.groupby(categ).groups #dictionary with the recordings
+    recSetsD = dataFr.groupby(categ).groups  # dictionary with the recordings
     recs = recSetsD.keys()
     #print "#recordings", len(recSetsD)
     return recSetsD, recs
@@ -387,7 +304,7 @@ def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
     list a list and returns:
     < li, sequence of tolkens, in for of a list
     > adj0, the adjacency 2D-dictionary of consecutive elements
-    > the call to index dicitonary
+    > the call to index dictionary
     > the index to call list
 
     If an adjacency matrix is already given then we add the counts to it
@@ -397,11 +314,11 @@ def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
     if call2index0 is None or index2call0 is None:
         adj0 = {}; call2index0 = {}; index2call0 = []
     assert( len(call2index0) == len(index2call0))# and len(adj0) >= len(call2index0) -1 )
-    # dictionaries must have the same lenght and adj at least the same lenght - 1
+    # dictionaries must have the same length and adj at least the same length - 1
 
     ### INICIALIZATIONS
     ## copy the values o avoid operating over a global mutable variable
-    adj = dict(adj0) # adjacenct dicitonary 
+    adj = dict(adj0) # adjacent dictionary 
     call2index = dict(call2index0)#.copy()  # call to index dict
     index2call = index2call0[:]  # index to call dict
     
@@ -412,15 +329,15 @@ def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
     sequence.append(call_1) # add end tolken to li
 
     if len(call2index) == 0: # if empty dict
-        print "inicializing"
+
         call2index[call_0] = 0
         call2index[call_1] = 1
-        index2call.insert(0, call_0)  # inicialize it w/ __INI
-        index2call.insert(1, call_1)  # inicialize it w/ __END
+        index2call.insert(0, call_0)  # initialise it w/ __INI
+        index2call.insert(1, call_1)  # initialise it w/ __END
 
     n = len(index2call)  # init with the no. of calls in the dict.
 
-    ### ITERATE OVER TOLKENS IN THE SEQUECE
+    ### ITERATE OVER TOLKENS IN THE SEQUENCE
     for call in sequence:
         if call not in call2index.keys():  # call in not in dict
             call2index[call] = n  # add call to dictionary
@@ -432,7 +349,7 @@ def bigramCounts( li, adj0=None, call2index0=None, index2call0=None):
             adj[call2index[call_0], call2index[call]] += 1
         else:
             adj[call2index[call_0], call2index[call]] = 1
-        call_0 = call # reeset previous call
+        call_0 = call # reset previous call
 
     return adj, call2index, index2call
 
@@ -449,7 +366,7 @@ def df2listOfSeqs( datB0, timeT=5, feature='call', shuffl=0):
   
     rec_datFrames, recs = sortedRecDatFr(datB0, shuff=shuffl)  # dataframes by recording sorted temporally
     seqsLi += [ seqsFromRec(rec_datFrames[rec], timeT, feature).sequences for rec in rec_datFrames ]  # list of sequences by rec
-    thisGrSeqs = [item for sublist in seqsLi for item in sublist]  # flatter the list of sequecne so taht they are no longer separated by recording
+    thisGrSeqs = [item for sublist in seqsLi for item in sublist]  # flatter the list of sequence so that they are no longer separated by recording
     return thisGrSeqs
 
 def listOfSeqs( datB0, groupN=[], timeT=5, feature='call', shuffl=0):
@@ -459,8 +376,8 @@ def listOfSeqs( datB0, groupN=[], timeT=5, feature='call', shuffl=0):
     ! assumes that the recording names are not repeated. CHECK whether this holds
     < datB0, dataframe with the calls (feature) and the timestamps
     < groupN = [], gives the option to create the list of sequences for
-        various groups, without mixing the sequences accross groups
-    > list of lists, where the lists are que sequences.
+        various groups, without mixing the sequences across groups
+    > list of lists, where the lists are the sequences.
     """
     seqsLi = []
     for gr in groupN:
@@ -471,7 +388,7 @@ def listOfSeqs( datB0, groupN=[], timeT=5, feature='call', shuffl=0):
         rec_datFrames, recs = sortedRecDatFr(datB, shuff=shuffl)  # dataframes by recording sorted temporally
         seqsLi += [ seqsFromRec(rec_datFrames[rec], timeT, feature).sequences for rec in rec_datFrames ]  # list of sequences by rec
 
-    thisGrSeqs = [item for sublist in seqsLi for item in sublist]  # flatter the list of sequecne so taht they are no longer separated by recording
+    thisGrSeqs = [item for sublist in seqsLi for item in sublist]  # flatter the list of sequence so that they are no longer separated by recording
     return thisGrSeqs
 
 
@@ -479,8 +396,8 @@ def listOfSeqs2BigramCounts(li, M=None, c2i=None, i2c=None):
     """
     transforms a list(li) of sequences into bigram counts
     returns:
-    beta - because inicializes the dicionaries from the calling of the function
-    giving the chance countinue adding bigrams to existing counts
+    beta - because initialises the dictionaries from the calling of the function
+    giving the chance continue adding bigrams to existing counts
     > bigrma counts dictionary (M)
     > call to index dictionary (c2i)
     > index to call array (i2c)
@@ -501,13 +418,13 @@ def listOfSeqs2BigramCounts(li, M=None, c2i=None, i2c=None):
 
 
 def getTimes(datB):
-    rec_datFrames, reccs = sortedRecDatFr(datB) # reccording data frames
+    rec_datFrames, reccs = sortedRecDatFr(datB) # recording data frames
     # time interval histogram
-    interDist = {rec: rec_datFrames[rec].intervals.values for rec in rec_datFrames} # intervals dictionary by reccording
+    interDist = {rec: rec_datFrames[rec].intervals.values for rec in rec_datFrames} # intervals dictionary by recording
 
-    # interval ditribution
+    # interval distribution
     allT = interDist.values() # all interval values
-    allT = np.asarray([item for subli in allT for item in subli]) # flattern the intervals
+    allT = np.asarray([item for subli in allT for item in subli]) # flatten the intervals
     allT.reshape((len(allT), 1)) # reshape for dictionary
     allT = allT[~np.isnan(allT)] #filter nans out
         
@@ -538,14 +455,14 @@ def tauNgramsMatrix(df, tau0=0, tauf=20, histSize=None):
 
 def normalize_2grams_dict(biGrmDict):
     """
-    this funciton gets a bigram dictionary with the bigram counts
-    and returns the normalized probablies
+    this function gets a bigram dictionary with the bigram counts
+    and returns the normalized probabilities
 
     Jul, 2014 (A)
     """
 
     assert( isinstance( biGrmDict, dict) )  # check input
-    counts2grm = {i_x[0]: 0 for i_x in biGrmDict.keys()} # inicialize normalized dictionary w/ zeros
+    counts2grm = {i_x[0]: 0 for i_x in biGrmDict.keys()} # initialize normalized dictionary w/ zeros
 
     # count the bigrams
     for A in counts2grm.keys(): # iterate the initial keys 'A'
@@ -645,7 +562,7 @@ def plDistributionAndRealVal_bar( dist, realVal = False, mu = False, h = False, 
 
 def adjBining( dists, Nbin0=5, minBinCont = 3, maxNbins=100 ):
     """
-    finds the number of bins such that no bin gets less than minBinCont
+    finds the number of bins such that no bin gets less than minBinCount
     * dists, an array with the bigram probabilities of the shufflings
 
     Jul, 2014 (B)
@@ -688,7 +605,7 @@ def printShuffledDistribution(datB, Nshuffl, baseN, minNumCalls=4,\
     ### Non shuffled data
     liS = df2listOfSeqs(datB, timeT=timeT, feature=feature, shuffl=0)  # define seqs
     NBiG0, c2i, i2c = listOfSeqs2BigramCounts(liS)  # count bigrams
-    df = pd.DataFrame(NBiG0, index=range(1))  # inicialize dataframe w/ the counts
+    df = pd.DataFrame(NBiG0, index=range(1))  # initialize dataframe w/ the counts
     NBiG_normalized = normalize_2grams_dict(NBiG0)  # normalize bigrams
     newDf = pd.DataFrame(NBiG_normalized, index=np.arange(1))  # dict -> dataFrame
     df = pd.concat([df, newDf], ignore_index=True)  # concat dataFrames
@@ -700,10 +617,10 @@ def printShuffledDistribution(datB, Nshuffl, baseN, minNumCalls=4,\
     else:
         normfun = lambda x : x
         
-    for i in range(Nshuffl):  # SHUFFLE, Nshuffl=1 was inicialization => substract 1
-        liS = df2listOfSeqs(datB, timeT=timeT, feature=feature, shuffl=1)  # this group slection just double checks
+    for i in range(Nshuffl):  # SHUFFLE, Nshuffl=1 was initialisation => subtract 1
+        liS = df2listOfSeqs(datB, timeT=timeT, feature=feature, shuffl=1)  # this group selection just double checks
 
-        X = {j: 0 for j in NBiG0.keys()}  # inicialize adj dictionary
+        X = {j: 0 for j in NBiG0.keys()}  # initialise adj dictionary
 
         print(i)
         NBiG, c2i, i2c = listOfSeqs2BigramCounts(liS, X, c2i, i2c)  # bigrams

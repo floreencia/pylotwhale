@@ -238,6 +238,89 @@ def get_ici_i_DictSeries(df_dict, timeLabel='ict_end_start', i=1, fun=np.log,
     return s1, s2
 
 
+
+#### PLOTTING
+
+def plTimeIntervals(datB, plTitle='', outFig='', shuffl=0,
+                    maxNTicks=False, TLims=(0, 19), frac=0, xLabel='ict [s]', yLabel='N'):
+    """
+    DEPRECATE
+    time interval distributions
+    takes:
+    < datB, data frame we whant to look into the time stamps
+    < groupN, this is only given for the naming of the output plot
+    < outFig, can be: outDir+"timeDistHist_%s.eps"%groupN
+    * frac, display a line at the value of T below which frac*100%
+            of the call pars are semarated, e.e, frac =0.75
+
+    and returnsplots an histogram in the image folder
+
+    """
+    rec_datFrames, recs = sortedRecDatFr(datB, shuff=shuffl)  # recording data frames
+
+    # time interval histogram
+    interDist = {rec: rec_datFrames[rec].intervals.values for rec in rec_datFrames}  # intervals dictionary by recording
+
+    # interval ditribution
+    allT = list(interDist.values())  # all interval values
+    allT = np.asarray([item for subli in allT for item in subli])  # flattern the intervals
+    allT.reshape((len(allT), 1))  # reshape for dictionary
+    allT = allT[~np.isnan(allT)]  #filter nans out
+    print( np.shape(allT), allT.min(), allT.max())
+
+     # histogram
+    fig, ax = plt.subplots(figsize=(6,3))
+    cax = ax.hist(allT[~np.isnan(allT)], bins=allT.max(), color =([0, 0.49, 0.47]))
+    ax.set_xlim(TLims)
+    ax.set_xlabel(xLabel)
+    ax.set_ylabel(yLabel)
+    if maxNTicks: plt.locator_params(nbins=maxNTicks)
+
+    if frac:
+        Cumx = np.cumsum(cax[0])
+        Tot = sum(cax[0])
+        tbins = cax[1]
+        ax.axvline(x=sum(Cumx <= Tot * frac), linewidth=4, color=(1, 0.1, 0.0))#[(0, 0.7, 0.9)])
+        print("line at", sum(Cumx <= Tot * frac))
+
+    if plTitle: ax.set_title(plTitle)
+
+    if outFig: fig.savefig( outFig, bbox_inches='tight')
+    print("outFig:", outFig)
+
+    #return fig, ax
+
+def plTape(t, yRaw, plName='', scaleF = 20, lw = 0.05, title=''):
+    """
+    plots the calls vs. time
+    """
+    assert(len(t) == len(yRaw))
+
+    freq_call = sorted([(yRaw.count(ucall), ucall) for ucall in
+             np.unique(yRaw)], reverse=True, key=lambda x: x[0])  # sort calls
+    i2c_tape = [thisCall[1] for thisCall in freq_call]
+    c2i_tape = {i2c_tape[ix]: ix for ix in range(len(i2c_tape))}  # c2i
+    #print np.unique(yRaw), c2i_tape, i
+    #sys.exit()
+    y = [c2i_tape[item] for item in yRaw]
+    #print y[:5], i2c_tape, c2i_tape
+    # plot
+
+    #if not tapeN: tapeN = "%s%s%s"%(i2c_tape[0],len(i2c_tape), i2c_tape[-1])
+    #figN = outDir+"tape_%s.pdf"%tapeN
+    print(((t[-1] - t[0])/scaleF, np.min([np.max([1, len(freq_call) / 2]), 3])))
+    fig = pl.figure(figsize=((t[-1] - t[0]) / scaleF, np.min([np.max([1, len(freq_call) / 2]), 3])))
+    ax = fig.add_subplot(111)
+    pl.plot(t, y, marker='|', lw=lw, markeredgewidth=1.5)
+    ax.set_ylim(-0.5, len(c2i_tape))  # +0.1)
+    ax.set_xlim(t[0] - 5, t[-1] + 5)
+    ax.set_yticks(np.arange(len(c2i_tape)))
+    ax.set_yticklabels(i2c_tape, fontsize=8)
+    ax.set_xlabel('time [s]')
+    ax.set_title(title)
+    if plName: pl.savefig(plName, bbox_inches='tight')
+
+
 ### FOURIER
 
 def window_times(onset_times, t0, tf):
