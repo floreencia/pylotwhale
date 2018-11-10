@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Nov 13 17:45:10 2015
-@author: florencia
+Analyse annotations 
+-- plot annotated spectro
 """
 
 from __future__ import print_function
@@ -306,9 +306,10 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
             subLi = [fun(df[l].iloc[i+1])]  # start new squence
 
     seqsLi.append(subLi)  # append last sequence
-    
+
     return seqsLi    
-    
+
+
 def seqsLi2iniEndSeq(seqsLi, ini='_ini', end="_end"):
     '''list of sequences (list) --> sequence with delimiting tockens <ini> and <end>
         eg seqsLi2iniEndSeq([[A, B], [A, A, B]])
@@ -319,7 +320,8 @@ def seqsLi2iniEndSeq(seqsLi, ini='_ini', end="_end"):
         newL.extend(item)
         newL.extend([end])
     return newL
-    
+
+
 def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
     """takes a dictionary of dataframes (eg. tape-dataframes) and retuns the sequences as
     a list of sequences see df2listOfSeqs"""
@@ -331,13 +333,12 @@ def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
     
 
 def annsDf2lisOfSeqs(df, Dt=None, l='l'):
-    '''
-    reads an annotations dataframe [t0, tf, l] into a list of sequences
+    """reads an annotations dataframe [t0, tf, l] into a list of sequences
     Parameters:
     -----------
         Dt : 2-dim tuple time interval for filtering the sequences 
                 None :  (0, 0.5) seconds        
-    '''
+    """
     #assert len(Dt) == 2, "Dt must be 2 dimesional"
     
     df = df.reset_index(drop=True)

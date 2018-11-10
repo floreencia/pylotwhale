@@ -38,6 +38,7 @@ def teStat_proportions_diff(p1):
     """test statistic for differnce of proportions p1-p2"""
     return p1  # 2*p1-1
 
+
 def plDist_with_obsValue(i, j, shuffledDistsM, obsM, ax=None, plTitle=None,
                          kwargs_obs=None, **kwargs):
     """plot randomised distribution (distsM) with observable
@@ -558,20 +559,42 @@ def Gstatistics(O, E):
     assert(len(O) == len(E))
     assert np.all(O > 4), "less than five occurences in this class %s"%np.min(O)
     assert np.all(E > 4), "less than five occurences in this class %s"%np.min(E)
-    df = len(O)-1
+    df = len(O) - 1
     #print(O*np.log(O/E))
     G = 2*np.sum(O*np.log(O/E))
     return G, st.chisqprob(G, df)
-    
-    
-    
+
+
 ### DISTANCES AND COMPARISONS
-    
+
+
+def normalisePDF(p, rg=None):
+    """normalises p in a given range, rg
+
+    Parameters
+    ----------
+    p : ndarray (n, )
+        PDF
+    rg : ndarray (2, )
+        range where to normalise the PDF
+        if None ==> inrange = (0, 1)
+    Returns
+    -------
+    pn : ndarray (n, )
+        normalised PDF
+
+    """
+    if rg is None:
+        rg = np.array([0, 1])
+
+    return p / np.linalg.norm(p, ord=1) * len(p) / (rg[-1] - rg[0])
+
+
 def stat_testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     """
     z-test for the difference of proportions
     tests the null hypothesis
-    'two tailed' H0: p1 = p2, H1: 
+    'two tailed' H0: p1 = p2, H1:
     'right tail' H0: p1 - p2 , H1: p1 > p2
     'left tail' H0: p1 < p2
     where p1 and p2 are two proportions, random variables normaly distruibuted.
@@ -660,9 +683,27 @@ def KSsimilarity(feature_arr, i_diag=1):
     return p
 
 
-def KL_div_symm(x, y):
+def JS_divergence(P, Q):
+    """Jensen-Shannon divergence
+
+    Parameters
+    ----------
+    P, Q : array-like (n,)
+        probability distributions
+
+    based in stackoverflow's questions 15880133, answer by Doug Shore
+    """
+    ## normalise PDFs to compute M
+    Pn = P/np.linalg.norm(P, ord=1)
+    Qn = Q/np.linalg.norm(Q, ord=1)
+    M = (Pn + Qn) / 2
+    return (st.entropy(P, M) + st.entropy(Q, M))/2
+
+
+def KL_div_symm(P, Q):
     """returns the symmetric KL-divergence"""
-    return st.entropy(x, y) + st.entropy(y, x)
+    return st.entropy(P, Q) + st.entropy(Q, P)
+
 
 def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
     """computes the distance between probability distributions
@@ -683,7 +724,7 @@ def pairwise_probDists_distance(feature_arr, i_diag=1, dist_fun=KL_div_symm):
             p[i,j] = dist_fun(feature_arr[i], feature_arr[j])
     return p
 
-    
+
 def pairwise_probDists_distance_df(di, dist_fun=KL_div_symm):
     """
     di: dict of nd arrays
@@ -807,7 +848,7 @@ def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
 
 def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None,
                  **CV_kwargs):  #  bw_range=None):
-    '''fit KDE estimating using cross validation to estimate the bandwith'''
+    '''fit KDE, using cross validation to estimate the bandwith'''
 
     # get model
     kde = CVbw_KDE(x, kde_param_grid=kde_param_grid, **CV_kwargs)
