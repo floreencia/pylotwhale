@@ -1,21 +1,13 @@
 from __future__ import print_function, division
 
 import numpy as np
-#import scipy as sp
-#import scipy.stats as stats
 from collections import Counter
 import nltk
-import random
-from matplotlib import pyplot as plt
 import pandas as pd
 
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 
-#import pylab as pl
-#import sys
-#import time
-#import itertools as it
 import scipy.stats as st
 import statsmodels as sm
 
@@ -26,7 +18,7 @@ from seaborn import xkcd_palette
 
 
 """
-    Module for doing statistics
+    Tools for probability and statistics
     florencia @ 16.05.14
 
 """
@@ -35,7 +27,7 @@ from seaborn import xkcd_palette
 ##### RANDOMISATIONS TEST FOR BIGRAMS ######
 
 def teStat_proportions_diff(p1):
-    """test statistic for differnce of proportions p1-p2"""
+    """test statistic for difference of proportions p1-p2"""
     return p1  # 2*p1-1
 
 
@@ -65,7 +57,7 @@ def repsProportion(seq, deg=1):
 
 
 def repsProportion_in_listOfSeqs(liOfSeqs, deg=1):
-    """proportion of repetitions in a list of sequeces
+    """proportion of repetitions in a list of sequences
     liOfSeqs: list of lists
     """
     Nbigrams = 0
@@ -165,7 +157,7 @@ def randomisation_test_repetitions(df_dict, Dtint, obsStat, Nsh, callsLi,
                                    label='call', time_param='ici',
                                    testStat=repsProportion_from_bigramMtx):
     """randomisation test for repetitions within the interval Dtint
-    shuffle tapes within a tape, define Dtint-seqeunces and count repetitions
+    shuffle tapes within a tape, define Dtint-sequences and count repetitions
     Parameters
     ----------
     df_dict: dict
@@ -220,7 +212,7 @@ def shuffleSeqOfSeqs(seqOfSeqs):
 
 
 def superSequenceSlicer(seqOfSeqs):
-    '''Returns the an array with the indices to slize back
+    '''Returns the an array with the indices to slice back
     Parameters
     ----------
     seqOfSeqs: list of lists
@@ -285,7 +277,7 @@ def randomisation_test4bigrmas_inSequences(seqOfSeqs, df_obsStat, Nsh, condsLi, 
     """DEPRECATED: use randtest4bigrmas_inSequences
     """
 
-    ## define array to slice supperSequnces back into the squences
+    ## define array to slice superSequences back into the sequences
     seq_slicer = superSequenceSlicer(seqOfSeqs)#np.cumsum(np.array([len(item) for item in seqOfSeqs]))
 
     ## define super sequence vector
@@ -466,10 +458,6 @@ class shuffleSequence(baseSequence):
         return seqO
         
 
-
-#class shuffleSequence(sequence):
-
-
 #### plotting
 
 def pValue_3colour(p, pc=0.05):
@@ -529,36 +517,36 @@ def tabularChiSquare(p, df):
     by default the st package measures the proportion under a curve (like chi-sq)
     form left to right which is the most natural. However, the common practice
     when doing a chi-square statistics is to take the proportion of the area
-    from right to left, tht'a why we difine this function.
+    from right to left, that's why we define this function.
     """
     return st.chi2._ppf(1 - p, df)
 
 
 def chiSquare(O, E):
     '''
-    chisquare test of an observed frquencies (O)
+    chisquare test of an observed frequencies (O)
     against the expected E assuming H0 is true. 
-    the same as st.shisquare()
+    the same as st.chisquare()
     > chi-square
-    > p-alue corresponding to the computed chi-square
+    > p-value corresponding to the computed chi-square
     '''
     assert(len(O) == len(E))
-    assert np.all(O > 4), "less than five occurences in this class %s"%np.min(O)
-    assert np.all(E > 4), "less than five occurences in this class %s"%np.min(E)
+    assert np.all(O > 4), "less than five occurrences in this class %s"%np.min(O)
+    assert np.all(E > 4), "less than five occurrences in this class %s"%np.min(E)
     df = len(O)-1
     Xsquare = np.sum((O-E)**2/E)
     return Xsquare, st.chisqprob(Xsquare, df)
     
 def Gstatistics(O, E):
     '''
-    chisquare test of an observed frquencies (O)
+    chisquare test of an observed frequencies (O)
     against the expected E assuming H0 is true. 
     > chi-square
-    > p-alue corresponding to the computed chi-square
+    > p-value corresponding to the computed chi-square
     '''
     assert(len(O) == len(E))
-    assert np.all(O > 4), "less than five occurences in this class %s"%np.min(O)
-    assert np.all(E > 4), "less than five occurences in this class %s"%np.min(E)
+    assert np.all(O > 4), "less than five occurrences in this class %s"%np.min(O)
+    assert np.all(E > 4), "less than five occurrences in this class %s"%np.min(E)
     df = len(O) - 1
     #print(O*np.log(O/E))
     G = 2*np.sum(O*np.log(O/E))
@@ -597,13 +585,13 @@ def stat_testDiffProportions(p1, p2, n1, n2, pcValue=0.9, test='two'):
     'two tailed' H0: p1 = p2, H1:
     'right tail' H0: p1 - p2 , H1: p1 > p2
     'left tail' H0: p1 < p2
-    where p1 and p2 are two proportions, random variables normaly distruibuted.
+    where p1 and p2 are two proportions, random variables normally distributed.
 
     Returns
     --------
     y[0]: 1 reject H0, -1 cannot reject H0
     y[1]: z- value
-    y[2]: z-critical value correspondent to the given pc-avlue
+    y[2]: z-critical value correspondent to the given pc-value
     """
     #assert(test == 'two')  # TODO: EXTEND TO RIGHT AND LEFT TESTS!
     assert(np.logical_and( p1 <= 1, p2 <= 1))
@@ -667,7 +655,7 @@ def KSsimilarity(feature_arr, i_diag=1):
     Similarity is measured as the p-values of the KS-test
     p=1 distributions were drawn from the same pdf,
     the closer p is to zero the more different are the distributions
-    returns only the lower traingle, upper traingle is set up to nan
+    returns only the lower triangle, upper triangle is set up to nan
     Parameters
     ----------
     feature_arr: list
@@ -848,7 +836,7 @@ def get_KDE_CVbw(x, kde_param_grid=None, **CV_kwargs):
 
 def fit_KDE_CVbw(x, supp_range, num=1000, kde_param_grid=None,
                  **CV_kwargs):  #  bw_range=None):
-    '''fit KDE, using cross validation to estimate the bandwith'''
+    '''fit KDE, using cross validation to estimate the bandwidth'''
 
     # get model
     kde = CVbw_KDE(x, kde_param_grid=kde_param_grid, **CV_kwargs)
@@ -899,5 +887,3 @@ def deZero(x, n=0, epsilon0=0):
     epsilon =np.sort(np.array(list(set(x))))[n] # list(set(np.sort(x[x > 0]))[n]
     x += epsilon + epsilon0
     return x
-
-
