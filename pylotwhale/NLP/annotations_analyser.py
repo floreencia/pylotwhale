@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-Analyse annotations 
--- plot annotated spectro
+Tools for exploring and validating annotated recordings and 
+for analysing the annotations.
 """
 
 from __future__ import print_function
@@ -9,10 +8,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-#import networkx as nx
 
 import pylotwhale.signalProcessing.signalTools_beta as sT
-#import pylotwhale.utils.whaleFileProcessing as fp
 import pylotwhale.utils.annotationTools as annT
 
 
@@ -24,7 +21,7 @@ def isLast_tf_theLargest(t):
     return np.max(t) == t[-1]
 
 def whereOverlaps(t0, tf):
-    '''returns an np.array with the line indexs, starting from 0'''
+    '''returns an np.array with the line indexes, starting from 0'''
     tbin = np.zeros(len(tf), dtype=bool)
     for i in range(len(tf)-1):
         tbin[i+1] = (t0[i+1] < tf[:i+1]).any()
@@ -94,7 +91,7 @@ def plotAnnotatedSpectro(wavFi, annFi, outDir, callAsTitle=True, figsize=None, d
     ax.imshow(M.T, aspect='auto', origin='bottom', #interpolation='nearest', 
               extent=[0, tf, 0, fs/2/1000.], **kwargs)
     ax.set_xlabel('time (s)')
-    ax.set_ylabel('frequecy (KHz)')
+    ax.set_ylabel('frequency (KHz)')
     ### read annotations
     annD = annT.parseAupFile(annFi)
     ## custom ann clrs
@@ -142,7 +139,7 @@ class annotationsDF():
         """
         class for processing annotations
         ict (gaps), call length
-        Parametrs:
+        Parameters
         ----------
             df : dataframe with the annotations info
             names : names of the df columns
@@ -205,7 +202,7 @@ class file2annotationsDF(annotationsDF):
         ict (gaps), call length
         Parameters
         ----------
-        path2file : path to a somple (eg. csv) text file
+        path2file : path to a sample (eg. csv) text file
         names : names of the columns
             default = ['t0', 'tf', 'l']
         """
@@ -214,10 +211,6 @@ class file2annotationsDF(annotationsDF):
         self.annotations_file = path2file
         df = pd.read_csv(self.annotations_file, sep ='\t', names=names )
         annotationsDF.__init__(self, df, names)
-
-
-### TIMING ####
-### stats plots
 
 
 ### chuck structure
@@ -241,7 +234,7 @@ def flattenlists_2darray(liofli):
     """Maps a list of lists into a 2d ndarray filling with zeroes"""
     n_rows = len(liofli)
     n_cols = len(liofli[-1])
-    twoDarray = np.zeros((n_rows, n_cols)) # inicialise
+    twoDarray = np.zeros((n_rows, n_cols)) # initialise
     
     for i in np.arange(n_rows):
         item = liofli[i]
@@ -257,21 +250,19 @@ def Ngrams_distributionDt_ndarray(df_tapes, Dtvec, seqLabel='call', time_param='
     return flattenlists_2darray(ngramsDt_li)
 
 def NgramsDist2callsInNgramsDist(ngrams_dist):
-    """transforms a ngram_distritribution matrix into a call in ngrams distribution"""
+    """transforms a ngram_distribution matrix into a call in ngrams distribution"""
     ngrams_nCalls_arr =  np.arange(1, ngrams_dist.shape[1]+1)
     return ngrams_dist*ngrams_nCalls_arr
     
 
-
 #### sequences
-
 
 def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_dtype = float):
     '''
     returns the sequences of <l>, chains of elements separated by the interval Dt
     Parameters:
     -----------
-        df : datadrame, must have a time column (time_param)
+        df : dataframe, must have a time column (time_param)
         time_param : name of the sequence definition time, default "ict"
         l : specifies the sequence type. default "calls"
             l can also be a list eg. ['call', 'ict'] but takes more time
@@ -295,7 +286,7 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
     else:
         assert False, 'wrong dtype'
 
-    seqsLi = []  # inicialise list of sequences
+    seqsLi = []  # initialise list of sequences
     subLi = [fun(df[l].iloc[0])]  # initialise sequence w/ first element
 
     for i in range(len(ict))[:endix]:
@@ -303,7 +294,7 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
             subLi.append(df[l].iloc[i+1])
         elif ict[i] >= Dt[1]:  # nope, then start a new sequence
             seqsLi.append(subLi)  # save the one we had
-            subLi = [fun(df[l].iloc[i+1])]  # start new squence
+            subLi = [fun(df[l].iloc[i+1])]  # start new sequence
 
     seqsLi.append(subLi)  # append last sequence
 
@@ -311,7 +302,7 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
 
 
 def seqsLi2iniEndSeq(seqsLi, ini='_ini', end="_end"):
-    '''list of sequences (list) --> sequence with delimiting tockens <ini> and <end>
+    '''list of sequences (list) --> sequence with delimiting tokens <ini> and <end>
         eg seqsLi2iniEndSeq([[A, B], [A, A, B]])
             [_ini, A, B, _end, _ini, A, A, B, _end]'''
     newL = []
@@ -323,7 +314,7 @@ def seqsLi2iniEndSeq(seqsLi, ini='_ini', end="_end"):
 
 
 def dfDict2listOfSeqs(dfDict, Dt=None, l='call', time_param='ict'):
-    """takes a dictionary of dataframes (eg. tape-dataframes) and retuns the sequences as
+    """takes a dictionary of dataframes (eg. tape-dataframes) and returns the sequences as
     a list of sequences see df2listOfSeqs"""
     seqsLi=[]
 
