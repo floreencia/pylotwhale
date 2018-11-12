@@ -13,3 +13,4 @@ Uses:
 * networkx 2.1
 * [librosa](https://github.com/bmcfee/librosa) 
 
+Have a look at the [demo notebook](https://github.com/floreencia/pylotwhale/blob/master/examples/segment_Bat_B.ipynb) to get started.
