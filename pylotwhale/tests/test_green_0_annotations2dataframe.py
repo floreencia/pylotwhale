@@ -44,7 +44,7 @@ import pylotwhale.NLP.myStatistics_beta as myst
 # In[5]:
 
 
-annsDir = '/home/florencia/profesjonell/bioacoustics/kurt/green/data/annotations/'
+annsDir = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/annotations/'
 
 
 # In[6]:

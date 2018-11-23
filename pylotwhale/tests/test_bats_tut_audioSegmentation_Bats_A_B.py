@@ -35,10 +35,10 @@ import pylotwhale.MLwhales.MLtools_beta as myML
 # In[7]:
 
 
-flacDir = '/home/florencia/profesjonell/bioacoustics/kdarras/data/flac/'
+flacDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/flac/'
 recl = 'file'
-oFigDir = '/home/florencia/profesjonell/bioacoustics/kdarras/data/images/'
-oDir = '/home/florencia/profesjonell/bioacoustics/kdarras/data/'
+oFigDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/images/'
+oDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/'
 
 clf_id_str = 'batA-batB'
 
