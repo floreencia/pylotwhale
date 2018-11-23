@@ -9,7 +9,7 @@ import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.signalProcessing.effects as eff
 from pylotwhale.utils.funTools import compose2
 
-import MLtools_beta as myML
+import pylotwhale.MLwhales.MLtools_beta as myML
 
 import pylotwhale.utils.whaleFileProcessing as fp
 from pylotwhale.utils.dataTools import stringiseDict
