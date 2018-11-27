@@ -73,7 +73,7 @@ print(id_str)
 # In[8]:
 
 
-cfile = '/home/florencia/profesjonell/bioacoustics/kurt/green/data/vervet_tc_annotations_df-1cs.txt'
+cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/vervet_tc_annotations_df-1cs.txt'
 
 df0 = pd.read_csv(cfile)
 

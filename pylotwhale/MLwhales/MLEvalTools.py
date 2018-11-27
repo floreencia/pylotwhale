@@ -1,5 +1,3 @@
-#!/usr/mprg/bin/python
-
 from __future__ import print_function, division
 import os
 import functools
@@ -15,8 +13,8 @@ import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.signalProcessing.audioFeatures as auf
 import pylotwhale.MLwhales.predictionTools as pT
 
-import MLtools_beta as myML
-import featureExtraction as fex
+import pylotwhale.MLwhales.MLtools_beta as myML
+import pylotwhale.MLwhales.featureExtraction as fex
 
 """
 Tools for evaluating classifiers
@@ -314,12 +312,11 @@ def printIterClfScores( fileN, clf, X, y, c0, comments=None, commtLi='#'):
                 f.write(comments+'\n')
                 
     ## write scores
-    S, P, R, F1 = clfScores( clf, X, y)			
+    S, P, R, F1 = clfScores( clf, X, y)		
     with open(fileN, 'a') as g:
-		g.write("%s, %s, %s, %s, %s\n"%(c0, S, 
-				', '.join(str(item) for item in P), 
-				', '.join(str(item) for item in R), 
-				', '.join(str(item) for item in F1) ) )
+        g.write("%s, %s, %s, %s, %s\n" % (c0, S, ', '.join(str(item) for item in P),
+                                          ', '.join(str(item) for item in R),
+                                            ', '.join(str(item) for item in F1)))
 
 ### confusion matrix
 

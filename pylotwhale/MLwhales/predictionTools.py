@@ -1,7 +1,7 @@
 from __future__ import print_function, division  # py3 compatibility
 import numpy as np
 import os
-import featureExtraction as fex
+import pylotwhale.MLwhales.featureExtraction as fex
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
 import pylotwhale.signalProcessing.audioFeatures as auf

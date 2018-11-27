@@ -21,7 +21,7 @@ import pandas as pd
 # In[10]:
 
 
-cfile = '/home/florencia/profesjonell/bioacoustics/kurt/green/data/vervet_annotations_df.txt'
+cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/vervet_annotations_df.txt'
 
 df_time = pd.read_csv(cfile)
 #df_time.head(20)
@@ -39,7 +39,7 @@ test_data()
 # In[12]:
 
 
-callTypeFile = '/home/florencia/profesjonell/bioacoustics/kurt/green/data/result_cluster_analysis.csv'
+callTypeFile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/result_cluster_analysis.csv'
 
 df_call0 = pd.read_csv(callTypeFile)
 df_call = df_call0[['name', 'sequence_nr', 'sex','context', 'calldur', 'cluster_two', 'cluster_four']]
