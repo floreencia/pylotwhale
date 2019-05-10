@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Functions for manipulating with data (pandas dataframes, dictionaries,
+Functions for manipulating data (pandas dataframes, dictionaries,
 lists): sorting, splitting, searching
 """
 
