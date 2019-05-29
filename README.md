@@ -2,15 +2,12 @@
 
 A python package for automatically annotating bioacoustic recordings.
 
-Uses:
+## Dependencies
 
-* numpy
-* matplotlib
-* scipy
-* scikit-learn 0.18
-* seaborn 0.9
-* nltk  3.2.1
-* networkx 2.1
-* [librosa](https://github.com/bmcfee/librosa) 
+If you are using `pip`, you can run `pip install -r requirements.txt`,
+and for `conda`, run `conda install --yes --file requirements.txt`
+using the proper interpreter or environment.
+
+## Example
 
 Have a look at the [demo notebook](http://nbviewer.jupyter.org/github/floreencia/pylotwhale/blob/master/examples/segment_Bat_B.ipynb) to get started.
