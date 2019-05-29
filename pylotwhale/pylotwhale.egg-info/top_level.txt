@@ -1,5 +1,0 @@
-MLwhales
-NLP
-signal-processing
-utils
-sequeces
