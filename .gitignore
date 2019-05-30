@@ -8,3 +8,6 @@ pylotwhale/MLwhales/configs/config.cfg
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Documentation
+doc/build
