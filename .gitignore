@@ -1,6 +1,7 @@
 *.pyc
 *~
 pylotwhale/MLwhales/configs/config.cfg
+*.egg-info
 
 
 # Byte-compiled / optimized / DLL files
