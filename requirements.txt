@@ -1,0 +1,8 @@
+numpy
+matplotlib
+scipy
+scikit-learn>=0.18
+seaborn>=0.9
+nltk>=3.2.1
+networkx>=2.1
+librosa
