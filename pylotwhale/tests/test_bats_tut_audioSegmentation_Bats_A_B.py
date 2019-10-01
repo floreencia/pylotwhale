@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # ### Tests loading audio from df with file name and annotation section
@@ -25,22 +24,22 @@ import pylotwhale.MLwhales.MLtools_beta as myML
 
 
 # # Train detector for bats A and B
-# 
+#
 # instance length 0.05s
-# 
+#
 # Using all data
-# 
+#
 # ## Dataset
 
 # In[7]:
 
 
-flacDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/flac/'
-recl = 'file'
-oFigDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/images/'
-oDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/'
+flacDir = "/home/florencia/profesjonell/bioacoustics/Kdarras/data/flac/"
+recl = "file"
+oFigDir = "/home/florencia/profesjonell/bioacoustics/Kdarras/data/images/"
+oDir = "/home/florencia/profesjonell/bioacoustics/Kdarras/data/"
 
-clf_id_str = 'batA-batB'
+clf_id_str = "batA-batB"
 
 # params
 sr = 192000
@@ -52,24 +51,24 @@ sum_ws = 10
 
 
 pDir = os.path.dirname(os.path.abspath(__file__))
-inF = os.path.join(pDir, 'data/annotations_301117.csv')
-#inF = '/home/florencia/profesjonell/bioacoustics/kdarras/data/annotations/annotations_301117.csv'
+inF = os.path.join(pDir, "data/annotations_301117.csv")
+# inF = '/home/florencia/profesjonell/bioacoustics/kdarras/data/annotations/annotations_301117.csv'
 df0 = pd.read_csv(inF)
 
 
 # ## Feature extraction settings
-# 
+#
 # Create pipeline for the feature extraction settings
-# 
+#
 # **y** settings
 
 # In[26]:
 
 
-classes = ['noise'] + clf_id_str.split('-')
+classes = ["noise"] + clf_id_str.split("-")
 lt = myML.labelTransformer(classes)
 
-df = df0[df0['type'].isin(classes)]
+df = df0[df0["type"].isin(classes)]
 
 
 # **X** settings
@@ -77,32 +76,35 @@ df = df0[df0['type'].isin(classes)]
 # In[12]:
 
 
-T_settings=[]
+T_settings = []
 
 #### preprocessing
 ## band pass filter
-filt = 'band_pass_filter'
+filt = "band_pass_filter"
 filtDi = {"fs": sr, "lowcut": 10000, "highcut": 100000, "order": 5}
-#T_settings.append(('bandFilter', (filt, filtDi)))
+# T_settings.append(('bandFilter', (filt, filtDi)))
 ## normalisation
-prepro = 'maxabs_scale'
+prepro = "maxabs_scale"
 preproDict = {}
-#T_settings.append(('normaliseWF', (prepro, preproDict)))
+# T_settings.append(('normaliseWF', (prepro, preproDict)))
 
 #### audio features
 auD = {}
 auD["fs"] = sr
 auD["NFFT"] = fft_ws
-overlap = 0; auD["overlap"] = overlap
-n_mels = 4; auD["n_mels"] = n_mels;
-fmin = 9000; auD["fmin"] = fmin;
-audioF = 'melspectro' #'MFCC'#
-T_settings.append(('Audio_features', (audioF, auD)))
+overlap = 0
+auD["overlap"] = overlap
+n_mels = 4
+auD["n_mels"] = n_mels
+fmin = 9000
+auD["fmin"] = fmin
+audioF = "melspectro"  #'MFCC'#
+T_settings.append(("Audio_features", (audioF, auD)))
 
 #### summ features
-summDict = {'n_textWS': sum_ws, 'normalise': True}
-summType = 'walking'
-T_settings.append(('summ', (summType, summDict)))
+summDict = {"n_textWS": sum_ws, "normalise": True}
+summType = "walking"
+T_settings.append(("summ", (summType, summDict)))
 
 print(T_settings)
 Tpipe = fex.makeTransformationsPipeline(T_settings)
@@ -118,24 +120,25 @@ feExFun = Tpipe.fun
 
 datO = myML.dataXy_names()
 
-classes = ['noise'] + clf_id_str.split('-')
+classes = ["noise"] + clf_id_str.split("-")
 
 for idx, s in df[:3].iterrows():
-    if s['type'] in classes: #
+    if s["type"] in classes:  #
 
-        t0 = s['tmin']
-        tf = s['tmax']
+        t0 = s["tmin"]
+        tf = s["tmax"]
         ## load waveform
-        y, sr = lb.core.load(os.path.join(flacDir, s[recl] + '.flac'), offset=t0,
-                              sr=None, duration=tf-t0)
-        #y = auf.getWavSec(y0, sr, t0, tf)
+        y, sr = lb.core.load(
+            os.path.join(flacDir, s[recl] + ".flac"), offset=t0, sr=None, duration=tf - t0
+        )
+        # y = auf.getWavSec(y0, sr, t0, tf)
         ## extract features
         try:
             M0 = feExFun(y)
         except AssertionError:
-            print(idx, s['type'], "skipping")
+            print(idx, s["type"], "skipping")
             continue
-        labs = np.repeat(s['type'], len(M0))
+        labs = np.repeat(s["type"], len(M0))
         datO.addInstances(M0, labs)
 
 
@@ -143,12 +146,13 @@ for idx, s in df[:3].iterrows():
 
 
 def test_load_df_data():
-    np.testing.assert_array_equal(lt.classes_ , np.array(['batA', 'batB', 'noise']))
-    assert(lt.targetNumNomDict() == {0: 'batA', 1: 'batB', 2: 'noise'})
-    assert(T_settings == 
-          [('Audio_features',
-          ('melspectro',
-           {'NFFT': 512, 'fmin': 9000, 'fs': 192000, 'n_mels': 4, 'overlap': 0})),
-             ('summ', ('walking', {'n_textWS': 10, 'normalise': True}))])
-    assert( datO.targetFrequencies() == {'noise': 68, 'batB': 4})
-
+    np.testing.assert_array_equal(lt.classes_, np.array(["batA", "batB", "noise"]))
+    assert lt.targetNumNomDict() == {0: "batA", 1: "batB", 2: "noise"}
+    assert T_settings == [
+        (
+            "Audio_features",
+            ("melspectro", {"NFFT": 512, "fmin": 9000, "fs": 192000, "n_mels": 4, "overlap": 0}),
+        ),
+        ("summ", ("walking", {"n_textWS": 10, "normalise": True})),
+    ]
+    assert datO.targetFrequencies() == {"noise": 68, "batB": 4}
