@@ -15,14 +15,13 @@ import pylotwhale.signalProcessing.signalTools_beta as sT0
 import pylotwhale.signalProcessing.signalTools as sT
 import pylotwhale.utils.annotationTools as annT
 
-#warnings.simplefilter('always', DeprecationWarning)
+# warnings.simplefilter('always', DeprecationWarning)
 
 ######     ANNOTATIONS     #########
 
 
-def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
-                 label='label', sr=None):
-    '''read annotated sections from a waveform
+def getAnnWavSec(wavFi, annFi, t0Label="startTime", tfLabel="endTime", label="label", sr=None):
+    """read annotated sections from a waveform
 
     Parameters
     ----------
@@ -44,14 +43,16 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
         mapping label of the annotation section to the waveform
         { <label>, <waveFormSection (np.array)> }
         [ { <label>, <waveFormSection> }, ... , { <label>, <waveFormSection> }]
-    '''
+    """
 
     sr = loadWaveform(wavFi, 0, 0, sr=sr)[1]
-    #waveform, fs = sT.wav2waveform(wavFi)  # read wav
+    # waveform, fs = sT.wav2waveform(wavFi)  # read wav
 
     if annFi is None:  # no annotations given
-        return([{label: os.path.basename(wavFi),
-                 'waveform': loadWaveform(wavFi, 0, None, sr=sr)[0]}], sr)
+        return (
+            [{label: os.path.basename(wavFi), "waveform": loadWaveform(wavFi, 0, None, sr=sr)[0]}],
+            sr,
+        )
     else:
         sectionsLi = []
         annLi = annT.parseAupFile(annFi)  # read annotations
@@ -59,15 +60,15 @@ def getAnnWavSec(wavFi, annFi, t0Label='startTime', tfLabel='endTime',
         t0 = annDi[t0Label]
         tf = annDi[tfLabel]
         l = annDi[label]
-        item = {label: l, 'waveform': loadWaveform(wavFi, t0, tf, sr=sr)[0]}
-        #getWavSec(waveform, fs, t0, tf)}
+        item = {label: l, "waveform": loadWaveform(wavFi, t0, tf, sr=sr)[0]}
+        # getWavSec(waveform, fs, t0, tf)}
         sectionsLi.append(item)
 
     return sectionsLi, sr
 
 
 def loadWaveform(wFile, t0=0, tf=None, sr=None):
-    '''Parameters
+    """Parameters
     -------------
     wFile : string
     t0 : float
@@ -81,10 +82,10 @@ def loadWaveform(wFile, t0=0, tf=None, sr=None):
         waveform
     fs : float
         sampling rate 
-    '''
+    """
 
     try:
-        dur = tf-t0
+        dur = tf - t0
     except TypeError:
         dur = None
 
@@ -106,18 +107,18 @@ def getWavSec(waveform, fs, t0, tf):
     """
     n0 = int(np.floor(fs * float(t0)))
     nf = int(np.ceil(fs * float(tf)))
-    return(waveform[n0:nf])
+    return waveform[n0:nf]
 
 
 def flatPartition(nSlices, vec_size):
-    '''
+    """
     returns the indexes that slice an array of size vec_size into nSlices
     Parameters
     ----------
         nSlices : number of slices
         vec_size : size of the vector to slice
-    '''
-    idx = np.linspace(0, vec_size, nSlices+1)
+    """
+    idx = np.linspace(0, vec_size, nSlices + 1)
     return np.array([int(item) for item in idx])
 
 
@@ -139,8 +140,7 @@ def time2indices(t_0, t_f, tIntervals_arr):
     """
     assert t_0 >= tIntervals_arr[0], "time sections should be within recording time (0, tf)"
     assert t_f <= tIntervals_arr[-1], "time sections should be within recording time (0, tf)"
-    idx_arr = np.where(np.logical_and(tIntervals_arr >= t_0,
-                                      tIntervals_arr <= t_f))[0]
+    idx_arr = np.where(np.logical_and(tIntervals_arr >= t_0, tIntervals_arr <= t_f))[0]
     if len(idx_arr) > 0:
         return idx_arr[0], idx_arr[-1]
     else:
@@ -148,7 +148,7 @@ def time2indices(t_0, t_f, tIntervals_arr):
         return idx_arr[0], idx_arr[0]
 
 
-def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
+def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps="b"):
     """reads annotations into m-instances labels array
     Parameters
     ----------
@@ -168,17 +168,16 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     labels_arr: ndarray (m, )
         array with the instance labels
     """
-    labels_arr = np.array([gaps]*int(m), dtype=object)   # initialise array
-    assert(len(T) == len(L)), "T and L must match in length"
+    labels_arr = np.array([gaps] * int(m), dtype=object)  # initialise array
+    assert len(T) == len(L), "T and L must match in length"
     assert isinstance(T, np.ndarray), "must be an ndarray"
     assert isinstance(L, np.ndarray), "must be an ndarray"
 
     ## Define labels order, first those not in the hierarchy
-    labelOrder = list(set(L) - set(labelsHierarchy)) \
-                + labelsHierarchy[::-1]
+    labelOrder = list(set(L) - set(labelsHierarchy)) + labelsHierarchy[::-1]
 
     tIntervals_arr = np.linspace(0, tf, m)
-    #assert labelsSet = set(labelsHierarchy)
+    # assert labelsSet = set(labelsHierarchy)
     ## overwrite sections hierarchically
     for l in labelOrder:  # for each label
         indices = np.where(L == l)[0]
@@ -186,34 +185,33 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
             t_0, t_f = T[i, :]  # get time itervals
             assert t_f > t_0, "time intervals should be positive"
             i_0, i_f = time2indices(t_0, t_f, tIntervals_arr)
-            labels_arr[i_0: i_f + 1] = l  # overwrite
+            labels_arr[i_0 : i_f + 1] = l  # overwrite
 
     return labels_arr
 
-def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
+
+def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps="b"):
     """reads annotations from file into instances"""
     if labelsHierarchy is None:
-        labelsHierarchy = ['c', 'w']
+        labelsHierarchy = ["c", "w"]
     T, L = annT.anns2TLndarrays(annFi)
-    if tf == 'auto':
-        tf = T[-1,-1] + 0.1
+    if tf == "auto":
+        tf = T[-1, -1] + 0.1
     return annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
 
 
-class annotations():
-    
+class annotations:
     def __init__(self, annFi):
         self.file_path = annFi
         self.T, self.L = annT.anns2TLndarrays(self.file_path)
-        self.tf = self.T[-1,-1]
+        self.tf = self.T[-1, -1]
+
     def as_array(self, m):
-        return annotations2instanceArray(T=self.T, L=self.L, m=m, tf=self.tf,
-                                         labelsHierarchy=[])
-    
+        return annotations2instanceArray(T=self.T, L=self.L, m=m, tf=self.tf, labelsHierarchy=[])
 
 
-def findLabel( stamp, stampLabelTu, i=0):
-    '''
+def findLabel(stamp, stampLabelTu, i=0):
+    """
     Returns the label associated with the given (time) stamp
     searching in the stampLabelTu
     Parameters:
@@ -229,7 +227,7 @@ def findLabel( stamp, stampLabelTu, i=0):
     --------
     > label, label of the "stamp"
     > i, index of the label
-    '''
+    """
     s, l = zip(*stampLabelTu)
 
     ## to big stamp
@@ -248,45 +246,46 @@ def findLabel( stamp, stampLabelTu, i=0):
 
 def setLabel(idx, annotTu):
     s, l = zip(*annotTu)
-    i=0
-    while s[i] < idx and i < len(s)-1 :
-        i+=1
+    i = 0
+    while s[i] < idx and i < len(s) - 1:
+        i += 1
 
-    return l[i-1], i#annoTu[]
+    return l[i - 1], i  # annoTu[]
+
 
 def tuLi2frameAnnotations(tuLiAnn, m_instances, tf):
-    '''
+    """
     transforms annotations
         list of tuples into --> instances annotations
     Parameters:
     tLiAnn : list of tuples (<start_time/start_frame_index>, <label>)
     m_instances : number of instances to annotate
     tf : final time/index of the file being annotated
-    '''
-    tstamps = np.linspace(0, tf, m_instances + 2 )[1:-1] # generate the time stamps of the instances
-    targetArr = np.zeros(m_instances, dtype=object) # inicialize the target array
-    i=0
+    """
+    tstamps = np.linspace(0, tf, m_instances + 2)[1:-1]  # generate the time stamps of the instances
+    targetArr = np.zeros(m_instances, dtype=object)  # inicialize the target array
+    i = 0
     for ix in np.arange(m_instances):
         l, i = findLabel(tstamps[ix], tuLiAnn, i)
         targetArr[ix] = l
     return targetArr
 
 
-
 ### normalisation tools
 
+
 def normalisationFun(funName=None, **kwargs):
-    '''
+    """
     Dictionary of normalisation
-    '''
-    D = {#'welch' : welchD,
+    """
+    D = {  #'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'normalize': sT0.spectralRep,
-        }
+        "normalize": sT0.spectralRep
+    }
 
 
 def normaliseMatrix(M):
-    '''normalises an ndarray dividing by the abs max'''
+    """normalises an ndarray dividing by the abs max"""
     normM = M / np.max(np.abs(M))
     return normM
 
@@ -294,15 +293,13 @@ def normaliseMatrix(M):
 #### FEATURE EXTRACTION and processing #####
 
 
-
-
-
 ####### SUMMARISATION
 
 ###### texturise features
 
+
 def summarisationFun(funName=None):
-    '''
+    """
     Dictionary of summarisations (=texturisations)
     returns of the requested summarisation function
     Parameters
@@ -310,20 +307,21 @@ def summarisationFun(funName=None):
     funName: str,
         name of the summarisation function
     Retuns: callble
-    '''
-    D = {#'welch' : welchD,
+    """
+    D = {  #'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'splitting': texturiseSplitting,
-        'walking':  texturiseWalking
-        }
+        "splitting": texturiseSplitting,
+        "walking": texturiseWalking,
+    }
 
-    if funName in D.keys(): # retuns a list of posible feature names
+    if funName in D.keys():  # retuns a list of posible feature names
         return D[funName]
     else:
         return D
-        
+
+
 def summariseMatrixFromSummDict(M, summariseDict):
-    '''
+    """
     Summarises M (n0_instances x n_features) according to the
     instructions in summariseDict. Eg:
     summariseDict = 
@@ -333,15 +331,15 @@ def summariseMatrixFromSummDict(M, summariseDict):
     Returns
     -------
     feature matrix, ndarray (n_summInstances, n_summFeatures)
-    '''
-    fun = summarisationFun(summariseDict['summarisation'])
+    """
+    fun = summarisationFun(summariseDict["summarisation"])
     settingsDir = dict(summariseDict)  # create new dict for the settings
-    del(settingsDir['summarisation'])  # remove summarisation
+    del settingsDir["summarisation"]  # remove summarisation
     return fun(M, **settingsDir)
 
 
 def texturiseSplitting(M, Nslices, normalise=False):
-    '''
+    """
     Summarises features matrix M splitting into Nslices
     along time instances
     M (n_time_instances x n_features)
@@ -351,26 +349,31 @@ def texturiseSplitting(M, Nslices, normalise=False):
         matrix to summarise
     nTextWS : int,
         size of the summarisation window
-    '''
+    """
     mt, nf = np.shape(M)
-    assert mt >= Nslices, 'Nslices ({}) should be smaller than the number \
-                            of instances({})'.format(Nslices, mt)
+    assert (
+        mt >= Nslices
+    ), "Nslices ({}) should be smaller than the number \
+                            of instances({})".format(
+        Nslices, mt
+    )
 
     slicingIdx = flatPartition(Nslices, mt)  # numpy array
-    m_instances = len(slicingIdx) - 1 # #(instances) = #(slicing indexes) - 1
-    fM = np.zeros((m_instances, 2*nf))
+    m_instances = len(slicingIdx) - 1  # #(instances) = #(slicing indexes) - 1
+    fM = np.zeros((m_instances, 2 * nf))
 
-    if normalise : M /= np.max(np.abs(M), axis=0) # the whole matrix
+    if normalise:
+        M /= np.max(np.abs(M), axis=0)  # the whole matrix
 
     for i in np.arange(m_instances):
-        thisX = np.array(M[slicingIdx[i] : slicingIdx[i+1], : ])
+        thisX = np.array(M[slicingIdx[i] : slicingIdx[i + 1], :])
 
-        fM[i,:] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
+        fM[i, :] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
     return fM
 
 
 def texturiseWalking(M, n_textWS, normalise=False):
-    '''
+    """
     Summarises features matrix M walking along time instances
     M (n_time_instances x n_features)
     Parameters
@@ -379,16 +382,18 @@ def texturiseWalking(M, n_textWS, normalise=False):
         matrix to summarise
     nTextWS : int,
         size of the summarisation window
-    '''
+    """
     mt, nf = np.shape(M)
-    assert mt >= n_textWS, 'texture window is larger than number of instances'
+    assert mt >= n_textWS, "texture window is larger than number of instances"
     ind = np.arange(0, mt - n_textWS + 1, n_textWS)  # sumarisation indexes
     m_instances = len(ind)  # number of instances of the new feature matrix
-    fM = np.zeros((m_instances, 2*nf))  # inicialise feature matrix
+    fM = np.zeros((m_instances, 2 * nf))  # inicialise feature matrix
 
     for i in np.arange(m_instances):
-        thisX = np.array(M[ind[i]: ind[i] + n_textWS, :]) # summarisation instance for all features
-        if normalise: # divide by the maximum
+        thisX = np.array(
+            M[ind[i] : ind[i] + n_textWS, :]
+        )  # summarisation instance for all features
+        if normalise:  # divide by the maximum
             thisX = normaliseMatrix(thisX)  # normalize each instance
         fM[i, :] = np.hstack((np.mean(thisX, axis=0), np.std(thisX, axis=0)))
     return fM
@@ -396,8 +401,9 @@ def texturiseWalking(M, n_textWS, normalise=False):
 
 #### FEATURE EXTRACTION and processing #####
 
+
 def featureExtractionFun(funName=None):
-    '''
+    """
     Dictionary of feature extracting functions
     returns function of the requested feature (str)
     or the feature options
@@ -408,33 +414,35 @@ def featureExtractionFun(funName=None):
         this functions take the waveform and return an instancited feature matrix
         m (instances) - rows
         n (features) - columns
-    '''
+    """
     print("\n\nyou are using sT0. use sT.audioFeaturesFun")
-    D = {#'welch' : welchD,
+    D = {  #'welch' : welchD,
         #'bandEnergy' : bandEnergy, ## sum of the powerspectrum within a band
-        'spectral': sT0.spectralRep,
-        'spectralDelta': functools.partial(sT0.spectralDspecRep, order=1),
-        'cepstral': sT0.cepstralRep,
-        'cepsDelta': functools.partial(sT0.cepstralDcepRep, order=1), # MFCC and delta-MFCC
-        'cepsDeltaDelta': functools.partial(sT0.cepstralDcepRep, order=2),
-        'chroma': sT0.chromaRep,
-        'melspectroDelta': sT0.melSpecDRep,
-        'melspectro': functools.partial(sT0.melSpecDRep, order=0)
-        }
+        "spectral": sT0.spectralRep,
+        "spectralDelta": functools.partial(sT0.spectralDspecRep, order=1),
+        "cepstral": sT0.cepstralRep,
+        "cepsDelta": functools.partial(sT0.cepstralDcepRep, order=1),  # MFCC and delta-MFCC
+        "cepsDeltaDelta": functools.partial(sT0.cepstralDcepRep, order=2),
+        "chroma": sT0.chromaRep,
+        "melspectroDelta": sT0.melSpecDRep,
+        "melspectro": functools.partial(sT0.melSpecDRep, order=0),
+    }
 
-    if funName == None: # retuns a list of posible feature names
+    if funName == None:  # retuns a list of posible feature names
         return D.keys()
     else:
-        return D[funName] # returns function name of the asked feature
+        return D[funName]  # returns function name of the asked feature
 
 
 ###############################################################################
 #### do you need this?
 #########################################################
 
-def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
-                          featExtrFun = sT0.cepstralRep, **featExArgs):
-    '''
+
+def featMatrixAnnotations(
+    waveform, fs, annotations=None, NanInfWarning=True, featExtrFun=sT0.cepstralRep, **featExArgs
+):
+    """
     Combines feature extraction with annotations
         --->>> No explicit texturiztion <<<--- (see waveform2featMatrix)
 
@@ -478,9 +486,10 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
                                                  annotations=annotLi_t,
                                                  **featConstD)
 
-    '''
+    """
     ## feature extraction
-    if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
+    if isinstance(featExtrFun, str):
+        featExtrFun = featureExtractionFun(featExtrFun)
     M, featNames, tf, featStr = featExtrFun(waveform, fs, **featExArgs)
 
     m_instances, n_features = np.shape(M)
@@ -488,13 +497,13 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
 
     ## ANNOTATIONS
     ## estimate the time stamps from the instances
-    tstamps = np.linspace(0, tf, m_instances + 2 )[1:-1]
+    tstamps = np.linspace(0, tf, m_instances + 2)[1:-1]
     ## inicialize the labels (target array)
     targetArr = np.zeros(m_instances, dtype=object)
     print("target array", np.shape(targetArr))
     ## determine the annotAtions of the extracted instances
     if annotations:
-        i=0
+        i = 0
         for ix in np.arange(m_instances):
             l, i = findLabel(tstamps[ix], annotations, i)
             targetArr[ix] = l
@@ -507,7 +516,7 @@ def featMatrixAnnotations(waveform, fs, annotations=None, NanInfWarning=True,
 
 
 def waveform2features(waveform, fs, transfsPipelinefun, annotations=None):
-    '''
+    """
     1. extract audio features
     2. texturizes them
         (computing the mean and std over a texture window, see texturizeFeatures)
@@ -521,22 +530,23 @@ def waveform2features(waveform, fs, transfsPipelinefun, annotations=None):
     Returns
     --------->
     M : feature matrix ( m x n )
-    '''
-    tf = len(waveform)/fs
+    """
+    tf = len(waveform) / fs
     M = transfsPipelinefun(waveform)
     m_instances, n_features = np.shape(M)
 
-    if annotations: # generate the targets for the instances
+    if annotations:  # generate the targets for the instances
         targetArr = tuLi2frameAnnotations(annotations, m_instances, tf)
     else:
         targetArr = np.zeros(m_instances, dtype=object)
 
     return M
 
-def waveform2featMatrix(waveform, fs, summariseDict,
-                        annotations=None,
-                        featExtrFun='cepsDelta', **featExArgs):
-    '''
+
+def waveform2featMatrix(
+    waveform, fs, summariseDict, annotations=None, featExtrFun="cepsDelta", **featExArgs
+):
+    """
     1. extract audio features
     2. texturizes them
         (computing the mean and std over a texture window, see texturizeFeatures)
@@ -567,26 +577,27 @@ def waveform2featMatrix(waveform, fs, summariseDict,
     > targetArr : target vector
     > featNames : feature names
     > featStr : string with feature extraction settings
-    '''
-    warnings.warn('use waveform2features', FutureWarning)
+    """
+    warnings.warn("use waveform2features", FutureWarning)
 
     ## audio feature extraction
-    if isinstance(featExtrFun, str): featExtrFun = featureExtractionFun(featExtrFun)
-    M0, featNames0, tf, featStr  = featExtrFun(waveform, fs, **featExArgs)
-    m0 = np.shape(M0)[0] ## number of frames
+    if isinstance(featExtrFun, str):
+        featExtrFun = featureExtractionFun(featExtrFun)
+    M0, featNames0, tf, featStr = featExtrFun(waveform, fs, **featExArgs)
+    m0 = np.shape(M0)[0]  ## number of frames
 
     ## summarisation of features
     M = summariseMatrixFromSummDict(M0, summariseDict=summariseDict)
-    summStr = '-'.join(['{}_{}'.format(ky, val) for ky, val in summariseDict.items()])
+    summStr = "-".join(["{}_{}".format(ky, val) for ky, val in summariseDict.items()])
 
-    #featStr ='-txWin%dms%d'%(textWS*1000, nTextWS) + summStr
+    # featStr ='-txWin%dms%d'%(textWS*1000, nTextWS) + summStr
 
     ## texturize features
-    #M = texturizeFeatures(M0, nTextWS=slicingIdx, normalize=normalize)
-    featNames = [str(fn) + 'mu' for fn in featNames0] + [str(fn) + 'std' for fn in featNames0]
+    # M = texturizeFeatures(M0, nTextWS=slicingIdx, normalize=normalize)
+    featNames = [str(fn) + "mu" for fn in featNames0] + [str(fn) + "std" for fn in featNames0]
     m_instances, n_features = np.shape(M)
 
-    if annotations: ## generate the targets for the instances
+    if annotations:  ## generate the targets for the instances
         targetArr = tuLi2frameAnnotations(annotations, m_instances, tf)
     else:
         targetArr = np.zeros(m_instances, dtype=object)
@@ -594,10 +605,10 @@ def waveform2featMatrix(waveform, fs, summariseDict,
     return M, targetArr, featNames, featStr
 
 
-def waveform2comboFeatMatrix(waveform, fs, textWS=0.2, normalize=True,
-                        annotations=None,
-                        featExtrFunLi=None):
-    '''
+def waveform2comboFeatMatrix(
+    waveform, fs, textWS=0.2, normalize=True, annotations=None, featExtrFunLi=None
+):
+    """
     Combined feature extraction
     like waveform2featMatri() but combining different feature extraction methods
     Parameters
@@ -616,34 +627,52 @@ def waveform2comboFeatMatrix(waveform, fs, textWS=0.2, normalize=True,
     > featNames : feature names
     > featStr : string with feature extraction settings
     ----
-    '''
+    """
 
-    if featExtrFunLi == None: #use all the posible features
+    if featExtrFunLi == None:  # use all the posible features
         featExtrFunLi = featureExtractionFun(None)
 
     feat = featExtrFunLi[0]
     print(feat)
-    X, tArr, fNs, fStr = waveform2featMatrix(waveform, fs, textWS=textWS,
-                                normalize=normalize, annotations=annotations,
-                                featExtrFun=featureExtractionFun(feat))
+    X, tArr, fNs, fStr = waveform2featMatrix(
+        waveform,
+        fs,
+        textWS=textWS,
+        normalize=normalize,
+        annotations=annotations,
+        featExtrFun=featureExtractionFun(feat),
+    )
 
     for feat in featExtrFunLi[1:]:
         print(feat)
-        M, targetArr, featNames, featStr = waveform2featMatrix(waveform, fs, textWS=textWS,
-                                normalize=normalize, annotations=annotations,
-                                featExtrFun=featureExtractionFun(feat))
+        M, targetArr, featNames, featStr = waveform2featMatrix(
+            waveform,
+            fs,
+            textWS=textWS,
+            normalize=normalize,
+            annotations=annotations,
+            featExtrFun=featureExtractionFun(feat),
+        )
         X = np.hstack((X, M))
-        #tArr = np.hstack((tArr, featNames))
+        # tArr = np.hstack((tArr, featNames))
         fNs = np.hstack((fNs, featNames))
         fStr += featStr
 
     return X, tArr, fNs, fStr
 
 
-
-def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0,
-                        overlap=0, normalize=True, featExtr='welch', **kwargs):
-    '''
+def tsFeatureExtraction(
+    y,
+    fs,
+    annotations=None,
+    textureWS=0.1,
+    textureWSsamps=0,
+    overlap=0,
+    normalize=True,
+    featExtr="welch",
+    **kwargs
+):
+    """
     returns  a time series with the spectral energy every textureWS (seconds)
     overlap [0,1)
     < y : signal (waveform)
@@ -658,51 +687,52 @@ def tsFeatureExtraction(y, fs, annotations=None, textureWS=0.1, textureWSsamps=0
     -->
     > feat_df : time series of the powerspectral density
     > targetArr : time interval of the texture window
-    '''
+    """
 
     ## set set (size of the texture window in samples)
-    if textureWS: step = 2**np.max((2, int(np.log(fs*textureWS)/np.log(2)))) # as a power of 2
-    if textureWSsamps: step = textureWSsamps
+    if textureWS:
+        step = 2 ** np.max((2, int(np.log(fs * textureWS) / np.log(2))))  # as a power of 2
+    if textureWSsamps:
+        step = textureWSsamps
 
     featExtrFun = featureExtractionFun(featExtr)
 
-    overl = int(step*overlap)
+    overl = int(step * overlap)
     feat_df = pd.DataFrame()
-    targetArr=[]
+    targetArr = []
     ix0 = 0
     ix = step
 
-    print("step:", step, "overlap", overl, "len signal", len(y),
-          "step (s)", 1.0*step/fs)
+    print("step:", step, "overlap", overl, "len signal", len(y), "step (s)", 1.0 * step / fs)
     while ix < len(y):
         yi = y[ix0:ix]  # signal section
         ix0 = ix - overl
         ix = ix0 + step
         di = featExtrFun(yi, fs)
         feat_df = feat_df.append(di, ignore_index=True)  # append the energy
-        if annotations : targetArr.append(setLabel(ix0 + step/2, annotations))
+        if annotations:
+            targetArr.append(setLabel(ix0 + step / 2, annotations))
 
-    return(feat_df, targetArr)
-
+    return (feat_df, targetArr)
 
 
 #####   FILE CONVERSIONS   #####
 
+
 def mf2wavLi(mf_file):
-    '''
+    """
     marsyas collection (mf) --> list of waves
     reads the list of wav files in a marsyas collecion file and returns them
     in a list
-    '''
+    """
     wF_li = []
 
     with open(mf_file) as f:
         for line in f:
-             wavF = line.split('.wav')[0]+'.wav' # parse wav file name
-             wF_li.append(wavF)
+            wavF = line.split(".wav")[0] + ".wav"  # parse wav file name
+            wF_li.append(wavF)
 
     return wF_li
 
 
-    
- ##  summarise
+##  summarise

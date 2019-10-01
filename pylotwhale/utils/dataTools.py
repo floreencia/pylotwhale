@@ -13,15 +13,16 @@ def arrShuffleSplit(arr, frac=0.5):
     n = len(arr)
     indices = np.arange(n)
     np.random.shuffle(indices)
-    idx = int(n*0.5)
+    idx = int(n * 0.5)
     return arr[indices[:idx]], arr[indices[idx:]]
 
 
 #### DATAFRAMES
 
-def dictOfGroupedDataFrames(df0, groupingKey='tape'):
-    '''groups a dataframe according to groupingKey
-    and returns a dictionary of data frames'''
+
+def dictOfGroupedDataFrames(df0, groupingKey="tape"):
+    """groups a dataframe according to groupingKey
+    and returns a dictionary of data frames"""
     df_dict = {}
     keysSet = set(df0[groupingKey])
     for t in keysSet:
@@ -30,7 +31,7 @@ def dictOfGroupedDataFrames(df0, groupingKey='tape'):
 
 
 def subsetdf(df, cs):
-    '''subset dataframe
+    """subset dataframe
     Parameters
     -----------
     df: pandas dataframe
@@ -40,26 +41,28 @@ def subsetdf(df, cs):
     Return
     ------
     constrained dataframe
-    '''
-    assert set(df.columns) > set(cs.keys()), "cs's keys should be columns of df \n{}".format(cs.keys())
+    """
+    assert set(df.columns) > set(cs.keys()), "cs's keys should be columns of df \n{}".format(
+        cs.keys()
+    )
     df_temp = []
     lastdf = df
     for k, v in cs.items():
         df_temp.append(lastdf[lastdf[k] == v])
-        lastdf=df_temp[-1]
+        lastdf = df_temp[-1]
 
-    return df_temp[-1].reset_index(drop=True) 
+    return df_temp[-1].reset_index(drop=True)
 
 
 def groupedCountsInDataFrame(df, group_key, count_key):
-    '''group dataframe by group_key and count the frequencies of group_key
+    """group dataframe by group_key and count the frequencies of group_key
     returns a Counters dictionary with group_key as keys
     Parameters:
     -----------
         df : data frame
         group_key : grouping key
         count_key : key to count
-    '''
+    """
     cd = {}
     for gr in set(df[group_key]):
         cd[gr] = Counter(df[df[group_key] == gr][count_key])
@@ -67,7 +70,7 @@ def groupedCountsInDataFrame(df, group_key, count_key):
 
 
 def get_indexColFromDataFrame(df, condFun):
-    '''returns the coordinates (index, column) of the values in
+    """returns the coordinates (index, column) of the values in
     a DataFrame that satisfy a condition
     Parameters
     ----------
@@ -78,13 +81,13 @@ def get_indexColFromDataFrame(df, condFun):
     ------
     indexCol: set of tuples
         set of index col tuples, {(i1, c1), ..., (in, cn)}
-        '''
+        """
     indexCol = set()
     for i, r in df.iterrows():
         for j, V in r.iteritems():
             if condFun(V):
                 indexCol |= {(i, j)}
-                #print(i,j, V)
+                # print(i,j, V)
     return indexCol
 
 
@@ -143,8 +146,8 @@ def filterIndicesForIct(ixArray, seqSize=2, diffCall=True):
         return ixArray[:-1][idx]
 
 
-def returnSequenceDf(df0, seq, label='call'):
-    '''returns the dataframe with the sequences (type label) of interest
+def returnSequenceDf(df0, seq, label="call"):
+    """returns the dataframe with the sequences (type label) of interest
     Parameters
     -----------
     df0: pandas dataframe
@@ -152,7 +155,7 @@ def returnSequenceDf(df0, seq, label='call'):
     label: column name in the df0 of the seq
     Returns
     -------
-    a pandas dataframe containing only the sequence'''
+    a pandas dataframe containing only the sequence"""
     ## Determine whether the call are different or the same
     if seq[0] == seq[1]:
         diffCall = False
@@ -160,20 +163,20 @@ def returnSequenceDf(df0, seq, label='call'):
         diffCall = True
     ## search indices with seq
     arr = df0[label].values
-    ix = filterIndicesForIct(search_sequence_numpy(arr, np.array(seq)),
-                           diffCall=diffCall)
+    ix = filterIndicesForIct(search_sequence_numpy(arr, np.array(seq)), diffCall=diffCall)
     return df0.loc[ix].reset_index()
 
 
 ##### DICTIONARIES
 
+
 def stringiseDict(di, distr):
-    '''converts a dictionary into string, supports dictionaries as values'''
+    """converts a dictionary into string, supports dictionaries as values"""
     for ky, val in di.items():  # for each element in the dictionary
         if isinstance(val, dict):
-            distr += '-'+stringiseDict(val, ky)
+            distr += "-" + stringiseDict(val, ky)
         else:
-            distr += '-{}_{}'.format(ky, val)
+            distr += "-{}_{}".format(ky, val)
     return distr
 
 
@@ -189,11 +192,16 @@ def ignoredKeys(di, ignoreKeys):
 
 
 def returnSortingKeys(di, minCounts=None, reverse=True):
-    '''keys that sort a dictionary
-        di : key --> num dictionary, eg. Counter dictionary'''
-    return np.array([item[0] for item in
-                    sorted(di.items(), key=lambda x: x[1], reverse=reverse)
-                    if item[1] >= minCounts])
+    """keys that sort a dictionary
+        di : key --> num dictionary, eg. Counter dictionary"""
+    return np.array(
+        [
+            item[0]
+            for item in sorted(di.items(), key=lambda x: x[1], reverse=reverse)
+            if item[1] >= minCounts
+        ]
+    )
+
 
 ### LISTS
 
@@ -201,12 +209,12 @@ def returnSortingKeys(di, minCounts=None, reverse=True):
 def isArraySorted(arr):
     """checks is arr is sorted increasingly
     arr: array like"""
-    x = [arr[i + 1] > arr[i] for i in np.arange(len(arr)-1)]
-    return(all(x))
+    x = [arr[i + 1] > arr[i] for i in np.arange(len(arr) - 1)]
+    return all(x)
 
 
 def flattenList(L):
-    '''flattens a list
+    """flattens a list
     Parameters
     ----------
     L : list
@@ -214,7 +222,7 @@ def flattenList(L):
     Returns
     -------
     flattedList : list
-    '''
+    """
     flattedList = []
     for sublist in L:
         flattedList += list(sublist)
@@ -222,7 +230,7 @@ def flattenList(L):
 
 
 def sliceBackSuperSequence(superSeq, seqSlicer):
-    '''
+    """
     Parameters
     ----------
     superSeq : ndarray
@@ -233,7 +241,7 @@ def sliceBackSuperSequence(superSeq, seqSlicer):
     -------
     seqOfSeqs: list
         list of lists
-    '''
+    """
     i0 = 0
     seqOfSeqs = []
     for i in seqSlicer:
@@ -242,28 +250,29 @@ def sliceBackSuperSequence(superSeq, seqSlicer):
     return seqOfSeqs
 
 
-def removeFromList(l0, l_ignore=['_ini', '_end']):
-    '''Removes l_ignore from l0
-    l0, l_ignore : list/np.array'''
+def removeFromList(l0, l_ignore=["_ini", "_end"]):
+    """Removes l_ignore from l0
+    l0, l_ignore : list/np.array"""
     return [item for item in l0 if item not in l_ignore]
 
 
-def removeElementWith(l0, l_ignore=['_ini', '_end']):
-    '''Removes any element containing any intersection with l_ignore
-    l0 : list of lists, l_ignore : list/np.array'''
+def removeElementWith(l0, l_ignore=["_ini", "_end"]):
+    """Removes any element containing any intersection with l_ignore
+    l0 : list of lists, l_ignore : list/np.array"""
     return [item for item in l0 if not any(set(l_ignore).intersection(item))]
 
 
 ### matrices \\ 2dim numpy array
 
+
 def matrixSubsample(M, rwl, cll, rwsbset, cllsbset):
-    '''Returns a subset of a matrix
+    """Returns a subset of a matrix
     Parameters:
     -----------
         M : matrix
         rwl, cll : rows and column labels
         rwsbset, cllsbset : row and label subsets
-    Returns: subset (Matrix, rw_labels, col_labels)'''
+    Returns: subset (Matrix, rw_labels, col_labels)"""
     IOrw = np.array([True if item in rwsbset else False for item in rwl])
     IOcl = np.array([True if item in cllsbset else False for item in cll])
     return M[IOrw, :][:, IOcl], rwl[IOrw], cll[IOcl]

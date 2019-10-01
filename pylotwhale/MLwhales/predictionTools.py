@@ -13,9 +13,8 @@ Tools for transforming classifier predictions into annotation sections and files
 ### WSD -- splitting -- PREDICT WAV SECTIONS (SOUND TYPE)
 
 
-def predictSoundSections(wavF, clf, lt, feExFun,
-                         outF='default', annSections='default'):
-    '''
+def predictSoundSections(wavF, clf, lt, feExFun, outF="default", annSections="default"):
+    """
     predicts and generates the annotations of the given wavF walking
 
     Parameters:
@@ -31,20 +30,22 @@ def predictSoundSections(wavF, clf, lt, feExFun,
         annotations out file name, default = wav base name + '-predictions'
     annSections : array
         sections to print, default = ['c']
-    '''
-    if outF == 'default':
+    """
+    if outF == "default":
         bN = os.path.basename(wavF)
-        outF = os.path.join(outDir, bN.replace('.wav', '-predictions.txt'))
+        outF = os.path.join(outDir, bN.replace(".wav", "-predictions.txt"))
 
     waveForm, fs = sT.wav2waveform(wavF)
 
-    oF = predictSectionsFromWaveform_genAnnotations(waveForm, fs, clf, lt, feExFun,
-                                       outF=outF, annSections=annSections)
+    oF = predictSectionsFromWaveform_genAnnotations(
+        waveForm, fs, clf, lt, feExFun, outF=outF, annSections=annSections
+    )
     return oF
 
 
-def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
-                                               outF, annSections='default'):
+def predictSectionsFromWaveform_genAnnotations(
+    waveform, fs, clf, lt, feExFun, outF, annSections="default"
+):
     """
     predicts the sections of a waveform and generates annotations
     walking along a waveform
@@ -64,17 +65,17 @@ def predictSectionsFromWaveform_genAnnotations(waveform, fs, clf, lt, feExFun,
         sections to print, default = ['c']
     """
 
-    if annSections == 'default':
-        annSections = ['c']
+    if annSections == "default":
+        annSections = ["c"]
 
     tf = 1.0 * len(waveform) / fs
-    M0 = feExFun(waveform) #, annotations=annotLi_t)
+    M0 = feExFun(waveform)  # , annotations=annotLi_t)
     y_pred = clf.predict(M0)
     annT.predictions2txt(lt.num2nom(y_pred), outF, tf, sections=annSections)
     return outF
 
 
-def predictAnnotations(waveform, fs, feExFun, lt, clf):  #, annSections=None):
+def predictAnnotations(waveform, fs, feExFun, lt, clf):  # , annSections=None):
     """
     predicts annotation sections of a waveform
     walking along a waveform
@@ -103,14 +104,16 @@ def predictAnnotations(waveform, fs, feExFun, lt, clf):  #, annSections=None):
     y_pred = clf.predict(M0)
     T, labels = annT.predictions2annotations(lt.num2nom(y_pred), tf)
     ### filter annotations to keep only annSections
-    #mask = np.in1d(labels, annSections) L[mask,:], labels[mask]
+    # mask = np.in1d(labels, annSections) L[mask,:], labels[mask]
     return T, labels
 
 
 ### WSD2
 
-def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
-                         readSections, dt=0): #keepSections=None
+
+def WSD2predictionsTLanns(
+    wavF, annWSD1, feExtFun, lt, WSD2_clf, readSections, dt=0
+):  # keepSections=None
     """Generate annotations using the WSD2
     reads the predicted sections from WSD1 to predicts
     the finer structure of the calls
@@ -141,19 +144,27 @@ def WSD2predictionsTLanns(wavF, annWSD1, feExtFun, lt, WSD2_clf,
         if l0 in readSections:  # if section of interest (c)
             thisWaveform = auf.getWavSec(waveform, fs, t0i - dt, t0f + dt)
             ## predict annotations
-            secT, secL = predictAnnotations(thisWaveform, fs, feExtFun,
-                                            lt, WSD2_clf)
+            secT, secL = predictAnnotations(thisWaveform, fs, feExtFun, lt, WSD2_clf)
             newSectT = secT + t0i - dt  # relative to the orginal ann sections
             newT_list.append(newSectT)
             newL_list.append(secL)
-            #outF = annT.save_TLannotations(newT, L, outF, opening_mode='a')
+            # outF = annT.save_TLannotations(newT, L, outF, opening_mode='a')
     newL = np.hstack((newL_list))
     newT = np.vstack((newT_list))
     return newT, newL
 
 
-def WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
-                readSections='default', labelsHierarchy='default'):
+def WSD2predict(
+    wavF,
+    template_annF,
+    WSD2_feExFun,
+    lt,
+    WSD2_clf,
+    m,
+    tf,
+    readSections="default",
+    labelsHierarchy="default",
+):
     """WSD2 predictions
     takes wavF, template_annF to predict instance labels with WSD2_clf
     Parameters
@@ -171,21 +182,22 @@ def WSD2predict(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, m, tf,
     y_pred_names: ndarray
         instance labels
     """
-    if readSections == 'default':
-        readSections = ['c']
-    if labelsHierarchy == 'default':
-        labelsHierarchy = ['c']
+    if readSections == "default":
+        readSections = ["c"]
+    if labelsHierarchy == "default":
+        labelsHierarchy = ["c"]
     ## ground truth vs. WSD2 annotations predictions
-    T, L = WSD2predictionsTLanns(wavF, template_annF, WSD2_feExFun, lt, WSD2_clf,
-                                 readSections=readSections)
+    T, L = WSD2predictionsTLanns(
+        wavF, template_annF, WSD2_feExFun, lt, WSD2_clf, readSections=readSections
+    )
     # instances
-    y_pred_names = auf.annotations2instanceArray(T, L, m, tf,
-                                                 labelsHierarchy=labelsHierarchy)
+    y_pred_names = auf.annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
     return y_pred_names
 
 
-def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
-                           readSections, keepSections='default', dt=0):
+def WSD2predictAnnotations(
+    wavF, annWSD1, feExtFun, lt, WSD2_clf, outF, readSections, keepSections="default", dt=0
+):
     """Generate annotations using the WSD2
     reads the predicted sections from WSD1 to predicts
     the finer structure of the calls
@@ -210,8 +222,8 @@ def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
     dt: float
         time buffer for reading around the desired annotation section
     """
-    if keepSections is 'default':
-        keepSections = ['c']
+    if keepSections is "default":
+        keepSections = ["c"]
     try:
         os.remove(outF)
     except OSError:
@@ -222,19 +234,20 @@ def WSD2predictAnnotations(wavF, annWSD1, feExtFun, lt, WSD2_clf, outF,
         if l0 in readSections:  # if section of interest (c)
             thisWaveform = auf.getWavSec(waveform, fs, t0i - dt, t0f + dt)
             ## predict annotations
-            T, L = predictAnnotations(thisWaveform, fs, feExtFun, lt,
-                                      WSD2_clf) #annSections=keepSections)
+            T, L = predictAnnotations(
+                thisWaveform, fs, feExtFun, lt, WSD2_clf
+            )  # annSections=keepSections)
             newT = T + t0i - dt  # relative to the orginal ann sections
             mask = np.in1d(L, keepSections)
-            outF = annT.save_TLannotations(newT[mask, :], L[mask], outF, opening_mode='a')
+            outF = annT.save_TLannotations(newT[mask, :], L[mask], outF, opening_mode="a")
     return outF
+
 
 ### PREDICT THE LABELS OF THE ANNOTATED SECTION IN A WAV FILE  (CALL TYPE)
 
 
-def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
-                                     sep='\t', stop=None):
-    '''read a collection (indexfile) of features (*.npy)
+def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None, sep="\t", stop=None):
+    """read a collection (indexfile) of features (*.npy)
     --> predict --> save predictions
     one prediction per file in the collection
     Parameters
@@ -252,35 +265,34 @@ def predictFeatureCollectionAndWrite(inFile, clf, lt, col=0, outFile=None,
     -------
     outFile: str
         path to output file
-    '''
+    """
     if outFile is None:
-        outFile = os.path.splitext(inFile)[0] + '-predictions.txt'
+        outFile = os.path.splitext(inFile)[0] + "-predictions.txt"
 
     try:  # remove file if exists
         os.remove(outFile)
     except OSError:
         pass
-    
 
     with open(inFile) as f:  # read lines
         lines = f.readlines()
 
-    with open(outFile, 'a') as g:  # predict
+    with open(outFile, "a") as g:  # predict
         g.write("#{}\n".format(lt.classes_))
         for li in lines[:stop]:
-            if li[0] != '#':
+            if li[0] != "#":
                 li = li.strip()
                 X = fex.loadAndFlattenX(li.split(sep)[col])
                 y = clf.predict(X)
                 y_probs = clf.predict_proba(X)
-                li += '\t{}\t{}\n'.format(lt.num2nom(y)[0], y_probs[0])
+                li += "\t{}\t{}\n".format(lt.num2nom(y)[0], y_probs[0])
             g.write(li)
     return outFile
 
 
-def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
-                                printProbs=False, readSections=None,
-                                printreadSectionsC=True):
+def TLpredictAnnotationSections(
+    wavF, annF, clf, featExtFun, lt, printProbs=False, readSections=None, printreadSectionsC=True
+):
     """generates annotations predicting audio section classes
     Parameters
     ----------
@@ -317,9 +329,19 @@ def TLpredictAnnotationSections(wavF, annF, clf, featExtFun, lt,
     return Tp, Lp
 
 
-def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
-                              sep='\t', printProbs=False, header='',
-                              readSections=None, printreadSectionsC=True):
+def predictAnnotationSections(
+    wavF,
+    annF,
+    clf,
+    featExtFun,
+    lt,
+    outFile=None,
+    sep="\t",
+    printProbs=False,
+    header="",
+    readSections=None,
+    printreadSectionsC=True,
+):
     """predicts annotations for call types sections
     Parameters
     ----------
@@ -341,13 +363,14 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
        TODO: recode to use TLpredictAnnotationSections
     """
 
-    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
+    if outFile is None:
+        outFile = os.path.splitext(annF)[0] + "-sectionPredictions.txt"
 
     try:  # remove file if exists
         os.remove(outFile)
     except OSError:
         pass
-                                       
+
     ## load files
     waveform, fs = sT.wav2waveform(wavF)
     T, L = annT.anns2TLndarrays(annF)
@@ -356,27 +379,28 @@ def predictAnnotationSections(wavF, annF, clf, featExtFun, lt, outFile=None,
     ## for each annotation section
     for i, label in enumerate(L):
         if label in readSections:
-            waveformSec = auf.getWavSec(waveform, fs, *T[i] )
+            waveformSec = auf.getWavSec(waveform, fs, *T[i])
             ## predict
             try:
-                M0 = featExtFun(waveformSec)  # estract features 
+                M0 = featExtFun(waveformSec)  # estract features
                 M = np.expand_dims(M0.flatten(), axis=0)
-                y_pred = lt.num2nom(clf.predict(M)) # predict label
+                y_pred = lt.num2nom(clf.predict(M))  # predict label
             except AssertionError:
                 y_pred = [label]
             ## write
-            with open(outFile, 'a') as f:
+            with open(outFile, "a") as f:
                 f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, *y_pred))
         elif printreadSectionsC:
-            with open(outFile, 'a') as f:
+            with open(outFile, "a") as f:
                 f.write("{}\t{}\t{}\t{}\n".format(T[i, 0], T[i, 1], label, label))
 
     return outFile
 
 
-def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
-                              sep='\t', printProbs=False, header=''):
-    '''
+def predictAnnotationSections0(
+    wavF, annF, clf, featExtFun, lt, outFile=None, sep="\t", printProbs=False, header=""
+):
+    """
     Predicts the label (call types) of each annotated section and writes 
     the prediction into outFile
     Parameters
@@ -391,9 +415,10 @@ def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
         feature extraction function
         or a dictionary with the feature extraction settings
         featureExtrationParams = dict(zip(i, i))
-    '''
+    """
     ### out file handling
-    if outFile is None: outFile = os.path.splitext(annF)[0] + '-sectionPredictions.txt'
+    if outFile is None:
+        outFile = os.path.splitext(annF)[0] + "-sectionPredictions.txt"
 
     try:  # remove file if exists
         os.remove(outFile)
@@ -406,10 +431,8 @@ def predictAnnotationSections0(wavF, annF, clf, featExtFun, lt, outFile=None,
     predictions = np.expand_dims(lt.num2nom(clf.predict(predO.X)), axis=1)
     if printProbs:
         predictions = np.hstack((predictions, clf.predict_proba(predO.X)))
-        header = '{}'.format(le.classes_)
+        header = "{}".format(le.classes_)
     ## save file
-    A = np.loadtxt(annF, delimiter='\t', dtype=object, ndmin=2) # usecols=[0,1])
-    np.savetxt(outFile, np.hstack((A, predictions)), fmt='%s',
-               delimiter = '\t', header=header)
+    A = np.loadtxt(annF, delimiter="\t", dtype=object, ndmin=2)  # usecols=[0,1])
+    np.savetxt(outFile, np.hstack((A, predictions)), fmt="%s", delimiter="\t", header=header)
     return outFile
-

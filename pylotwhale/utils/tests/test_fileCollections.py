@@ -11,17 +11,18 @@ import glob
 
 #### File loading functions
 sripts_dir = os.path.dirname(os.path.realpath(__file__))
-teFi = sripts_dir+'/text.txt'
+teFi = sripts_dir + "/text.txt"
+
 
 def test_get_path():
     return fcll.get_path(teFi)
 
 
 def test_concatFile_intoList():
-    return 2*len(fcll.concatFile_intoList(teFi)) == len(fcll.concatFile_intoList(teFi, teFi))
-       
+    return 2 * len(fcll.concatFile_intoList(teFi)) == len(fcll.concatFile_intoList(teFi, teFi))
+
+
 def test_areListItemsUnique():
-    x = ['a', 'b', 'c', 'd', 'e', 'b', 'f', 'e']
+    x = ["a", "b", "c", "d", "e", "b", "f", "e"]
     assert not fcll.areListItemsUnique(x)  # contains duplicated
     assert fcll.areListItemsUnique(set(x))  # sets have unique elements
-
