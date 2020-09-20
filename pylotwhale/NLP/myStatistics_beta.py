@@ -726,9 +726,25 @@ def pairwise_probDists_distance_df(di, dist_fun=KL_div_symm):
             #print(i, j)
             #df[i,j] = dist_fun(feature_arr[i], feature_arr[j])
             df.at[keys[i], keys[j]] = dist_fun(di[keys[i]], di[keys[j]])
-            df.at[keys[j], keys[i]] = df.at[keys[i], keys[j]]
+            #df.at[keys[j], keys[i]] = df.at[keys[i], keys[j]]
             
     return df
+
+
+def distance_toModel(model_dist, dists, dist_fun=KL_div_symm):
+    """
+    NOT YET TESTED
+    model_dist: np.array
+        distribution against which we compute the distances of all dists
+    dist: ndarray
+        array of distributions
+    di: dict of nd arrays
+        pdfs
+    """
+    D = np.zeros(len(dists))
+    D[:] = dist_fun(model_dist, dists[:,:])
+
+    return D
 
 
 def KL_div_joint(x, y, Nsh=10):
