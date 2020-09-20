@@ -42,8 +42,10 @@ import pylotwhale.utils.netTools as nT
 
 # In[3]:
 
+pDir = os.path.dirname(os.path.abspath(__file__))
 
-df_file = '/home/florencia/profesjonell/bioacoustics/noriega2018sequences/data/groupB_annotations_df.csv'
+df_file = os.path.join(pDir, 'data/groupB_annotations_df.csv')
+#df_file = '/home/florencia/profesjonell/bioacoustics/noriega2018sequences/data/groupB_annotations_df.csv'
 # load
 df = pd.read_csv(df_file)#; df= df0
 # tape separation
