@@ -221,7 +221,7 @@ def Ngrams_distributionDt_list(df_tapes, Dtvec, seqLabel='call', time_param='ict
     for Dt in Dtvec: # delta t iteration
         seqsLi = []
         for thisdf in df_tapes.values(): # tape iteration
-            seqsLi += df2listOfSeqs( thisdf, Dt=(None, Dt), l=seqLabel, 
+            seqsLi += df2listOfSeqs( thisdf, Dt=(float('-inf'), Dt), l=seqLabel, 
                                        time_param=time_param) # sequences list (of lists)
 
         seqlens = [ len(item) for item in seqsLi] # Ngrams --> N

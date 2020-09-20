@@ -25,18 +25,18 @@ df_100 = pd.DataFrame(np.hstack((np.random.randint(0,5,size=(100, 1)), np.random
 
 def test_df2listOfSeqs():
     ## NAN ending
-    Dt = (None, np.max(te_df['t'])) # one big sequence
+    Dt = (float('-inf'), np.max(te_df['t'])) # one big sequence
     assert len(aa.df2listOfSeqs(te_df, Dt, time_param='t')[0]) == len(te_df)
     
-    Dt = (None,0) # each element by its own
+    Dt = (float('-inf') , 0) # each element by its own
     assert len(aa.df2listOfSeqs(te_df, Dt, time_param='t')) == len(te_df)
 
     ## float ending
-    Dt = (None, np.max(te_df['t'])) # one big sequence
+    Dt = (float('-inf') , np.max(te_df['t'])) # one big sequence
     te_df2 = te_df[:-1]
     assert len(aa.df2listOfSeqs(te_df2, Dt, time_param='t')[0]) == len(te_df2)
     
-    Dt = (None,0) # each element by its own
+    Dt = (float('-inf') ,0) # each element by its own
     assert len(aa.df2listOfSeqs(te_df2, Dt, time_param='t')) == len(te_df2)
 
     

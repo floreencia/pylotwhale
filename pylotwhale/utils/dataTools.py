@@ -90,7 +90,6 @@ def get_indexColFromDataFrame(df, condFun):
 
 ### search sequence in PANDAS dataframe
 
-
 def search_sequence_numpy(arr, seq):
     """ Find sequence in an array
 
@@ -117,7 +116,7 @@ def search_sequence_numpy(arr, seq):
     M = (arr[np.arange(Na - Nseq + 1)[:, None] + r_seq] == seq).all(1)
 
     # Get the range of those indices as final output
-    if M.any > 0:
+    if M.any:
         return np.where(np.convolve(M, np.ones((Nseq), dtype=int)) > 0)[0]
     else:
         return np.array([])

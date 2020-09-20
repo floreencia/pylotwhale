@@ -24,8 +24,9 @@ import pylotwhale.NLP.myStatistics_beta as mysts
 
 # In[9]:
 
-
-cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/mice/data/sequenceFiles_df.txt'
+pDir = os.path.dirname(os.path.abspath(__file__))
+cfile = os.path.join(pDir, 'data/sequenceFiles_df.txt')
+#cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/mice/data/sequenceFiles_df.txt'
 
 df0 = pd.read_csv(cfile)
 
