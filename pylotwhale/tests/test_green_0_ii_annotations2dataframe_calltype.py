@@ -40,7 +40,8 @@ test_data()
 # In[12]:
 
 
-callTypeFile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/result_cluster_analysis.csv'
+callTypeFile = os.path.join(pDir, 'data/result_cluster_analysis.csv')
+#'/home/florencia/profesjonell/bioacoustics/Kurt/green/data/result_cluster_analysis.csv'
 
 df_call0 = pd.read_csv(callTypeFile)
 df_call = df_call0[['name', 'sequence_nr', 'sex','context', 'calldur', 'cluster_two', 'cluster_four']]
