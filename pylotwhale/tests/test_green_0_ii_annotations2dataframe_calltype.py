@@ -20,8 +20,9 @@ import pandas as pd
 
 # In[10]:
 
-
-cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/vervet_annotations_df.txt'
+pDir = os.path.dirname(os.path.abspath(__file__))
+cfile = os.path.join(pDir, 'data/vervet_annotations_df.txt')
+#cfile = '/home/florencia/profesjonell/bioacoustics/Kurt/green/data/vervet_annotations_df.txt'
 
 df_time = pd.read_csv(cfile)
 #df_time.head(20)

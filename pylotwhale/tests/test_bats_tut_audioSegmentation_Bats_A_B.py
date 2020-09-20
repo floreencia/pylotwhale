@@ -35,10 +35,12 @@ import pylotwhale.MLwhales.MLtools_beta as myML
 # In[7]:
 
 
-flacDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/flac/'
+pDir = os.path.dirname(os.path.abspath(__file__))
+flacDir = os.path.join(pDir, 'data')
+#flacDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/flac/'
 recl = 'file'
-oFigDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/images/'
-oDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/'
+#oFigDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/images/'
+#oDir = '/home/florencia/profesjonell/bioacoustics/Kdarras/data/'
 
 clf_id_str = 'batA-batB'
 
@@ -51,7 +53,6 @@ sum_ws = 10
 # In[8]:
 
 
-pDir = os.path.dirname(os.path.abspath(__file__))
 inF = os.path.join(pDir, 'data/annotations_301117.csv')
 #inF = '/home/florencia/profesjonell/bioacoustics/kdarras/data/annotations/annotations_301117.csv'
 df0 = pd.read_csv(inF)
