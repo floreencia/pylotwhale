@@ -69,7 +69,7 @@ def test_data():
 
 
 ## parameters and settings
-Dt = 0.3; Dtint = (None, Dt)
+Dt = 0.3; Dtint = (float('-inf'), Dt)
 ## define the sequences
 sequencesList0 = aa.dfDict2listOfSeqs(tapedf, Dt=Dtint, l='call', time_param='ici')
 ## filter out isolated calls (sequences of size one)

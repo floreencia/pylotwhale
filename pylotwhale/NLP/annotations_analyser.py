@@ -275,7 +275,7 @@ def df2listOfSeqs(df, Dt=None, l='call', time_param='ict_end_start', time_param_
     else:
         fun = lambda x: tuple(x)
  
-    if Dt is None: Dt = (None, 0.5)
+    if Dt is None: Dt = (float('-inf'), 0.5)
 
     ict = df[time_param].values
 
