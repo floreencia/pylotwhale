@@ -71,7 +71,7 @@ def audioFeaturesFun(funName=None):
         'chroma' : chromogram,
         'melspectroDelta' : melSpectral_nDelta,
         'melspectro' : functools.partial(melSpectral_nDelta, order=0),
-        'rms': librosa.feature.rmse
+        'rms': librosa.feature.rms
         }
 
     if funName in D.keys(): # returns a list of possible feature names
