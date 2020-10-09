@@ -1,6 +1,6 @@
 # PylotWhale
 
-[PylotWhale](https://github.com/floreencia/pylotwhale) is a Python package for automatically annotating bioacoustic recordings by combining available tools for machine learning (Scikit-learn) and audio signal processing (Librosa). With Pylotwhale you can handle annotated audio files, extract audio features and transform classifier predictions into annotation files. 
+[PylotWhale](https://github.com/floreencia/pylotwhale) is a Python package for automatically annotating bioacoustic recordings by combining available tools for machine learning (Scikit-learn) and audio signal processing (Librosa). With PylotWhale you can handle annotated audio files, extract audio features and transform classifier predictions into annotation files. 
 
 ## How does it work?
 
