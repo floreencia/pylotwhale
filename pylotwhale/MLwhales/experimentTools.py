@@ -95,7 +95,7 @@ class WSD_experiment(experiment):
         self.metric = metric
         
     def print_comments(self, start='', end='\n'):
-	"""time, collections, classes"""
+        '''time, collections, classes'''
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
         s += '\n# Labels H: {}'.format(self.labsHierarchy)
         self.print_in_out_file(start + s + end)
@@ -158,6 +158,8 @@ def run_experiment_WSD(train_coll, test_coll, test_frac,
     ----------
         train_coll: list
         test_coll: list
+        test_frac: float
+            fraction of the test set, eg. 0.2
         lt: ML.labelTransformer
         T_settings: list of tuples
         labelsHierachy: list of strings
@@ -273,7 +275,7 @@ class callClf_experiment(experiment):
         self.metric = metric
         
     def print_comments(self, start='', end='\n'):
-	"""time, collections, classes"""
+        '''time, collections, classes'''
         s = '# {}\n# Coll: {}'.format(self.time, self.train_coll)
         s += '\n# Labels H: {}'.format(self.labsHierarchy)
         self.print_in_out_file(start + s + end)
