@@ -9,7 +9,7 @@ Module for creating collections and handling paths of annotation files
 
 Some features are:
 - finding paths in directories
--check is the items of a collection are repeated
+- check is the items of a collection are repeated
 - creating collections by searching files in a directory
 
 A collection is a text file with paths to particular files,

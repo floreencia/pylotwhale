@@ -7,9 +7,12 @@ import numpy as np
 
 """
 x:
+- load annotation files to numpy arrays and back
 - transforming them into numpy arrays
 - replacing strings, e.g. commas
 - transforming classifier predictions to annotation files
+- change annotations format, eg. sonicvisualizer
+
 """
 
 ### load annotation files to numpy arrays and back

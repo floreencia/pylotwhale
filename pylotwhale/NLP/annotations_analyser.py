@@ -1,8 +1,3 @@
-"""
-Tools for exploring and validating annotated recordings and 
-for analysing the annotations.
-"""
-
 from __future__ import print_function
 import os
 import numpy as np
@@ -11,6 +6,11 @@ import pandas as pd
 
 import pylotwhale.signalProcessing.signalTools_beta as sT
 import pylotwhale.utils.annotationTools as annT
+
+"""
+Tools for exploring and validating annotated recordings and 
+for analysing the annotations. 
+"""
 
 
 ### annotations validity
@@ -150,9 +150,9 @@ class annotationsDF():
         if names is None: names=['t0', 'tf', 'l']
         self.Nsections =len(self.df)
         ### read times and stamps
-        self.t0 = self.df['t0'].values # initial times
-        self.tf = self.df['tf'].values # final times
-        self.labels = self.df['l'].values # section label - sound - call type
+        self.t0 = self.df[names[0]].values # initial times
+        self.tf = self.df[names[1]].values # final times
+        self.labels = self.df[names[1]].values # section label - sound - call type
         ### sounds and silences
         self.ict = self.t0[1:] - self.tf[:-1] # inter-call times
         self.calls_lengths = self.tf[:] - self.t0[:] # sound lengths

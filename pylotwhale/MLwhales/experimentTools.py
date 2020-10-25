@@ -69,6 +69,7 @@ class WSD_experiment(experiment):
     ----------
     train_coll, test_coll: list
         2 entry list --> path/to/wav.wav path/to/ann.txt
+    test_frac:
     lt: labelTransformer
     labsHierarchy: list
     cv: int
@@ -180,7 +181,7 @@ def run_experiment_WSD(train_coll, test_coll, test_frac,
     ## prepare X y data
     X0, y0_names = dataO.filterInstances(lt.classes_)  # filter for clf_labs
     if class_balance:
-	X0, y0_names = myML.balanceToClass(X0, y0_names, class_balance)
+    	X0, y0_names = myML.balanceToClass(X0, y0_names, class_balance)
     X, y_names = X0, y0_names #myML.balanceToClass(X0, y0_names, 'c')  # balance classes X0, y0_names#
     y = lt.nom2num(y_names)
     #labsD = lt.targetNumNomDict()
