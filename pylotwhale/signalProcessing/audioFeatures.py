@@ -191,7 +191,22 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
     return labels_arr
 
 def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
-    """reads annotations from file into instances"""
+    """reads annotations from file into instances
+    Parameters
+    ----------
+    annFi: str
+        path to file
+    m: int
+        number of instances
+    labelsHierarchy: list like object
+        hierarchy of the annotations in case of overlaps.
+        Only one label per instance, eg = ['c', 'w']
+    gaps: string,
+        label for the gaps
+    Returns
+    -------
+    labels_arr: ndarray (m, )
+        array with the instance labels"""
     if labelsHierarchy is None:
         labelsHierarchy = ['c', 'w']
     T, L = annT.anns2TLndarrays(annFi)
