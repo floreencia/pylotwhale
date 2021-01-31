@@ -23,15 +23,15 @@ def anns2array(annF):
     return np.genfromtxt(annF, dtype=None)
 
 
-def loadAnnLabels(fi, cols=(2,)):
+def loadAnnLabels(fi, cols=(2,), sep=None):
     """Loads labels from annotations file (3rd column)"""
-    return np.loadtxt(fi, dtype=object, usecols=cols, ndmin=1)
+    return np.loadtxt(fi, dtype=object, usecols=cols, ndmin=1, delimiter=sep)
 
 
-def anns2TLndarrays(fi, Tcols=(0, 1), Lcols=(2, )):
+def anns2TLndarrays(fi, Tcols=(0, 1), Lcols=(2, ), sep=None):
     """like anns2array but returns 2 ndarrays T (n, 2) and L (n,)"""
-    T = np.loadtxt(fi, usecols=Tcols, ndmin=2)
-    L = loadAnnLabels(fi, cols=Lcols)
+    T = np.loadtxt(fi, usecols=Tcols, ndmin=2, delimiter=sep)
+    L = loadAnnLabels(fi, cols=Lcols, sep=sep)
     return T, L
 
 

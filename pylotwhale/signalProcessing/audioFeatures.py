@@ -190,7 +190,8 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
 
     return labels_arr
 
-def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
+def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b',
+                            sep=None):
     """reads annotations from file into instances
     Parameters
     ----------
@@ -209,7 +210,7 @@ def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b'):
         array with the instance labels"""
     if labelsHierarchy is None:
         labelsHierarchy = ['c', 'w']
-    T, L = annT.anns2TLndarrays(annFi)
+    T, L = annT.anns2TLndarrays(annFi, sep=sep)
     if tf == 'auto':
         tf = T[-1,-1] + 0.1
     return annotations2instanceArray(T, L, m, tf, labelsHierarchy=labelsHierarchy)
