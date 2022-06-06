@@ -156,6 +156,8 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
         time intervals
     L: ndarray (m,) str
         labels
+    tf: float
+        final time
     m: int
         number of instances
     labelsHierarchy: list like object
