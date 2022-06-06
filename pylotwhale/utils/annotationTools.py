@@ -4,7 +4,6 @@ import os
 
 import numpy as np
 
-
 """
 x:
 - load annotation files to numpy arrays and back
