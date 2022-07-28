@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
+'''Update paths and rename as constants.py'''
 
 import os
 
 TEST = 1
 
-BASE_PATH = '/Users/florencia/Science/code/pylotwhale/examples'
-AUDIOS_DIR_PATH = '/Users/florencia/Science/datasets/audio/AudioMNIST/data'
+BASE_PATH = '/path/to/pylotwhale/examples'
+AUDIOS_DIR_PATH = '/path/to/AudioMNIST/data'
 
 LABELLED_COLL = os.path.join(BASE_PATH, 'audios_collection.csv')
 
