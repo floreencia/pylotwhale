@@ -327,6 +327,40 @@ class wavFeatureExtractionSplit(wavFeatureExtraction):
         return feExDict
 
 
+def wavLCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
+    """
+    Returns the data object of a collection of labelled wavs
+
+        ..... call type (classification) ....    
+    Used in experiment_callClf.ipynb
+
+
+    Parameters
+    ----------
+    wavLabelCollection : list of tuples/list
+        tu[0] : path to wav file
+        tu[1] : wav label
+    featExtFun : callable
+
+    Return
+    ------
+    > datO: myML.dataXy_names
+        data
+    """
+
+    datO = myML.dataXy_names() # initialise data object
+
+    for wavF, l in wavLabelCollection:
+        waveForm, fs = wav2waveform(wavF, fs=fs)#, normalize=False)
+        M = featExtFun(waveForm)
+        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])
+
+        #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
+    return datO
+
+
+
+
 #### DO WE STILL NEED THIS PART?!!!
 
 
@@ -680,32 +714,4 @@ def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
     return XyDict
 
 
-def wavLCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
-    """
-    Deprecated?
-    returns the data object of a collection of labelled wavs
 
-        ..... call type (classification) ....
-
-    Parameters
-    ----------
-    wavLabelCollection : list of tuples
-        tu[0] : path to wav file
-        tu[1] : wav label
-    featExtFun : callable
-
-    Return
-    ------
-    > datO: myML.dataXy_names
-        data
-    """
-
-    datO = myML.dataXy_names() # initialise data object
-
-    for wavF, l in wavLabelCollection:
-        waveForm, fs = wav2waveform(wavF, fs=fs)#, normalize=False)
-        M = featExtFun(waveForm)
-        datO.addInstances(np.expand_dims(M.flatten(), axis=0), [l])
-
-        #print(np.shape(M0), datO.shape, np.shape(datO.y), os.path.basename(wavF))
-    return datO
