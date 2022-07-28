@@ -149,7 +149,7 @@ def time2indices(t_0, t_f, tIntervals_arr):
 
 
 def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
-    """reads annotations into m-instances labels array
+    """reads annotations into m-instances labels array filling the gaps.
     Parameters
     ----------
     T: ndarray (m, 2), float
@@ -192,7 +192,7 @@ def annotations2instanceArray(T, L, m, tf, labelsHierarchy, gaps='b'):
 
     return labels_arr
 
-def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, gaps='b',
+def annotationsFi2instances(annFi, m, tf, labelsHierarchy=None, #gaps='b',
                             sep=None):
     """reads annotations from file into instances
     Parameters

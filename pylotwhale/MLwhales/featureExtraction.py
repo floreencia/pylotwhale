@@ -336,6 +336,7 @@ def wavFAnnF2sections_wavsEnsemble_datXy_names(wavF, annF, featExtFun=None,
                                                wavPreprocessingT=None,
                                                ensembleSettings=None):
     """
+    Deprecated?
     Computes the features of each annotated section in the wav file
     ment to be used with feature extraction 'split' 
 
@@ -389,6 +390,7 @@ def wavFAnnF2sections_wavsEnsemble_datXy_names(wavF, annF, featExtFun=None,
 def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun,
                                              wavPreprocessingT=None,
                                              ensembleSettings=None):
+    """Deprecated?"""
         
     datO = myML.dataXy_names() # initialise data object
     for wavF, annF in wavAnnColl[:]:
@@ -402,7 +404,9 @@ def wavAnnCollection2Xy_ensemble_datXy_names(wavAnnColl, featExtFun,
 
 
 def annotationsSamplesSpace(wavAnnColl):
-    """create dictionary of labels and a list of waveforms from collection"""
+    """
+    Deprecated?
+    create dictionary of labels and a list of waveforms from collection"""
     sampSpaceDi={}
     for wavF, annF in wavAnnColl:
         segmentsLi, fs = auf.getAnnWavSec(wavF, annF)
@@ -416,7 +420,9 @@ def annotationsSamplesSpace(wavAnnColl):
     return sampSpaceDi
 
 def waveformsLi2DatXy_names(waveformsLi, label, feExFun, nInstances):
-    """Extracts features from an waveformlist and returns data object"""
+    """
+    Deprecated?
+    Extracts features from an waveformlist and returns data object"""
     n_samps = len(waveformsLi)
     stopIdx=None
     if n_samps > nInstances:
@@ -431,7 +437,9 @@ def waveformsLi2DatXy_names(waveformsLi, label, feExFun, nInstances):
 
 def waveformsLi2aritificial_DatXy_names(waveformsLi, label, feExFun, n_instances,
                                         **ensemble_settings):
-    """takes a list of waveforms, all with the same label, generates artificial samples, 
+    """
+    Deprecated?
+    takes a list of waveforms, all with the same label, generates artificial samples, 
     extracts features and returns data object
     Parameters
     ---------
@@ -454,7 +462,9 @@ def waveformsLi2aritificial_DatXy_names(waveformsLi, label, feExFun, n_instances
     return datO
 
 def extractFeaturesWDataAugmentation(sampSpace, feExFun, n_instances = 10, **ensSettings):
-    """Prepares data with the labels in wavAnnCollection, 
+    """
+    Deprecated?
+    Prepares data with the labels in wavAnnCollection, 
     balancing the classes generating artificial samples
     Parameter
     ---------
@@ -486,6 +496,7 @@ def extractFeaturesWDataAugmentation(sampSpace, feExFun, n_instances = 10, **ens
 
 def get_DataXy_fromWavFannF(wavF, annF, feExFun, labelsHierarchy):
     """
+    Deprecated?
     extracts features and its labels (ground truth) from wavF and annF files
     and returns its dataXy_names instance
     ----------
@@ -517,6 +528,7 @@ def getXy_fromWavFAnnF(wavF, annF, feExFun, labelsHierarchy, filter_classes=None
 
 def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='default'):
     """
+    Deprecated?
     Extracts features and labels from wav-ann collection
     Parameters
     ----------
@@ -545,6 +557,7 @@ def wavAnnCollection2datXy(WavAnnCollection, feExFun=None, labelsHierarchy='defa
 
 def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='default'):
     """
+    Deprecated?
     Extracts features and labels from wav-ann collection    
     Parameters
     ----------
@@ -568,6 +581,7 @@ def wavAnnCollectionFi2datXy(WavAnnCollectionFi, feExFun=None, labelsHierarchy='
 
 def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
     """
+    Deprecated?
     Instantiates the annotated sections of a wavfile
     extracting a feature vector for each annotated section in the wav file
     meant to be used with feature extraction 'split'
@@ -604,6 +618,7 @@ def wavAnn2annSecs_dataXy_names(wavF, annF, featExtFun=None):
  
 def wavAnnCollection2annSecs_dataXy_names(wavAnnColl, featExtFun=None):
     """
+    Deprecated?
     Computes the X, y for a collection of annotated wav files
     for each annotated section in the wav file
     meant to be used with feature extraction 'split'
@@ -634,6 +649,7 @@ def wavAnnCollection2annSecs_dataXy_names(wavAnnColl, featExtFun=None):
     
 def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
     """
+    Deprecated?
     Computes the Xy-data-object and save it as a dictionary, 
     using the wavF and annF as dictionary keys,
     for a collection of annotated wav files
@@ -666,6 +682,7 @@ def wavAnnCollection2datXyDict(wavAnnColl, featExtFun=None):
 
 def wavLCollection2datXy(wavLabelCollection, fs=None, featExtFun=None):
     """
+    Deprecated?
     returns the data object of a collection of labelled wavs
 
         ..... call type (classification) ....
