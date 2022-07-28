@@ -352,7 +352,9 @@ def plConfusionMatrix(cM, labels, outFig='', fontSz=20, figsize=None,
     ax.set_ylabel('true label')
     if title: ax.set_title(title)
     
-    if outFig: fig.savefig(outFig)    
+    if outFig: fig.savefig(outFig)  
+
+    return fig , ax 
     
 ### learning curve
 
